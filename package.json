@@ -22,6 +22,7 @@
     "wepack-cli": "^0.0.1-security"
   },
   "dependencies": {
+    "@aws-sdk/client-ec2": "^3.345.0",
     "uglifyjs-webpack-plugin": "^2.2.0"
   }
 }
