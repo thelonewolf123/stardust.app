@@ -1,1 +1,1 @@
-export * from './calculator'
+console.log('Hello, world')
