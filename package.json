@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack-cli --watch && node dist/server.js"
+    "dev": "webpack-cli --watch && node dist/server.js",
+    "build": "webpack-cli"
   },
   "keywords": [],
   "author": "",
