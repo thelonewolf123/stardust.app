@@ -9,7 +9,7 @@ async function startContainer(imageName: string) {
     return containerId
 }
 
-async function deleteContainer(containerId: string) {
+async function killContainer(containerId: string) {
     const ps = spawn('podman', ['kill', containerId])
     await new Promise((r) => ps.on('exit', r))
     return containerId
@@ -37,4 +37,4 @@ async function restoreCheckpoint(backupFileName: string) {
     return containerId
 }
 
-export { startContainer, deleteContainer, createCheckpoint, restoreCheckpoint }
+export { startContainer, killContainer, createCheckpoint, restoreCheckpoint }
