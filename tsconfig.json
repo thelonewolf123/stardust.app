@@ -12,5 +12,5 @@
         "strict": true,
         "forceConsistentCasingInFileNames": true
     },
-    "include": ["src"]
+    "include": ["packages/backend/aws", "packages/spot/docker"]
 }

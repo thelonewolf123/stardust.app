@@ -13,7 +13,7 @@ export const s3Client = new S3({
         accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
         secretAccessKey: process.env.AWS_ACCESS_KEY_SECRET || ''
     },
-    region: 'ap-south-1'
+    region: 'us-east-1'
 })
 
 const CONTAINER_BUCKET_NAME = process.env.CONTAINER_BUCKET_NAME

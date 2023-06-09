@@ -27,7 +27,9 @@
   "dependencies": {
     "@aws-sdk/client-ec2": "^3.345.0",
     "@aws-sdk/client-s3": "^3.348.0",
+    "@t3-oss/env-nextjs": "^0.4.0",
     "@types/uuid": "^9.0.2",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "zod": "^3.21.4"
   }
 }
