@@ -12,5 +12,6 @@
         "strict": true,
         "forceConsistentCasingInFileNames": true
     },
-    "include": ["packages/backend/aws", "packages/spot/docker"]
+    "exclude": ["**/dist/**"],
+    "include": ["packages/**/**.ts"]
 }

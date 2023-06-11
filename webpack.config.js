@@ -3,7 +3,9 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
 module.exports = {
     entry: {
-        backend: path.resolve(__dirname, 'packages/backend/index.ts')
+        backend: path.resolve(__dirname, 'packages/backend/index.ts'),
+        spot: path.resolve(__dirname, 'packages/spot/index.ts'),
+        lambda: path.resolve(__dirname, 'packages/lambda/index.ts')
     },
     module: {
         rules: [
