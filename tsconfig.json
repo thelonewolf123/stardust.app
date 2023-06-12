@@ -9,6 +9,7 @@
         "moduleResolution": "node",
         "outDir": "./dist",
         "rootDir": ".",
+        "esModuleInterop": true,
         "strict": true,
         "forceConsistentCasingInFileNames": true
     },
