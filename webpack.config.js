@@ -16,7 +16,7 @@ module.exports = {
             }
         ]
     },
-    resolve: { extensions: ['.ts'] },
+    resolve: { extensions: ['.ts', '.js'] },
     output: {
         chunkFilename: '[name].js',
         filename: '[name].js'
