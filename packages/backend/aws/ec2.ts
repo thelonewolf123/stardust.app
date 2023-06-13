@@ -14,16 +14,25 @@ const client = new EC2Client({
 })
 
 function requestEc2SpotInstance(count: number) {
-    const command = new RequestSpotInstancesCommand({
-        InstanceCount: count,
-        LaunchSpecification: {
-            ImageId: 'ami-02e726886cc4f5795',
-            InstanceType: 'm3.medium',
-            SecurityGroupIds: ['sg-005992c68c98aeca5']
-        },
-        SpotPrice: '0.050',
-        ValidUntil: new Date(Date.now() + 600_000), // valid for 10 mins from request!
-        Type: 'one-time'
+    const command = new RequestSpotFleetCommand({
+        SpotFleetRequestConfig: {
+            SpotPrice: '0.050',
+            IamFleetRole:
+                'arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetTaggingRole',
+            LaunchSpecifications: [
+                {
+                    ImageId: 'ami-02e726886cc4f5795',
+                    SecurityGroups: [{ GroupId: 'sg-005992c68c98aeca5' }],
+                    InstanceRequirements: {
+                        VCpuCount: { Min: 1, Max: 2 },
+                        MemoryMiB: { Max: 8192 }
+                    }
+                }
+            ],
+            TargetCapacity: count,
+            ValidUntil: new Date(Date.now() + 600_000), // valid for 10 mins from request!
+            Type: 'one-time'
+        }
     })
 
     return client.send(command)
