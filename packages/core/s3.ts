@@ -7,6 +7,7 @@ import {
 } from '@aws-sdk/client-s3'
 import { readFileSync } from 'fs'
 import { writeFile } from 'fs/promises'
+import { env } from '../env'
 
 export const s3Client = new S3({
     credentials: {
@@ -16,11 +17,9 @@ export const s3Client = new S3({
     region: 'us-east-1'
 })
 
-const CONTAINER_BUCKET_NAME = process.env.CONTAINER_BUCKET_NAME
-
 async function isFileExist(slug: string) {
     const cmd = new HeadObjectCommand({
-        Bucket: CONTAINER_BUCKET_NAME,
+        Bucket: env.CONTAINER_BUCKET_NAME,
         Key: slug
     })
     return s3Client.send(cmd)
@@ -28,7 +27,7 @@ async function isFileExist(slug: string) {
 
 async function uploadFile(slug: string, path: string) {
     const cmd = new PutObjectCommand({
-        Bucket: CONTAINER_BUCKET_NAME,
+        Bucket: env.CONTAINER_BUCKET_NAME,
         Key: slug,
         Body: readFileSync(path)
     })
@@ -37,7 +36,7 @@ async function uploadFile(slug: string, path: string) {
 
 async function deleteFile(slug: string, path: string) {
     const cmd = new DeleteObjectCommand({
-        Bucket: CONTAINER_BUCKET_NAME,
+        Bucket: env.CONTAINER_BUCKET_NAME,
         Key: slug
     })
     return s3Client.send(cmd)
@@ -45,7 +44,7 @@ async function deleteFile(slug: string, path: string) {
 
 async function downloadFile(slug: string, path: string) {
     const cmd = new GetObjectCommand({
-        Bucket: CONTAINER_BUCKET_NAME,
+        Bucket: env.CONTAINER_BUCKET_NAME,
         Key: slug
     })
 

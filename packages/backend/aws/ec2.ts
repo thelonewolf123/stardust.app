@@ -7,8 +7,8 @@ import { env } from '../../env'
 
 const client = new EC2Client({
     credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
-        secretAccessKey: process.env.AWS_ACCESS_KEY_SECRET || ''
+        accessKeyId: env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: env.AWS_ACCESS_KEY_SECRET
     },
     region: env.AWS_REGION
 })
