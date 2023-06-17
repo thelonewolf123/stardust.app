@@ -18,7 +18,9 @@ export const env = createEnv({
         CONTAINER_BUCKET_NAME: z.string().min(1),
 
         NODE_ENV: z.enum(['development', 'production']),
-        DEPLOYMENT_ENV: z.enum(['local', 'aws'])
+        DEPLOYMENT_ENV: z.enum(['local', 'aws']),
+
+        RABBITMQ_URL: z.string().url()
     },
     client: {},
     runtimeEnv: {
@@ -31,6 +33,8 @@ export const env = createEnv({
 
         NODE_ENV: process.env.NODE_ENV,
 
-        DEPLOYMENT_ENV: process.env.DEPLOYMENT_ENV
+        DEPLOYMENT_ENV: process.env.DEPLOYMENT_ENV,
+
+        RABBITMQ_URL: process.env.RABBITMQ_URL
     }
 })
