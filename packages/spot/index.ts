@@ -1,45 +1,40 @@
-import { connect } from 'amqplib'
+import { createConsumer, createQueue, getClient } from '../core/queue'
 
 async function start() {
-    const client = await connect(process.env.RABBITMQ_URL || '')
-    var ch = await client.createChannel()
-    var exch = 'test_exchange'
-    var q = 'test_queue'
-    var rkey = 'test_route'
-    var msg = 'Hello World!'
-    await ch
-        .assertExchange(exch, 'direct', { durable: true })
-        .catch(console.error)
-    await ch.assertQueue(q, { durable: true })
-    await ch.bindQueue(q, exch, rkey)
-    await ch.publish(exch, rkey, Buffer.from(msg))
+    const exchange = 'test_exchange'
+    const queue = 'test_queue'
+    const routingKey = 'test_route'
+    const msg = 'Hello World!'
 
-    setTimeout(function () {
-        ch.close()
-        client.close()
-    }, 500)
+    const amqp = await getClient()
+    if (!amqp) throw new Error('AMQP connection is missing!')
+
+    const channel = await createQueue(amqp, { exchange, queue, routingKey })
+    await channel.publish(exchange, routingKey, Buffer.from(msg))
+
+    setInterval(async () => {
+        await channel.publish(
+            exchange,
+            routingKey,
+            Buffer.from(`${msg} ${new Date()}`)
+        )
+    }, 1000)
 }
 
 async function do_consume() {
-    var conn = await connect(process.env.RABBITMQ_URL || '', 'heartbeat=60')
-    var ch = await conn.createChannel()
-    var q = 'test_queue'
-    await conn.createChannel()
-    await ch.assertQueue(q, { durable: true })
-    await ch.consume(
-        q,
-        function (msg) {
+    const amqp = await getClient()
+    const queue = 'test_queue'
+    if (!amqp) throw new Error('AMQP connection is missing!')
+    const channel = await createConsumer(amqp, { queue })
+    await channel.consume(
+        queue,
+        (msg) => {
             if (!msg) return
             console.log(msg.content.toString())
-            ch.ack(msg)
-            ch.cancel('myconsumer')
+            channel.ack(msg)
         },
         { consumerTag: 'myconsumer' }
     )
-    setTimeout(function () {
-        ch.close()
-        conn.close()
-    }, 500)
 }
 
 do_consume()

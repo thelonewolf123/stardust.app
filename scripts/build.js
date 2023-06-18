@@ -21,7 +21,7 @@ Object.entries(entries).map((value) => {
         ...sharedConfig,
         entryPoints: [path],
         platform: 'node', // for CJS
-        outfile: `dist/${name}.js`,
+        outfile: `dist/${name}.bundle.js`,
         sourcemap: true
     })
 })
