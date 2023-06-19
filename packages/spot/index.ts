@@ -9,32 +9,32 @@ async function start() {
     const amqp = await getClient()
     if (!amqp) throw new Error('AMQP connection is missing!')
 
-    const channel = await createQueue(amqp, { exchange, queue, routingKey })
-    await channel.publish(exchange, routingKey, Buffer.from(msg))
+    const { channel, publish } = await createQueue(amqp, {
+        exchange,
+        queue,
+        routingKey
+    })
+
+    await publish({ message: msg })
 
     setInterval(async () => {
-        await channel.publish(
-            exchange,
-            routingKey,
-            Buffer.from(`${msg} ${new Date()}`)
-        )
+        await publish({ message: msg })
     }, 1000)
 }
 
 async function do_consume() {
     const amqp = await getClient()
     const queue = 'test_queue'
+    const consumerTag = 'myconsumer'
+
     if (!amqp) throw new Error('AMQP connection is missing!')
-    const channel = await createConsumer(amqp, { queue })
-    await channel.consume(
-        queue,
-        (msg) => {
-            if (!msg) return
-            console.log(msg.content.toString())
-            channel.ack(msg)
-        },
-        { consumerTag: 'myconsumer' }
-    )
+    const { channel, onMessage } = await createConsumer(amqp, { queue })
+
+    await onMessage((msg) => {
+        if (!msg) return
+        console.log(msg.content.toString())
+        channel.ack(msg)
+    }, consumerTag)
 }
 
 do_consume()

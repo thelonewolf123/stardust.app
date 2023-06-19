@@ -1,4 +1,4 @@
-import { connect, type Connection } from 'amqplib'
+import { connect, ConsumeMessage, type Connection } from 'amqplib'
 import { env } from '../env'
 
 let connection: Connection | null = null
@@ -25,13 +25,27 @@ async function createQueue(
         .catch(console.error)
     await channel.assertQueue(queue, { durable: true })
     await channel.bindQueue(queue, exchange, routingKey)
-    return channel
+    const publish = (message: Record<string, unknown>) => {
+        return channel.publish(
+            exchange,
+            routingKey,
+            Buffer.from(JSON.stringify(message))
+        )
+    }
+
+    return { channel, publish }
 }
 
 async function createConsumer(amqp: Connection, args: { queue: string }) {
     var channel = await amqp.createChannel()
     await channel.assertQueue(args.queue, { durable: true })
-    return channel
+    const onMessage = (
+        fn: (msg: ConsumeMessage | null) => void,
+        consumerTag: string
+    ) => {
+        return channel.consume(args.queue, fn, { consumerTag })
+    }
+    return { channel, onMessage }
 }
 
 export { getClient, createQueue, createConsumer }
