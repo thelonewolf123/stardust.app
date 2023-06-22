@@ -41,7 +41,7 @@ async function createConsumer(amqp: Connection, args: { queue: string }) {
     await channel.assertQueue(args.queue, { durable: true })
     const onMessage = (
         fn: (msg: ConsumeMessage | null) => void,
-        consumerTag: string
+        consumerTag?: string
     ) => {
         return channel.consume(args.queue, fn, { consumerTag })
     }

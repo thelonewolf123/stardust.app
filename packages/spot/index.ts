@@ -1,4 +1,10 @@
-import { createConsumer, createQueue, getClient } from '../core/queue'
+import {
+    createConsumer,
+    createQueue,
+    getClient,
+    queueManager
+} from '../core/queue'
+import { S3BackupMessage } from '../types'
 
 async function start() {
     const exchange = 'test_exchange'
@@ -39,3 +45,18 @@ async function do_consume() {
 
 do_consume()
 start()
+
+const setupListener = async () => {
+    const exchange = 'test_exchange'
+    const queue = 'local-instance-queue'
+    const routingKey = 'instanceTermination'
+
+    const { onMessage } = await queueManager({ exchange, queue, routingKey })
+
+    await onMessage((message) => {
+        if (!message) return
+        const data: S3BackupMessage = JSON.parse(message.content.toString())
+        if (data.type === 's3-backup') {
+        }
+    })
+}

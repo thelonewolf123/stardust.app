@@ -12,7 +12,7 @@ async function start() {
         routingKey
     })
 
-    await publish({ instanceId: msg })
+    await publish({ type: msg })
     await channel.close()
     await client.close()
 }
