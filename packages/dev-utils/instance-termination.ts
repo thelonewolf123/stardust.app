@@ -1,7 +1,7 @@
 import { createQueue, getClient, queueManager } from '../core/queue'
 
 async function start() {
-    const exchange = 'test_exchange'
+    const exchange = 'worker_exchange'
     const queue = 'local-instance-queue'
     const routingKey = 'instanceTermination'
     const msg = 's3-backup'

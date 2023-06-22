@@ -1,3 +1,8 @@
-export type S3BackupMessage = {
-    type: 's3-backup'
-}
+export type WorkerQueueMessage =
+    | {
+          type: 's3-backup'
+      }
+    | {
+          type: 's3-restore'
+          filename: string
+      }

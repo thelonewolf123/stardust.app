@@ -37,4 +37,19 @@ async function restoreCheckpoint(backupFileName: string) {
     return containerId
 }
 
-export { startContainer, killContainer, createCheckpoint, restoreCheckpoint }
+async function getAllContainers() {
+    // podman ps -a -q
+    const ps = spawn('podman', ['ps', '-a', '-q'])
+    let containerIds = ''
+    ps.stdout.on('data', (chunk) => (containerIds += chunk))
+    await new Promise((r) => ps.on('exit', r))
+    return containerIds.split('\n')
+}
+
+export {
+    startContainer,
+    killContainer,
+    createCheckpoint,
+    restoreCheckpoint,
+    getAllContainers
+}

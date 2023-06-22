@@ -1,62 +1,22 @@
-import {
-    createConsumer,
-    createQueue,
-    getClient,
-    queueManager
-} from '../core/queue'
-import { S3BackupMessage } from '../types'
-
-async function start() {
-    const exchange = 'test_exchange'
-    const queue = 'test_queue'
-    const routingKey = 'test_route'
-    const msg = 'Hello World!'
-
-    const amqp = await getClient()
-    if (!amqp) throw new Error('AMQP connection is missing!')
-
-    const { channel, publish } = await createQueue(amqp, {
-        exchange,
-        queue,
-        routingKey
-    })
-
-    await publish({ message: msg })
-
-    setInterval(async () => {
-        await publish({ message: msg })
-    }, 1000)
-}
-
-async function do_consume() {
-    const amqp = await getClient()
-    const queue = 'test_queue'
-    const consumerTag = 'myconsumer'
-
-    if (!amqp) throw new Error('AMQP connection is missing!')
-    const { channel, onMessage } = await createConsumer(amqp, { queue })
-
-    await onMessage((msg) => {
-        if (!msg) return
-        console.log(msg.content.toString())
-        channel.ack(msg)
-    }, consumerTag)
-}
-
-do_consume()
-start()
+import { queueManager } from '../core/queue'
+import { WorkerQueueMessage } from '../types'
+import { getAllContainers } from './docker'
 
 const setupListener = async () => {
-    const exchange = 'test_exchange'
+    const exchange = 'worker_exchange'
     const queue = 'local-instance-queue'
     const routingKey = 'instanceTermination'
 
     const { onMessage } = await queueManager({ exchange, queue, routingKey })
 
-    await onMessage((message) => {
+    await onMessage(async (message) => {
         if (!message) return
-        const data: S3BackupMessage = JSON.parse(message.content.toString())
-        if (data.type === 's3-backup') {
-        }
+        const data: WorkerQueueMessage = JSON.parse(message.content.toString())
+        if (data.type !== 's3-backup') return
+        console.log('container backup')
+        const allContainer = await getAllContainers()
+        console.log(allContainer)
     })
 }
+
+setupListener()
