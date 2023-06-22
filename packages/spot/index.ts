@@ -7,7 +7,11 @@ const setupListener = async () => {
     const queue = 'local-instance-queue'
     const routingKey = 'instanceTermination'
 
-    const { onMessage } = await queueManager({ exchange, queue, routingKey })
+    const { onMessage, receiveChannel } = await queueManager({
+        exchange,
+        queue,
+        routingKey
+    })
 
     await onMessage(async (message) => {
         if (!message) return
@@ -16,6 +20,7 @@ const setupListener = async () => {
         console.log('container backup')
         const allContainer = await getAllContainers()
         console.log(allContainer)
+        receiveChannel.ack(message)
     })
 }
 

@@ -56,13 +56,16 @@ const queueManager = async (args: {
     const { queue, routingKey, exchange } = args
     const client = await getClient()
     if (!client) throw new Error('AMQP connection missing!')
-    const { channel, publish } = await createQueue(client, {
+    const { channel: sendChannel, publish } = await createQueue(client, {
         queue,
         routingKey,
         exchange
     })
-    const { channel: _, onMessage } = await createConsumer(client, { queue })
-    return { onMessage, publish, channel, client }
+    const { channel: receiveChannel, onMessage } = await createConsumer(
+        client,
+        { queue }
+    )
+    return { onMessage, publish, sendChannel, client, receiveChannel }
 }
 
 export { getClient, createQueue, createConsumer, queueManager }
