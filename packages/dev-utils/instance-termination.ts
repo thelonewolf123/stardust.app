@@ -1,19 +1,20 @@
-import { createQueue, getClient } from '../core/queue'
+import { createQueue, getClient, queueManager } from '../core/queue'
 
 async function start() {
     const exchange = 'test_exchange'
-    const queue = 'test_queue'
-    const routingKey = 'test_route'
-    const msg = 'Hello World!'
+    const queue = 'local-instance-queue'
+    const routingKey = 'instanceTermination'
+    const msg = 's3-backup'
 
-    const amqp = await getClient()
-    if (!amqp) throw new Error('AMQP connection is missing!')
-
-    const { channel, publish } = await createQueue(amqp, {
+    const { channel, publish, client } = await queueManager({
         exchange,
         queue,
         routingKey
     })
 
     await publish({ instanceId: msg })
+    await channel.close()
+    await client.close()
 }
+
+start()

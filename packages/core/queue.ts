@@ -4,7 +4,7 @@ import { env } from '../env'
 let connection: Connection | null = null
 
 async function getClient() {
-    if (!connection) return connection
+    if (connection) return connection
     connection = await connect(env.RABBITMQ_URL)
     return connection
 }
@@ -48,4 +48,21 @@ async function createConsumer(amqp: Connection, args: { queue: string }) {
     return { channel, onMessage }
 }
 
-export { getClient, createQueue, createConsumer }
+const queueManager = async (args: {
+    queue: string
+    routingKey: string
+    exchange: string
+}) => {
+    const { queue, routingKey, exchange } = args
+    const client = await getClient()
+    if (!client) throw new Error('AMQP connection missing!')
+    const { channel, publish } = await createQueue(client, {
+        queue,
+        routingKey,
+        exchange
+    })
+    const { channel: _, onMessage } = await createConsumer(client, { queue })
+    return { onMessage, publish, channel, client }
+}
+
+export { getClient, createQueue, createConsumer, queueManager }
