@@ -6,18 +6,14 @@ async function start() {
     const routingKey = 'instanceTermination'
     const msg = 's3-backup'
 
-    const {
-        sendChannel: channel,
-        publish,
-        client
-    } = await queueManager({
+    const { channel, publish, client } = await queueManager({
         exchange,
         queue,
         routingKey
     })
 
     await publish({ type: msg })
-    await channel.close()
+    await channel.sender.close()
     await client.close()
 }
 

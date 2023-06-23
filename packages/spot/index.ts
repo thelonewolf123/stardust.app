@@ -1,13 +1,13 @@
 import { queueManager } from '../core/queue'
 import { WorkerQueueMessage } from '../types'
-import { getAllContainers } from './docker'
+import { createCheckpoint, getAllContainers } from './docker'
 
 const setupListener = async () => {
     const exchange = 'worker_exchange'
     const queue = 'local-instance-queue'
     const routingKey = 'instanceTermination'
 
-    const { onMessage, receiveChannel } = await queueManager({
+    const { onMessage, channel } = await queueManager({
         exchange,
         queue,
         routingKey
@@ -19,8 +19,9 @@ const setupListener = async () => {
         if (data.type !== 's3-backup') return
         console.log('container backup')
         const allContainer = await getAllContainers()
+        await Promise.all(allContainer.map((id) => createCheckpoint(id)))
         console.log(allContainer)
-        receiveChannel.ack(message)
+        channel.receiver.ack(message)
     })
 }
 
