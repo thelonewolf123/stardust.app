@@ -1,4 +1,4 @@
-import { createQueue, getClient, queueManager } from '../core/queue'
+import { queueManager } from '../core/queue'
 
 async function start() {
     const exchange = 'worker_exchange'
