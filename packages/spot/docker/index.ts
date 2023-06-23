@@ -18,7 +18,7 @@ async function killContainer(containerId: string) {
 }
 
 async function createCheckpoint(containerId: string) {
-    const backup = path.join(env.CHECKPOINT_PATH, `${v4()}.tar.gz`)
+    const backup = path.join(env.CHECKPOINT_PATH, `${containerId}.tar.gz`)
     const ps = spawn('podman', [
         'container',
         'checkpoint',
@@ -26,15 +26,20 @@ async function createCheckpoint(containerId: string) {
         '-e',
         backup
     ])
-
-    await new Promise((r) => ps.on('exit', r))
+    await new Promise((resolve, reject) => {
+        ps.on('error', (error) => reject(error))
+        ps.on('exit', resolve)
+    })
     return backup
 }
 
 async function restoreCheckpoint(backupFileName: string) {
     const backupFullPath = path.join(env.CHECKPOINT_PATH, backupFileName)
     const ps = spawn('podman', ['container', 'restore', '-i', backupFullPath])
-    await new Promise((r) => ps.on('exit', r))
+    await new Promise((resolve, reject) => {
+        ps.on('error', (error) => reject(error))
+        ps.on('exit', resolve)
+    })
     let containerId = ''
     ps.stdout.on('data', (chunk) => (containerId += chunk))
     return containerId

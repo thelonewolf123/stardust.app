@@ -2,9 +2,10 @@
 import { createEnv } from '@t3-oss/env-nextjs'
 import { z } from 'zod'
 import { configDotenv } from 'dotenv'
+
 if (process.env.NODE_ENV === 'development') {
     configDotenv({
-        path: '../.env.local'
+        path: './.env.local'
     })
 }
 
