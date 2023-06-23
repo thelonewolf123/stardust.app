@@ -19,8 +19,10 @@ const setupListener = async () => {
         if (data.type !== 's3-backup') return
         console.log('container backup')
         const allContainer = await getAllContainers()
-        await Promise.all(allContainer.map((id) => createCheckpoint(id)))
-        console.log(allContainer)
+        const backups = await Promise.all(
+            allContainer.map((id) => createCheckpoint(id))
+        )
+        console.log(allContainer, backups)
         channel.receiver.ack(message)
     })
 }

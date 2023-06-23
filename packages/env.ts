@@ -18,6 +18,7 @@ export const env = createEnv({
         CONTAINER_BUCKET_NAME: z.string().min(1),
         NODE_ENV: z.enum(['development', 'production']),
         DEPLOYMENT_ENV: z.enum(['local', 'aws']),
+        CHECKPOINT_PATH: z.string().min(1),
         SPOT_INSTANCE_ID: z.string().min(1),
         RABBITMQ_URL: z.string().url()
     },
@@ -31,6 +32,7 @@ export const env = createEnv({
         CONTAINER_BUCKET_NAME: process.env.CONTAINER_BUCKET_NAME,
         NODE_ENV: process.env.NODE_ENV,
         DEPLOYMENT_ENV: process.env.DEPLOYMENT_ENV,
+        CHECKPOINT_PATH: process.env.CHECKPOINT_PATH,
         SPOT_INSTANCE_ID: process.env.SPOT_INSTANCE_ID,
         RABBITMQ_URL: process.env.RABBITMQ_URL
     }
