@@ -1,4 +1,5 @@
-import { connect, ConsumeMessage, type Connection } from 'amqplib'
+import { connect, Connection, ConsumeMessage } from 'amqplib'
+
 import { env } from '../env'
 
 let connection: Connection | null = null
@@ -68,7 +69,12 @@ const queueManager = async (args: {
         onMessage,
         publish,
         client,
-        channel: { sender, receiver }
+        channel: { sender, receiver },
+        cleanup: async () => {
+            await sender.close()
+            await receiver.close()
+            await client.close()
+        }
     }
 }
 

@@ -7,7 +7,7 @@ const setupListener = async () => {
     const queue = 'local-instance-queue'
     const routingKey = 'instanceTermination'
 
-    const { onMessage, channel } = await queueManager({
+    const { onMessage, channel, cleanup } = await queueManager({
         exchange,
         queue,
         routingKey
@@ -24,6 +24,11 @@ const setupListener = async () => {
         )
         console.log(allContainer, backups)
         channel.receiver.ack(message)
+    })
+
+    process.on('SIGINT', async () => {
+        await cleanup()
+        process.exit(0)
     })
 }
 

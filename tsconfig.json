@@ -11,7 +11,9 @@
         "rootDir": ".",
         "esModuleInterop": true,
         "strict": true,
-        "forceConsistentCasingInFileNames": true
+        "forceConsistentCasingInFileNames": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
     },
     "exclude": ["**/dist/**"],
     "include": ["packages/**/**.ts", "packages/infra/env.ts"]

@@ -2,6 +2,7 @@ import {
     APIGatewayProxyEvent,
     APIGatewayProxyResult
 } from 'aws-lambda/trigger/api-gateway-proxy'
+
 export const lambdaHandler = async (
     event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
