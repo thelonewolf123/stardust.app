@@ -1,7 +1,8 @@
-// src/env.mjs
-import { createEnv } from '@t3-oss/env-nextjs'
-import { z } from 'zod'
 import { configDotenv } from 'dotenv'
+import { z } from 'zod'
+
+// @ts-ignore
+import { createEnv } from '@t3-oss/env-nextjs'
 
 if (process.env.NODE_ENV === 'development') {
     configDotenv({

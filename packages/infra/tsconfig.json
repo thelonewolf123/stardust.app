@@ -10,9 +10,9 @@
         "pretty": true,
         "noFallthroughCasesInSwitch": true,
         "noImplicitReturns": true,
+        "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true
     },
-    "files": [
-        "index.ts"
-    ]
+    "files": ["index.ts", "env.ts"],
+    "include": ["*.ts", "env.ts"]
 }

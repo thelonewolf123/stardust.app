@@ -14,5 +14,5 @@
         "forceConsistentCasingInFileNames": true
     },
     "exclude": ["**/dist/**"],
-    "include": ["packages/**/**.ts"]
+    "include": ["packages/**/**.ts", "packages/infra/env.ts"]
 }
