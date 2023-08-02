@@ -3,7 +3,8 @@ import {
     RequestSpotFleetCommand,
     RequestSpotInstancesCommand
 } from '@aws-sdk/client-ec2'
-import { env } from '../../env'
+
+import { env } from '../../../env'
 
 const client = new EC2Client({
     credentials: {
