@@ -1,13 +1,10 @@
 import * as aws from '@pulumi/aws'
-import * as awsx from '@pulumi/awsx'
-import * as pulumi from '@pulumi/pulumi'
 
-import { env } from '../../env'
 import * as awsInfra from '../constants/aws-infra'
 import { generateSshKey } from '../utils'
+import { privateKeyBucket } from './s3'
 
 const privateKey = generateSshKey()
-const privateKeyBucket = new aws.s3.Bucket(env.PRIVATE_KEY_BUCKET_NAME)
 
 export const privateKeyBucketId = privateKeyBucket.id
 

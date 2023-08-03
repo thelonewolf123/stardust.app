@@ -1,22 +1,22 @@
 import * as aws from '@pulumi/aws'
-import * as awsx from '@pulumi/awsx'
-import * as pulumi from '@pulumi/pulumi'
 
-export const ubuntuAmi = pulumi.output(
-    aws.ec2.getAmi({
-        filters: [
-            {
-                name: 'name',
-                values: [
-                    'ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*'
-                ]
-            },
-            {
-                name: 'virtualization-type',
-                values: ['hvm']
-            }
-        ],
-        owners: ['099720109477'], // Canonical
-        mostRecent: true
-    })
-)
+import * as awsInfra from '../constants/aws-infra'
+import { ubuntuAmi } from './ami'
+import { securityGroup } from './security-group'
+import { keyPair } from './ssh-keystore'
+
+export const instance = new aws.ec2.Instance(awsInfra.EC2_INSTANCE_NAME, {
+    ami: ubuntuAmi.apply((ami) => ami.id),
+    instanceType: awsInfra.EC2_INSTANCE_TYPE,
+    keyName: keyPair.id.apply((keyName) => keyName),
+    vpcSecurityGroupIds: [securityGroup.id.apply((id) => id)],
+    tags: {
+        Name: awsInfra.EC2_INSTANCE_NAME
+    },
+    userData: `#!/bin/bash
+    sudo apt-get update
+    sudo apt-get install -y docker.io git curl
+    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+    `
+})
