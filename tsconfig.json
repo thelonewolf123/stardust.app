@@ -16,5 +16,5 @@
         "emitDecoratorMetadata": true
     },
     "exclude": ["**/dist/**"],
-    "include": ["packages/**/**.ts", "packages/infra/env.ts"]
+    "include": ["packages/**/**.ts", "packages/infra/env.ts", "global.d.ts"]
 }

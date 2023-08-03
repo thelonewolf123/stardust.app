@@ -1,7 +1,8 @@
-// src/env.mjs
-import { createEnv } from '@t3-oss/env-nextjs'
-import { z } from 'zod'
 import { configDotenv } from 'dotenv'
+import { z } from 'zod'
+
+// @ts-ignore
+import { createEnv } from '@t3-oss/env-nextjs'
 
 if (process.env.NODE_ENV === 'development') {
     configDotenv({
@@ -15,6 +16,8 @@ export const env = createEnv({
 
         AWS_ACCESS_KEY_ID: z.string().min(1),
         AWS_ACCESS_KEY_SECRET: z.string().min(1),
+        DATABASE_NAME: z.string().min(1),
+        PRIVATE_KEY_BUCKET_NAME: z.string().min(1),
         AWS_REGION: z.string().min(1),
         CONTAINER_BUCKET_NAME: z.string().min(1),
         NODE_ENV: z.enum(['development', 'production']),
@@ -26,6 +29,8 @@ export const env = createEnv({
     client: {},
     runtimeEnv: {
         MONGODB_URI: process.env.MONGODB_URI,
+        PRIVATE_KEY_BUCKET_NAME: process.env.PRIVATE_KEY_BUCKET_NAME,
+        DATABASE_NAME: process.env.DATABASE_NAME,
 
         AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
         AWS_ACCESS_KEY_SECRET: process.env.AWS_ACCESS_KEY_SECRET,

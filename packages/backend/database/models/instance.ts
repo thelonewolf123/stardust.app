@@ -7,8 +7,14 @@ class InstanceClass {
     @prop({ required: true })
     public amiId!: string
 
-    @prop({ required: true })
-    public status!: string
+    @prop({
+        required: true,
+        enum: ['scheduled', 'running', 'stopped', 'terminated']
+    })
+    public status!: 'scheduled' | 'running' | 'stopped' | 'terminated'
+
+    @prop({ required: false })
+    public isTerminatedByHealthCheck!: boolean
 
     @prop({ required: true })
     public createdAt!: Date
