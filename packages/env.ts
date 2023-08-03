@@ -1,4 +1,5 @@
 import { configDotenv } from 'dotenv'
+import path from 'path'
 import { z } from 'zod'
 
 // @ts-ignore
@@ -6,7 +7,10 @@ import { createEnv } from '@t3-oss/env-nextjs'
 
 if (process.env.NODE_ENV === 'development') {
     configDotenv({
-        path: './.env.local'
+        path: path.join(
+            process.env.PROJECT_ROOT || '/Users/harish/Work/soul-forge', // edit based on your system path
+            './.env.local'
+        )
     })
 }
 

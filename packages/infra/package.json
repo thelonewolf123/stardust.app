@@ -2,8 +2,7 @@
     "name": "infra-soul-forge",
     "main": "index.ts",
     "devDependencies": {
-        "@types/node": "^16",
-        "@types/ssh2": "^1.11.13"
+        "@types/node": "^16"
     },
     "dependencies": {
         "@pulumi/aws": "^5.0.0",
@@ -11,7 +10,6 @@
         "@pulumi/pulumi": "^3.0.0",
         "@t3-oss/env-nextjs": "^0.6.0",
         "dotenv": "^16.3.1",
-        "ssh2": "^1.14.0",
         "zod": "^3.21.4"
     }
 }

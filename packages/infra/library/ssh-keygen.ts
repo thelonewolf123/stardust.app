@@ -1,4 +1,4 @@
-import { exec, execSync } from 'child_process'
+import { execSync } from 'child_process'
 import { existsSync, readFileSync } from 'fs'
 
 export function generateSshKey() {
@@ -7,10 +7,13 @@ export function generateSshKey() {
         existsSync('./infra-public-key.pub')
 
     if (!isKeyExist) {
-        execSync('rm -rf ./infra-private-key.pem ./infra-public-key.pub')
-        execSync('ssh-keygen -t rsa -b 4096 -f ./infra-private-key -N ""')
-        execSync('mv ./infra-private-key ./infra-private-key.pem')
-        execSync('mv ./infra-private-key.pub ./infra-public-key.pub')
+        execSync(`
+#!/bin/bash
+rm -rf ./infra-private-key.pem ./infra-public-key.pub
+ssh-keygen -t rsa -b 4096 -f ./infra-private-key -N ""
+mv ./infra-private-key ./infra-private-key.pem
+mv ./infra-private-key.pub ./infra-public-key.pub
+        `)
     }
 
     return {

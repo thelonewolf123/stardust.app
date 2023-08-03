@@ -2,8 +2,8 @@ import * as aws from '@pulumi/aws'
 import * as awsx from '@pulumi/awsx'
 import * as pulumi from '@pulumi/pulumi'
 
+import { env } from '../env'
 import * as awsInfra from './constants/aws-infra'
-import { env } from './env'
 import { generateSshKey } from './library/ssh-keygen'
 
 const bucket = new aws.s3.Bucket(env.CONTAINER_BUCKET_NAME)
@@ -58,7 +58,6 @@ const securityGroup = new aws.ec2.SecurityGroup(
         description: 'Allow inbound traffic on ports 22, 80, 443'
     }
 )
-
 for (const port of [22, 80, 443]) {
     new aws.ec2.SecurityGroupRule(`sgRule${port}`, {
         type: 'ingress',
@@ -69,6 +68,7 @@ for (const port of [22, 80, 443]) {
         cidrBlocks: ['0.0.0.0/0']
     })
 }
+
 const instance = new aws.ec2.Instance(awsInfra.EC2_INSTANCE_NAME, {
     ami: ubuntuAmi.apply((ami) => ami.id),
     instanceType: awsInfra.EC2_INSTANCE_TYPE,
