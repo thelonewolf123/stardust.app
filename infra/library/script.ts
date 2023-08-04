@@ -11,7 +11,7 @@ const dockerJson = {
 
 const dockerKey = generateDockerKey()
 
-export const userDataScript = `#!/bin/bash
+export const ec2UserData = `#!/bin/bash
     sudo apt-get update
     sudo apt-get install -y docker.io git curl
     curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -

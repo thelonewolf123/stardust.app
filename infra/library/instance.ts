@@ -2,6 +2,7 @@ import * as aws from '@pulumi/aws'
 
 import * as awsInfra from '../constants/aws-infra'
 import { ubuntuAmi } from './ami'
+import { ec2UserData } from './script'
 import { securityGroup } from './security-group'
 import { keyPair } from './ssh-keystore'
 
@@ -13,10 +14,5 @@ export const instance = new aws.ec2.Instance(awsInfra.EC2_INSTANCE_NAME, {
     tags: {
         Name: awsInfra.EC2_INSTANCE_NAME
     },
-    userData: `#!/bin/bash
-    sudo apt-get update
-    sudo apt-get install -y docker.io git curl
-    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-    sudo apt-get install -y nodejs
-    `
+    userData: ec2UserData
 })

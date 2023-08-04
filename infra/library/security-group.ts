@@ -16,7 +16,8 @@ export const securityGroup = new aws.ec2.SecurityGroup(
         ]
     }
 )
-for (const port of [22, 80, 443]) {
+
+for (const port of awsInfra.EC2_EXPOSED_PORTS) {
     new aws.ec2.SecurityGroupRule(`sgRule${port}`, {
         type: 'ingress',
         fromPort: port,
