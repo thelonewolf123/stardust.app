@@ -9,14 +9,14 @@ const privateKey = generateSshKey()
 export const privateKeyBucketId = privateKeyBucket.id
 
 new aws.s3.BucketObject(awsInfra.EC2_PRIVATE_KEY_NAME, {
-    key: 'privateKey.pem',
+    key: awsInfra.EC2_PRIVATE_KEY_NAME,
     acl: 'private',
     bucket: privateKeyBucket.id,
     content: privateKey.privateKey
 })
 
 new aws.s3.BucketObject(awsInfra.EC2_PUBLIC_KEY_NAME, {
-    key: 'publicKey.pub',
+    key: awsInfra.EC2_PUBLIC_KEY_NAME,
     acl: 'private',
     bucket: privateKeyBucket.id,
     content: privateKey.publicKey

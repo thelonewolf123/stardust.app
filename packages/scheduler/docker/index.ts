@@ -1,6 +1,6 @@
 import Docker from 'dockerode'
 
-function getDockerClient() {
+export function getDockerClient(ipAddress: string) {
     const docker = new Docker({
         socketPath: '/var/run/docker.sock'
     })

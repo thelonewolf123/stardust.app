@@ -4,7 +4,7 @@ import {
     SCHEDULER_INSTANCE_QUEUE_NAME,
     SCHEDULER_INSTANCE_ROUTING_KEY
 } from '../constants'
-import { NewContainerSchedulerSchema } from '../schema'
+import { InstanceSchedulerSchema } from '../schema'
 
 export const setupInstanceConsumer = async () => {
     const { onMessage, channel, cleanup } = await queueManager({
@@ -12,19 +12,15 @@ export const setupInstanceConsumer = async () => {
         queue: SCHEDULER_INSTANCE_QUEUE_NAME,
         routingKey: SCHEDULER_INSTANCE_ROUTING_KEY
     })
+    process.on('SIGINT', () => cleanup())
 
-    await onMessage(async (message) => {
+    onMessage(async (message) => {
         if (!message) return
         const { content } = message
-        const data = NewContainerSchedulerSchema.parse(
+        const data = InstanceSchedulerSchema.parse(
             JSON.parse(content.toString())
         )
         console.log(data)
         channel.receiver.ack(message)
-    })
-
-    process.on('SIGINT', async () => {
-        await cleanup()
-        process.exit(0)
     })
 }

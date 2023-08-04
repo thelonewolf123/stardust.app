@@ -1,4 +1,4 @@
-import { InstanceModel } from '../database/models/instance'
+import { InstanceModel } from '../backend/database/models/instance'
 
 export const instanceHealthCheck = async () => {
     const allInstance = await InstanceModel.find({
