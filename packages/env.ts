@@ -18,10 +18,12 @@ export const env = createEnv({
     server: {
         MONGODB_URI: z.string().url(),
 
+        REMOTE_DOCKER_PASSWORD: z.string().min(1),
         AWS_ACCESS_KEY_ID: z.string().min(1),
         AWS_ACCESS_KEY_SECRET: z.string().min(1),
         DATABASE_NAME: z.string().min(1),
         PRIVATE_KEY_BUCKET_NAME: z.string().min(1),
+        REMOTE_DOCKER_BUCKET_NAME: z.string().min(1),
         AWS_REGION: z.string().min(1),
         CONTAINER_BUCKET_NAME: z.string().min(1),
         NODE_ENV: z.enum(['development', 'production']),
@@ -33,9 +35,11 @@ export const env = createEnv({
     client: {},
     runtimeEnv: {
         MONGODB_URI: process.env.MONGODB_URI,
-        PRIVATE_KEY_BUCKET_NAME: process.env.PRIVATE_KEY_BUCKET_NAME,
-        DATABASE_NAME: process.env.DATABASE_NAME,
 
+        PRIVATE_KEY_BUCKET_NAME: process.env.PRIVATE_KEY_BUCKET_NAME,
+        REMOTE_DOCKER_BUCKET_NAME: process.env.REMOTE_DOCKER_BUCKET_NAME,
+        DATABASE_NAME: process.env.DATABASE_NAME,
+        REMOTE_DOCKER_PASSWORD: process.env.REMOTE_DOCKER_PASSWORD,
         AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
         AWS_ACCESS_KEY_SECRET: process.env.AWS_ACCESS_KEY_SECRET,
         AWS_REGION: process.env.AWS_REGION,

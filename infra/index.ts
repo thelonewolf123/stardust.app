@@ -2,9 +2,12 @@ import { createAmiFromInstance } from './library/ami'
 import { instance } from './library/instance'
 import { containerBucket } from './library/s3'
 import { keyPair } from './library/ssh-keystore'
+import { dockerPassword, storeBaseAmiId } from './library/ssm'
 
 const ami = createAmiFromInstance(instance)
+const baseAmiSSMId = storeBaseAmiId(ami)
 
+export const dockerPasswordSSMId = dockerPassword.id
 export const bucketName = containerBucket.id
 export const sshKeyName = keyPair.keyName
 export const amiId = ami.id

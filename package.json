@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev:spot": "ts-node packages/spot/index.ts",
     "dev:server": "ts-node packages/backend/index.ts",
-    "infra:up": "cd packages/infra && pulumi up -y",
-    "infra:down": "cd packages/infra && pulumi destroy -y",
+    "infra:up": "cd ./infra && pulumi up -y",
+    "infra:down": "cd ./infra && pulumi destroy -y",
     "build": "node scripts/build.js"
   },
   "keywords": [],
