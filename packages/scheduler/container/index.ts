@@ -1,6 +1,7 @@
 import { queueManager } from '../../core/queue'
 import { DESTROY_CONTAINER, NEW_CONTAINER } from '../constants'
 import { ContainerSchedulerSchema } from '../schema'
+import { createNewContainer } from './controller'
 
 export const setupNewContainerConsumer = async () => {
     const { onMessage, channel, cleanup } = await queueManager({
@@ -16,6 +17,7 @@ export const setupNewContainerConsumer = async () => {
         const data = ContainerSchedulerSchema.parse(
             JSON.parse(content.toString())
         )
+        createNewContainer(data)
         console.log(data)
         channel.receiver.ack(message)
     })

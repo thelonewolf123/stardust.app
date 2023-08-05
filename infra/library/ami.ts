@@ -1,7 +1,7 @@
 import * as aws from '@pulumi/aws'
 import * as pulumi from '@pulumi/pulumi'
 
-import * as awsInfra from '../constants/aws-infra'
+import * as awsInfra from '../../constants/aws-infra'
 
 export const ubuntuAmi = pulumi.output(
     aws.ec2.getAmi({

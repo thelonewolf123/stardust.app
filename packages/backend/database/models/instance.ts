@@ -1,34 +1,38 @@
 import { getModelForClass, prop } from '@typegoose/typegoose'
 
 class InstanceClass {
-    @prop({ required: true })
-    public name!: string
-
-    @prop({ required: true })
+    @prop({ type: () => String, required: true })
     public amiId!: string
 
+    @prop({ type: () => String, required: true })
+    public instanceSlug!: string
+
+    @prop({ type: () => String, required: false })
+    public instanceId!: string
+
     @prop({
+        type: () => String,
         required: true,
         enum: ['scheduled', 'running', 'stopped', 'terminated']
     })
     public status!: 'scheduled' | 'running' | 'stopped' | 'terminated'
 
-    @prop({ required: false })
+    @prop({ type: () => String, required: false })
     public isTerminatedByHealthCheck!: boolean
 
-    @prop({ required: true })
+    @prop({ type: () => Date, required: true })
     public createdAt!: Date
 
-    @prop({ required: true })
+    @prop({ type: () => Date, required: true })
     public updatedAt!: Date
 
-    @prop({ required: true })
+    @prop({ type: () => Date, required: true })
     public deletedAt!: Date
 
-    @prop({ required: true })
+    @prop({ type: () => String, required: true })
     public ipAddress!: string
 
-    @prop({ required: true })
+    @prop({ type: () => String, required: true })
     public region!: string
 }
 

@@ -16,5 +16,5 @@
         "emitDecoratorMetadata": true
     },
     "exclude": ["**/dist/**"],
-    "include": ["packages/**/**.ts", "global.d.ts"]
+    "include": ["packages/**/**.ts", "global.d.ts", "constants/aws-infra.ts"]
 }

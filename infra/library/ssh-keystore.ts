@@ -1,6 +1,6 @@
 import * as aws from '@pulumi/aws'
 
-import * as awsInfra from '../constants/aws-infra'
+import * as awsInfra from '../../constants/aws-infra'
 import { generateSshKey } from '../utils'
 import { privateKeyBucket } from './s3'
 

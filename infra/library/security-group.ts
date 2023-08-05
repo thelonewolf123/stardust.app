@@ -1,6 +1,6 @@
 import * as aws from '@pulumi/aws'
 
-import * as awsInfra from '../constants/aws-infra'
+import * as awsInfra from '../../constants/aws-infra'
 
 export const securityGroup = new aws.ec2.SecurityGroup(
     awsInfra.EC2_SECURITY_GROUP_NAME,

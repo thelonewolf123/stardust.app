@@ -1,11 +1,16 @@
 import { z } from 'zod'
 
-import { NewContainerSchema } from '../../backend/modules/container/validator'
 import { getDockerClient } from '../docker'
+import {
+    getInstanceById,
+    getInstanceForNewContainer
+} from '../library/instance'
+import { ContainerSchedulerSchema } from '../schema'
 
 export async function createNewContainer(
-    data: z.infer<typeof NewContainerSchema>
+    data: z.infer<typeof ContainerSchedulerSchema>
 ) {
+    const instanceId = await getInstanceForNewContainer()
     const docker = await getDockerClient('1.1.1.1')
     console.log('docker', docker)
 }

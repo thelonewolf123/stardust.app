@@ -1,5 +1,7 @@
 const { build } = require('esbuild')
 const path = require('path')
+const inlineImportPlugin = require('esbuild-plugin-inline-import')
+
 // const { dependencies, peerDependencies } = require('./package.json')
 
 const sharedConfig = {
@@ -23,7 +25,17 @@ Object.entries(entries).map((value) => {
         ...sharedConfig,
         entryPoints: [path],
         platform: 'node', // for CJS
+        target: 'esnext',
+        tsconfig: './tsconfig.json',
         outfile: `dist/${name}.bundle.js`,
-        sourcemap: true
+        sourcemap: true,
+        plugins: [
+            inlineImportPlugin({
+                filter: /^inline:/,
+                namespace: '_' + Math.random().toString(36).substr(2, 9),
+                transform: async (contents, args) => contents
+            })
+        ],
+        loader: { '.node': 'file' }
     })
 })

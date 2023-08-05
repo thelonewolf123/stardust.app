@@ -1,15 +1,16 @@
-import { getModelForClass, prop, Ref } from '@typegoose/typegoose'
+import { getModelForClass, prop, PropType, Ref } from '@typegoose/typegoose'
 
 import { InstanceModel } from './instance'
 
 class ContainerClass {
-    @prop({ required: true })
-    public name!: string
+    @prop({ type: () => String, required: true })
+    public containerSlug!: string
 
-    @prop({ required: true })
+    @prop({ type: () => String, required: true })
     public image!: string
 
     @prop({
+        type: () => String,
         required: true,
         enum: ['scheduled', 'running', 'stopped', 'checkpoint', 'deleted']
     })
@@ -20,25 +21,25 @@ class ContainerClass {
         | 'checkpoint'
         | 'deleted'
 
-    @prop({ required: true, default: Date.now() })
+    @prop({ type: () => Date, required: true, default: Date.now() })
     public createdAt!: Date
 
-    @prop({ required: true, default: Date.now() })
+    @prop({ type: () => Date, required: true, default: Date.now() })
     public updatedAt!: Date
 
-    @prop({ required: false })
+    @prop({ type: () => Date, required: false })
     public deletedAt!: Date
 
-    @prop({ required: false })
-    public metaData!: Record<string, unknown>
+    @prop({ type: () => String, required: false }, PropType.MAP)
+    public metaData!: Record<string, string>
 
-    @prop({ required: false })
+    @prop({ type: () => String, required: false })
     public containerId!: string
 
-    @prop({ required: false })
+    @prop({ type: () => String, required: false })
     public checkpointId!: string
 
-    @prop({ ref: InstanceModel, required: true })
+    @prop({ ref: () => InstanceModel, required: true })
     public instanceId!: Ref<typeof InstanceModel>
 }
 

@@ -1,6 +1,6 @@
 import Docker from 'dockerode'
 
-import { REMOTE_DOCKER_CRED } from '../../../infra/constants/aws-infra'
+import { REMOTE_DOCKER_CRED } from '../../../constants/aws-infra'
 import { s3 } from '../../core/s3'
 import { env } from '../../env'
 
