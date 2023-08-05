@@ -1,8 +1,13 @@
-import { setupContainerConsumer } from './container'
-import { setupInstanceConsumer } from './instance'
+import {
+    setupDestroyContainerConsumer,
+    setupNewContainerConsumer
+} from './container'
 
 const consumers = () => {
-    return Promise.all([setupInstanceConsumer(), setupContainerConsumer()])
+    return Promise.all([
+        setupNewContainerConsumer(),
+        setupDestroyContainerConsumer()
+    ])
 }
 
 consumers()

@@ -8,5 +8,8 @@ export const EC2_SECURITY_GROUP_NAME = 'soulForgeSecurityGroup'
 
 export const EC2_EXPOSED_PORTS = [22, 80, 443, 2376]
 
-export const REMOTE_DOCKER_CLIENT_CERT_NAME = 'remote-docker-client-cert.pem'
-export const REMOTE_DOCKER_CLIENT_KEY_NAME = 'remote-docker-client-key.pem'
+export const REMOTE_DOCKER_CRED = {
+    ca: 'ca-key.pem',
+    key: 'client-docker-key.pem',
+    cert: 'client-docker-cert.pem'
+}

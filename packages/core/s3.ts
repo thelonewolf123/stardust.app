@@ -1,3 +1,6 @@
+import { readFileSync } from 'fs'
+import { writeFile } from 'fs/promises'
+
 import {
     DeleteObjectCommand,
     GetObjectCommand,
@@ -5,8 +8,7 @@ import {
     PutObjectCommand,
     S3
 } from '@aws-sdk/client-s3'
-import { readFileSync } from 'fs'
-import { writeFile } from 'fs/promises'
+
 import { env } from '../env'
 
 export const s3Client = new S3({
@@ -14,37 +16,37 @@ export const s3Client = new S3({
         accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
         secretAccessKey: process.env.AWS_ACCESS_KEY_SECRET || ''
     },
-    region: 'us-east-1'
+    region: env.AWS_REGION
 })
 
-async function isFileExist(slug: string) {
+async function isFileExist(slug: string, bucketName: string) {
     const cmd = new HeadObjectCommand({
-        Bucket: env.CONTAINER_BUCKET_NAME,
+        Bucket: bucketName,
         Key: slug
     })
     return s3Client.send(cmd)
 }
 
-async function uploadFile(slug: string, path: string) {
+async function uploadFile(slug: string, path: string, bucketName: string) {
     const cmd = new PutObjectCommand({
-        Bucket: env.CONTAINER_BUCKET_NAME,
+        Bucket: bucketName,
         Key: slug,
         Body: readFileSync(path)
     })
     return s3Client.send(cmd)
 }
 
-async function deleteFile(slug: string, path: string) {
+async function deleteFile(slug: string, path: string, bucketName: string) {
     const cmd = new DeleteObjectCommand({
-        Bucket: env.CONTAINER_BUCKET_NAME,
+        Bucket: bucketName,
         Key: slug
     })
     return s3Client.send(cmd)
 }
 
-async function downloadFile(slug: string, path: string) {
+async function downloadFile(slug: string, path: string, bucketName: string) {
     const cmd = new GetObjectCommand({
-        Bucket: env.CONTAINER_BUCKET_NAME,
+        Bucket: bucketName,
         Key: slug
     })
 
@@ -55,4 +57,28 @@ async function downloadFile(slug: string, path: string) {
     writeFile(path, body)
 }
 
-export { downloadFile, uploadFile, deleteFile, isFileExist }
+async function downloadFileBuffer(slug: string, bucketName: string) {
+    const cmd = new GetObjectCommand({
+        Bucket: bucketName,
+        Key: slug
+    })
+
+    const data = await s3Client.send(cmd)
+    if (!data.Body) return
+
+    const body = await data.Body.transformToByteArray()
+    return body
+}
+
+export function s3(bucketName: string) {
+    return {
+        isFileExist: (slug: string) => isFileExist(slug, bucketName),
+        uploadFile: (slug: string, path: string) =>
+            uploadFile(slug, path, bucketName),
+        deleteFile: (slug: string) => deleteFile(slug, slug, bucketName),
+        downloadFile: (slug: string, path: string) =>
+            downloadFile(slug, path, bucketName),
+        downloadFileBuffer: (slug: string) =>
+            downloadFileBuffer(slug, bucketName)
+    }
+}

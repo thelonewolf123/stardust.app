@@ -1,6 +1,6 @@
 import { spawn } from 'child_process'
 import path from 'path'
-import { v4 } from 'uuid'
+
 import { env } from '../../env'
 
 async function startContainer(imageName: string) {

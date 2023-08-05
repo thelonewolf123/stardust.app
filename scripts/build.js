@@ -11,7 +11,9 @@ const sharedConfig = {
 const entries = {
     backend: path.resolve(__dirname, '../packages/backend/index.ts'),
     spot: path.resolve(__dirname, '../packages/spot/index.ts'),
-    lambda: path.resolve(__dirname, '../packages/lambda/index.ts')
+    lambda: path.resolve(__dirname, '../packages/lambda/index.ts'),
+    cron: path.resolve(__dirname, '../packages/cron/index.ts'),
+    scheduler: path.resolve(__dirname, '../packages/scheduler/index.ts')
 }
 
 Object.entries(entries).map((value) => {

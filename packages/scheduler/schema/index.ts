@@ -2,11 +2,11 @@ import { z } from 'zod'
 
 export const ContainerSchedulerSchema = z
     .object({
-        name: z.string().min(1),
+        containerSlug: z.string().min(1),
         image: z.string().min(1),
         command: z.array(z.string().min(1)),
-        env: z.record(z.string().min(1)),
-        ports: z.record(z.string().min(1), z.number())
+        env: z.record(z.string().min(1)).optional(),
+        ports: z.record(z.string().min(1), z.number()).optional()
     })
     .strict()
 

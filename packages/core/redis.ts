@@ -12,4 +12,18 @@ redisClient.on('error', (err) => {
     console.error('Redis Client Error:', err)
 })
 
-export default redisClient
+async function runLuaScript(containerSlug: string, luaScript: string) {
+    try {
+        // Execute the script with the container slug argument using EVAL
+        const result = await redisClient.eval(luaScript, {
+            arguments: [containerSlug]
+        })
+        console.log('Result:', result)
+        return result
+    } catch (err) {
+        console.error('Error:', err)
+    }
+    return null
+}
+
+export { redisClient, runLuaScript }

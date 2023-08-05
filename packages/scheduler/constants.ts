@@ -1,7 +1,11 @@
-export const SCHEDULER_INSTANCE_QUEUE_NAME = 'scheduler'
-export const SCHEDULER_INSTANCE_EXCHANGE_NAME = 'scheduler'
-export const SCHEDULER_INSTANCE_ROUTING_KEY = 'scheduler'
+export const NEW_CONTAINER = {
+    QUEUE_NAME: 'new-container',
+    EXCHANGE_NAME: 'new-container',
+    ROUTING_KEY: 'new-container'
+}
 
-export const SCHEDULER_CONTAINER_QUEUE_NAME = 'scheduler-container'
-export const SCHEDULER_CONTAINER_EXCHANGE_NAME = 'scheduler-container'
-export const SCHEDULER_CONTAINER_ROUTING_KEY = 'scheduler-container'
+export const DESTROY_CONTAINER = {
+    QUEUE_NAME: 'destroy-container',
+    EXCHANGE_NAME: 'destroy-container',
+    ROUTING_KEY: 'destroy-container'
+}
