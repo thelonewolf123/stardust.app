@@ -1,13 +1,13 @@
 import * as aws from '@pulumi/aws'
 
-import * as awsInfra from '../../constants/aws-infra'
+import { SSM_PARAMETER_KEYS } from '../../constants/aws-infra'
 
 export const containerBucket = new aws.s3.Bucket(
-    awsInfra.CONTAINER_SNAPSHOT_BUCKET_NAME
+    SSM_PARAMETER_KEYS.dockerSnapshotBucket
 )
 export const privateKeyBucket = new aws.s3.Bucket(
-    awsInfra.PRIVATE_KEY_BUCKET_NAME
+    SSM_PARAMETER_KEYS.ec2PrivateKeyBucket
 )
 export const remoteDockerBucket = new aws.s3.Bucket(
-    awsInfra.REMOTE_DOCKER_BUCKET_NAME
+    SSM_PARAMETER_KEYS.dockerKeysBucket
 )

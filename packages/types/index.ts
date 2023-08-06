@@ -15,3 +15,25 @@ export type ScheduleQueueMessage =
           type: 'destroy-instance'
           instanceId: string
       }
+
+export type PhysicalHostType = {
+    instanceId: string
+    publicIp: string
+    scheduledForDeletionAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    status:
+        | 'running'
+        | 'stopped'
+        | 'terminated'
+        | 'pending'
+        | 'scheduled-for-deletion'
+    amiId: string
+    containers: {
+        containerId: string
+        containerSlug: string
+        updatedAt: Date
+        scheduledAt: Date
+        status: 'running' | 'stopped' | 'scheduled'
+    }[]
+}

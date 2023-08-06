@@ -5,6 +5,7 @@ local publicIp = ARGV[3]   -- The public IP address of the instance
 
 -- Get the current 'physicalHost' data from Redis
 local data = redis.call('GET', 'physicalHost')
+local currentTime = tonumber(redis.call('TIME')[1])
 
 -- Check if 'physicalHost' data exists in Redis
 if not data then
@@ -19,6 +20,8 @@ local newInstance = {
     amiId = amiId,
     scheduledForDeletionAt = nil,
     status = 'scheduled',
+    createdAt = currentTime,
+    updatedAt = currentTime,
     publicIp = publicIp,
     containers = {}
 }

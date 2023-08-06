@@ -25,3 +25,11 @@ export function storeKeyPairName(keyPair: aws.ec2.KeyPair) {
         value: keyPair.id.apply((id) => id)
     })
 }
+
+export function storeBucketId(bucket: aws.s3.Bucket, key: string) {
+    return new aws.ssm.Parameter(key, {
+        name: key,
+        type: 'String',
+        value: bucket.id.apply((id) => id)
+    })
+}

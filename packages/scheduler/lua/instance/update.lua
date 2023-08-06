@@ -1,6 +1,7 @@
 -- Arguments passed from Node.js
 local instanceId = ARGV[1]        -- The unique identifier for the instance
 local keyValuePairsJson = ARGV[2] -- The JSON string containing the key-value pairs to update or add
+local currentTime = tonumber(redis.call('TIME')[1])
 
 -- Get the 'physicalHost' data from Redis
 local data = redis.call('GET', 'physicalHost')
@@ -32,6 +33,8 @@ local instance = physicalHost[instanceIndex]
 
 -- Decode the JSON string containing the key-value pairs to update or add
 local keyValuePairs = cjson.decode(keyValuePairsJson)
+
+instance.updatedAt = currentTime
 
 -- Update or add the key-value pairs in the instance object
 for key, value in pairs(keyValuePairs) do

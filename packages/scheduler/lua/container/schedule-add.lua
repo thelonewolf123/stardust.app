@@ -1,6 +1,6 @@
 local containerSlug = ARGV[1]
 local data = redis.call('GET', 'physicalHost')
-
+local currentTime = tonumber(redis.call('TIME')[1])
 -- Check if 'physicalHost' key exists
 if not data then
     return nil
@@ -16,10 +16,10 @@ for i, instance in ipairs(physicalHost) do
         local newContainer = {
             containerSlug = containerSlug,
             status = 'scheduled',
-            scheduledAt = os.time() -- assuming you want to set the current timestamp
+            scheduledAt = currentTime -- assuming you want to set the current timestamp
         }
         table.insert(instance.containers, newContainer)
-        
+
         -- Convert the modified physicalHost table back to JSON string
         local updatedData = cjson.encode(physicalHost)
 

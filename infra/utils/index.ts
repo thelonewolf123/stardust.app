@@ -37,9 +37,9 @@ export function generateDockerKey() {
         const command = `
 #!/bin/bash
 rm -rf ./certs
-./create-certs.sh -m ca -pw ${env.REMOTE_DOCKER_PASSWORD} -t certs -e 900
-./create-certs.sh -m server -h docker.soulforge.com -pw ${env.REMOTE_DOCKER_PASSWORD} -t certs -e 365
-./create-certs.sh -m client -h docker -pw ${env.REMOTE_DOCKER_PASSWORD} -t certs -e 365`
+./scripts/create-certs.sh -m ca -pw ${env.REMOTE_DOCKER_PASSWORD} -t certs -e 900
+./scripts/create-certs.sh -m server -h docker.soulforge.com -pw ${env.REMOTE_DOCKER_PASSWORD} -t certs -e 365
+./scripts/create-certs.sh -m client -h docker -pw ${env.REMOTE_DOCKER_PASSWORD} -t certs -e 365`
 
         console.log(
             'Please run the command to generate docker certificate',

@@ -21,5 +21,8 @@ export const REMOTE_DOCKER_CRED = {
 export const SSM_PARAMETER_KEYS = {
     baseAmiId: 'base-ami-id',
     baseSecurityGroup: 'base-security-group',
-    baseKeyParName: 'base-key-pair-name'
+    baseKeyParName: 'base-key-pair-name',
+    ec2PrivateKeyBucket: 'ec2-private-key-bucket',
+    dockerKeysBucket: 'docker-keys-bucket',
+    dockerSnapshotBucket: 'docker-snapshot-bucket'
 }

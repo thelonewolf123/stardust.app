@@ -5,7 +5,9 @@ import * as awsInfra from '../../constants/aws-infra'
 export const securityGroup = new aws.ec2.SecurityGroup(
     awsInfra.EC2_SECURITY_GROUP_NAME,
     {
-        description: 'Allow inbound traffic on ports 22, 80, 443',
+        description: `Allow inbound traffic on ports ${awsInfra.EC2_EXPOSED_PORTS.join(
+            ', '
+        )}} from anywhere and allow all outbound traffic`,
         egress: [
             {
                 protocol: '-1', // all protocols

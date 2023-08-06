@@ -11,14 +11,14 @@ export const privateKeyBucketId = privateKeyBucket.id
 new aws.s3.BucketObject(awsInfra.EC2_PRIVATE_KEY_NAME, {
     key: awsInfra.EC2_PRIVATE_KEY_NAME,
     acl: 'private',
-    bucket: privateKeyBucket.id,
+    bucket: privateKeyBucket.id.apply((id) => id),
     content: privateKey.privateKey
 })
 
 new aws.s3.BucketObject(awsInfra.EC2_PUBLIC_KEY_NAME, {
     key: awsInfra.EC2_PUBLIC_KEY_NAME,
     acl: 'private',
-    bucket: privateKeyBucket.id,
+    bucket: privateKeyBucket.id.apply((id) => id),
     content: privateKey.publicKey
 })
 

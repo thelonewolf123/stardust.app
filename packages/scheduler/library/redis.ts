@@ -21,7 +21,7 @@ async function runLuaScript(luaScript: string, args: string[]) {
         console.log('Result:', result)
         return result
     } catch (err) {
-        console.error('Error:', err)
+        console.error('Redis Error:', err)
     }
     return null
 }
