@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { nanoid } from 'nanoid'
 
 import { ContainerModel } from '../../database/models/containers'
 import { NewContainerSchema } from './validator'
@@ -17,11 +18,9 @@ router.get('/api/container/:id', (req, res) => {
 })
 
 router.post('/api/container', (req, res) => {
-    const { name, image, command, env, ports } = NewContainerSchema.parse(
-        req.body
-    )
+    const { image, command, env, ports } = NewContainerSchema.parse(req.body)
     ContainerModel.create({
-        name,
+        containerSlug: nanoid(),
         image,
         status: 'scheduled'
     })

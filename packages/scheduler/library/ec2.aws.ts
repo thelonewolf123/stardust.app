@@ -1,10 +1,10 @@
 import {
     EC2Client,
     RequestSpotFleetCommand,
-    RequestSpotInstancesCommand
+    RunInstancesCommand
 } from '@aws-sdk/client-ec2'
 
-import { env } from '../../../env'
+import { env } from '../../env'
 
 const client = new EC2Client({
     credentials: {
@@ -39,4 +39,15 @@ function requestEc2SpotInstance(count: number) {
     return client.send(command)
 }
 
-export { requestEc2SpotInstance }
+function requestEc2OnDemandInstance() {
+    const command = new RunInstancesCommand({
+        ImageId: 'ami-07fd367013a43eecd',
+        InstanceType: 't2.micro',
+        MinCount: 1,
+        MaxCount: 1
+    })
+
+    return client.send(command)
+}
+
+export default { requestEc2SpotInstance, requestEc2OnDemandInstance }

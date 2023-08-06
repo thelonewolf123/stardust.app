@@ -18,5 +18,5 @@ export async function getInstanceForNewContainer() {
 }
 
 export async function getInstanceById(id: string) {
-    // const instance = await InstanceModel.findOne({ instanceId: id })
+    const instance = await InstanceModel.findOne({ instanceId: id })
 }

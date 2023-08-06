@@ -13,3 +13,9 @@ export const REMOTE_DOCKER_CRED = {
     key: 'client-docker-key.pem',
     cert: 'client-docker-cert.pem'
 }
+
+export const SSM_PARAMETER_KEYS = {
+    baseAmiId: 'base-ami-id',
+    baseSecurityGroup: 'base-security-group',
+    baseKeyParName: 'base-key-pair-name'
+}

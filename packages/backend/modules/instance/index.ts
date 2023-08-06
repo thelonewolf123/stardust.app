@@ -1,7 +1,7 @@
 import { Router } from 'express'
 
+import { requestEc2SpotInstance } from '../../../scheduler/library/ec2.aws'
 import { InstanceModel } from '../../database/models/instance'
-import { requestEc2SpotInstance } from '../../library/aws/ec2'
 import { NewInstanceSchema } from './validator'
 
 const router = Router()
