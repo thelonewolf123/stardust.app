@@ -1,10 +1,14 @@
 import {
+    DescribeInstancesCommand,
+    DescribeInstanceStatusCommand,
     EC2Client,
     RequestSpotFleetCommand,
     RunInstancesCommand
 } from '@aws-sdk/client-ec2'
 
+import { SSM_PARAMETER_KEYS } from '../../../constants/aws-infra'
 import { env } from '../../env'
+import ssmAws from './ssm.aws'
 
 const client = new EC2Client({
     credentials: {
@@ -39,15 +43,45 @@ function requestEc2SpotInstance(count: number) {
     return client.send(command)
 }
 
-function requestEc2OnDemandInstance() {
+async function requestEc2OnDemandInstance(count: number) {
+    const [ami, securityGroup, keyPairName] = await Promise.all([
+        ssmAws.getSSMParameter(SSM_PARAMETER_KEYS.baseAmiId),
+        ssmAws.getSSMParameter(SSM_PARAMETER_KEYS.baseSecurityGroup),
+        ssmAws.getSSMParameter(SSM_PARAMETER_KEYS.baseKeyParName)
+    ])
+
     const command = new RunInstancesCommand({
-        ImageId: 'ami-07fd367013a43eecd',
+        ImageId: ami,
         InstanceType: 't2.micro',
-        MinCount: 1,
-        MaxCount: 1
+        MinCount: count,
+        MaxCount: count,
+        KeyName: keyPairName,
+        SecurityGroupIds: [securityGroup]
     })
 
-    return client.send(command)
+    const instance = await client.send(command)
+    return instance.Instances?.[0]
 }
 
-export default { requestEc2SpotInstance, requestEc2OnDemandInstance }
+async function getInstanceInfoById(instanceId: string) {
+    const command = new DescribeInstancesCommand({
+        InstanceIds: [instanceId]
+    })
+    const info = await client.send(command)
+    return info.Reservations?.[0].Instances?.[0]
+}
+
+async function getInstanceStatusById(instanceId: string) {
+    const command = new DescribeInstanceStatusCommand({
+        InstanceIds: [instanceId]
+    })
+    const info = await client.send(command)
+    return info.InstanceStatuses?.[0]?.InstanceStatus
+}
+
+export default {
+    requestEc2SpotInstance,
+    requestEc2OnDemandInstance,
+    getInstanceInfoById,
+    getInstanceStatusById
+}

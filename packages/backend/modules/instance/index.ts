@@ -1,6 +1,6 @@
 import { Router } from 'express'
 
-import { requestEc2SpotInstance } from '../../../scheduler/library/ec2.aws'
+import ec2 from '../../../scheduler/library/ec2.aws'
 import { InstanceModel } from '../../database/models/instance'
 import { NewInstanceSchema } from './validator'
 
@@ -9,7 +9,7 @@ const router = Router()
 router.post('/api/instance', async (req, res) => {
     const { count, type } = NewInstanceSchema.parse(req.body)
     if (type === 'spot') {
-        const response = await requestEc2SpotInstance(count)
+        const response = await ec2.requestEc2SpotInstance(count)
         return res.json(response)
     }
     return res.status(400).json({ message: 'Invalid instance type' })

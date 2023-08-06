@@ -1,6 +1,9 @@
 import Docker from 'dockerode'
 
-import { REMOTE_DOCKER_CRED } from '../../../constants/aws-infra'
+import {
+    REMOTE_DOCKER_BUCKET_NAME,
+    REMOTE_DOCKER_CRED
+} from '../../../constants/aws-infra'
 import { s3 } from '../../core/s3'
 import { env } from '../../env'
 
@@ -9,7 +12,7 @@ import { env } from '../../env'
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 
 export async function getDockerClient(ipAddress: string) {
-    const s3Client = s3(env.REMOTE_DOCKER_BUCKET_NAME)
+    const s3Client = s3(REMOTE_DOCKER_BUCKET_NAME)
     const ca = await s3Client.downloadFileBuffer(REMOTE_DOCKER_CRED.ca)
     const key = await s3Client.downloadFileBuffer(REMOTE_DOCKER_CRED.key)
     const cert = await s3Client.downloadFileBuffer(REMOTE_DOCKER_CRED.cert)

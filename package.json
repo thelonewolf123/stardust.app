@@ -32,6 +32,7 @@
   "dependencies": {
     "@aws-sdk/client-ec2": "^3.345.0",
     "@aws-sdk/client-s3": "^3.348.0",
+    "@aws-sdk/client-ssm": "^3.385.0",
     "@t3-oss/env-nextjs": "^0.4.0",
     "@typegoose/typegoose": "^11.4.0",
     "amqplib": "^0.10.3",
