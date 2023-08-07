@@ -15,7 +15,7 @@ for i, instance in ipairs(physicalHost) do
         -- Add a new item to the containers array for the matching instance
         local newContainer = {
             containerSlug = containerSlug,
-            status = 'scheduled',
+            status = 'pending',
             scheduledAt = currentTime -- assuming you want to set the current timestamp
         }
         table.insert(instance.containers, newContainer)

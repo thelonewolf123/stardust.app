@@ -12,14 +12,9 @@ class ContainerClass {
     @prop({
         type: () => String,
         required: true,
-        enum: ['scheduled', 'running', 'stopped', 'checkpoint', 'deleted']
+        enum: ['pending', 'running', 'stopped', 'checkpoint', 'deleted']
     })
-    public status!:
-        | 'scheduled'
-        | 'running'
-        | 'stopped'
-        | 'checkpoint'
-        | 'deleted'
+    public status!: 'pending' | 'running' | 'stopped' | 'checkpoint' | 'deleted'
 
     @prop({ type: () => Date, required: true, default: Date.now() })
     public createdAt!: Date

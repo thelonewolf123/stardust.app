@@ -13,9 +13,9 @@ class InstanceClass {
     @prop({
         type: () => String,
         required: true,
-        enum: ['scheduled', 'running', 'stopped', 'terminated']
+        enum: ['pending', 'running', 'stopped', 'terminated']
     })
-    public status!: 'scheduled' | 'running' | 'stopped' | 'terminated'
+    public status!: 'pending' | 'running' | 'stopped' | 'terminated'
 
     @prop({ type: () => String, required: false })
     public isTerminatedByHealthCheck!: boolean

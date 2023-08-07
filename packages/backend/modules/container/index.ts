@@ -22,7 +22,7 @@ router.post('/api/container', (req, res) => {
     ContainerModel.create({
         containerSlug: nanoid(),
         image,
-        status: 'scheduled'
+        status: 'pending'
     })
     return res.send('Container')
 })
