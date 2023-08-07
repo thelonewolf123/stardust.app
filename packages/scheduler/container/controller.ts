@@ -1,8 +1,9 @@
 import updateContainer from 'inline:../lua/container/update.lua'
+import invariant from 'invariant'
 import { nanoid } from 'nanoid'
 import { z } from 'zod'
 
-import { getDockerClient } from '../docker'
+import { getDockerClient } from '../library/docker'
 import ec2Aws from '../library/ec2.aws'
 import { getInstanceForNewContainer } from '../library/instance'
 import { runLuaScript } from '../library/redis'
@@ -15,7 +16,7 @@ export async function createNewContainer(
     const instanceId = await getInstanceForNewContainer(containerSlug)
     const instance = await ec2Aws.getInstanceInfoById(instanceId)
 
-    if (!instance) throw new Error('Instance not found')
+    invariant(instance, 'Instance not found')
     console.log('instance', instance)
 
     const docker = await getDockerClient(instance.PublicIpAddress!)

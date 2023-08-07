@@ -1,3 +1,5 @@
+import invariant from 'invariant'
+
 import { InstanceModel } from '../backend/database/models/instance'
 
 export const instanceHealthCheck = async () => {
@@ -10,8 +12,7 @@ export const instanceHealthCheck = async () => {
                 const data = await fetch(
                     `http://${instance.ipAddress}/_health`
                 ).then((r) => r.json())
-                if (data.ok) return null
-                throw new Error('Instance health check failed!')
+                invariant(data.ok, 'Instance is not healthy')
             } catch (err) {
                 console.log((err as Error).message)
                 return instance

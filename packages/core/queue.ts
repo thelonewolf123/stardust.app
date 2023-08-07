@@ -1,4 +1,5 @@
 import { connect, Connection, ConsumeMessage } from 'amqplib'
+import invariant from 'invariant'
 
 import { env } from '../env'
 
@@ -56,7 +57,7 @@ const queueManager = async (args: {
 }) => {
     const { queue, routingKey, exchange } = args
     const client = await getClient()
-    if (!client) throw new Error('AMQP connection missing!')
+    invariant(client, 'AMQP connection missing!')
     const { channel: sender, publish } = await createQueue(client, {
         queue,
         routingKey,

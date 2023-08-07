@@ -1,3 +1,5 @@
+import invariant from 'invariant'
+
 // Import the required AWS SDK modules
 import {
     GetParameterCommand,
@@ -45,8 +47,9 @@ async function getSSMParameter(name: string) {
     // Call GetParameterCommand to retrieve the parameter from the Parameter Store
     try {
         const data = await ssmClient.send(new GetParameterCommand(params))
-        if (!data.Parameter) throw new Error(`Parameter "${name}" not found.`)
-        return data.Parameter.Value || ''
+        invariant(data.Parameter?.Value, `Parameter "${name}" not found.`)
+        console.log(`Parameter "${name}" retrieved successfully.`)
+        return data.Parameter.Value
     } catch (error: any) {
         console.error(`Error getting parameter "${name}": ${error.message}`)
         throw error

@@ -70,7 +70,7 @@ async function downloadFileBuffer(slug: string, bucketName: string) {
     return body
 }
 
-export function s3(bucketName: string) {
+export default function s3Aws(bucketName: string) {
     return {
         isFileExist: (slug: string) => isFileExist(slug, bucketName),
         uploadFile: (slug: string, path: string) =>

@@ -1,14 +1,12 @@
 import Docker from 'dockerode'
+import invariant from 'invariant'
 
 import {
-    REMOTE_DOCKER_BUCKET_NAME,
     REMOTE_DOCKER_CRED,
     SSM_PARAMETER_KEYS
 } from '../../../constants/aws-infra'
-import { remoteDockerBucket } from '../../../infra/library/s3'
-import { s3 } from '../../core/s3'
-import { env } from '../../env'
-import ssmAws from '../library/ssm.aws'
+import s3Aws from '../../core/s3.aws'
+import ssmAws from './ssm.aws'
 
 // NOTE: This is a workaround for the following error:
 // Error: self signed certificate in certificate chain
@@ -18,15 +16,15 @@ export async function getDockerClient(ipAddress: string) {
     const remoteDockerBucketName = await ssmAws.getSSMParameter(
         SSM_PARAMETER_KEYS.dockerKeysBucket
     )
-    const s3Client = s3(remoteDockerBucketName)
+    const s3Client = s3Aws(remoteDockerBucketName)
+
     const [ca, key, cert] = await Promise.all([
         s3Client.downloadFileBuffer(REMOTE_DOCKER_CRED.ca),
         s3Client.downloadFileBuffer(REMOTE_DOCKER_CRED.key),
         s3Client.downloadFileBuffer(REMOTE_DOCKER_CRED.cert)
     ])
 
-    if (!ca || !key || !cert)
-        throw new Error('Failed to download docker credentials')
+    invariant(ca && key && cert, 'Failed to download docker credentials')
 
     const docker = new Docker({
         protocol: 'https',

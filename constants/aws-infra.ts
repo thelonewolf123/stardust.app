@@ -6,10 +6,6 @@ export const SSH_KEY_NAME = 'infra-soulbound-keypair'
 export const EC2_AMI_NAME = 'soulForgeBaseAmi'
 export const EC2_SECURITY_GROUP_NAME = 'soulForgeSecurityGroup'
 
-export const REMOTE_DOCKER_BUCKET_NAME = 'docker-remote-keys'
-export const CONTAINER_SNAPSHOT_BUCKET_NAME = 'ec2-docker-snapshot'
-export const PRIVATE_KEY_BUCKET_NAME = 'ec2-private-keys'
-
 export const EC2_EXPOSED_PORTS = [22, 80, 443, 2376]
 
 export const REMOTE_DOCKER_CRED = {
