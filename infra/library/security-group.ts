@@ -15,17 +15,25 @@ export const securityGroup = new aws.ec2.SecurityGroup(
                 toPort: 0, // all ports
                 cidrBlocks: ['0.0.0.0/0']
             }
+        ],
+        ingress: [
+            {
+                protocol: '-1',
+                fromPort: 0,
+                toPort: 0,
+                cidrBlocks: ['0.0.0.0/0']
+            }
         ]
     }
 )
 
-for (const port of awsInfra.EC2_EXPOSED_PORTS) {
-    new aws.ec2.SecurityGroupRule(`sgRule${port}`, {
-        type: 'ingress',
-        fromPort: port,
-        toPort: port,
-        protocol: 'tcp',
-        securityGroupId: securityGroup.id.apply((id) => id),
-        cidrBlocks: ['0.0.0.0/0']
-    })
-}
+// for (const port of awsInfra.EC2_EXPOSED_PORTS) {
+//     new aws.ec2.SecurityGroupRule(`sgRule${port}`, {
+//         type: 'ingress',
+//         fromPort: port,
+//         toPort: port,
+//         protocol: 'tcp',
+//         securityGroupId: securityGroup.id.apply((id) => id),
+//         cidrBlocks: ['0.0.0.0/0']
+//     })
+// }

@@ -27,7 +27,8 @@ export const env = createEnv({
         DEPLOYMENT_ENV: z.enum(['local', 'aws']),
         CHECKPOINT_PATH: z.string().min(1),
         SPOT_INSTANCE_ID: z.string().min(1),
-        RABBITMQ_URL: z.string().url()
+        RABBITMQ_URL: z.string().url(),
+        REDIS_HOST: z.string().min(1)
     },
     client: {},
     runtimeEnv: {
@@ -42,6 +43,7 @@ export const env = createEnv({
         DEPLOYMENT_ENV: process.env.DEPLOYMENT_ENV,
         CHECKPOINT_PATH: process.env.CHECKPOINT_PATH,
         SPOT_INSTANCE_ID: process.env.SPOT_INSTANCE_ID,
-        RABBITMQ_URL: process.env.RABBITMQ_URL
+        RABBITMQ_URL: process.env.RABBITMQ_URL,
+        REDIS_HOST: process.env.REDIS_HOST
     }
 })

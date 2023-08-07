@@ -6,7 +6,7 @@ import { z } from 'zod'
 import { getDockerClient } from '../library/docker'
 import ec2Aws from '../library/ec2.aws'
 import { getInstanceForNewContainer } from '../library/instance'
-import { runLuaScript } from '../library/redis'
+import redis from '../library/redis'
 import { ContainerSchedulerSchema } from '../schema'
 
 export async function createNewContainer(
@@ -28,7 +28,7 @@ export async function createNewContainer(
 
     const info = await container.inspect()
 
-    await runLuaScript(updateContainer, [
+    await redis.runLuaScript(updateContainer, [
         containerSlug,
         JSON.stringify({
             containerId: info.Id,
