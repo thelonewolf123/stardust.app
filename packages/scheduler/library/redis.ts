@@ -15,11 +15,11 @@ redisClient.on('error', (err) => {
 async function runLuaScript(luaScript: string, args: string[]) {
     try {
         // Execute the script with the container slug argument using EVAL
-        const result = (await redisClient.eval(luaScript, {
+        const result = await redisClient.eval(luaScript, {
             arguments: args
-        })) as null | string // type casting is not safe,
+        })
         console.log('Result:', result)
-        return result
+        return result as null | string // type casting is not safe,
     } catch (err) {
         console.error('Redis Error:', err)
     }

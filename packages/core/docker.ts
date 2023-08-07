@@ -1,7 +1,7 @@
 import { spawn } from 'child_process'
 import path from 'path'
 
-import { env } from '../../env'
+import { env } from '../env'
 
 async function startContainer(imageName: string) {
     const ps = spawn('podman', ['run', '--rm', '-d', imageName])

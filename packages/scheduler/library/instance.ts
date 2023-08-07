@@ -17,12 +17,23 @@ export async function getInstanceForNewContainer(containerSlug: string) {
     ])
     console.log('instance Id', instanceId)
     if (!instanceId) {
-        const newInstance = await ec2Aws.requestEc2OnDemandInstance(1)
-        invariant(newInstance, 'Instance not created')
+        const instanceList = await ec2Aws.requestEc2OnDemandInstance(1)
+        invariant(instanceList, 'Instance not created')
+        const newInstance = instanceList[0]
 
-        instanceId = newInstance.InstanceId!
-        const publicIp = newInstance.PublicIpAddress!
-        const imageId = newInstance.ImageId!
+        invariant(
+            newInstance &&
+                newInstance.InstanceId &&
+                newInstance.PublicIpAddress &&
+                newInstance.ImageId,
+            'Instance not created'
+        )
+
+        instanceId = newInstance.InstanceId
+        const [publicIp, imageId] = [
+            newInstance.PublicIpAddress,
+            newInstance.ImageId
+        ]
 
         const result = await runLuaScript(scheduleInstanceAdd, [
             instanceId,

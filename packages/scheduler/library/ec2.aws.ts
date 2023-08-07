@@ -6,7 +6,10 @@ import {
     RunInstancesCommand
 } from '@aws-sdk/client-ec2'
 
-import { SSM_PARAMETER_KEYS } from '../../../constants/aws-infra'
+import {
+    EC2_INSTANCE_TYPE,
+    SSM_PARAMETER_KEYS
+} from '../../../constants/aws-infra'
 import { env } from '../../env'
 import ssmAws from './ssm.aws'
 
@@ -18,7 +21,13 @@ const client = new EC2Client({
     region: env.AWS_REGION
 })
 
-function requestEc2SpotInstance(count: number) {
+async function requestEc2SpotInstance(count: number) {
+    const [ami, securityGroup, keyPairName] = await Promise.all([
+        ssmAws.getSSMParameter(SSM_PARAMETER_KEYS.baseAmiId),
+        ssmAws.getSSMParameter(SSM_PARAMETER_KEYS.baseSecurityGroup),
+        ssmAws.getSSMParameter(SSM_PARAMETER_KEYS.baseKeyParName)
+    ])
+
     const command = new RequestSpotFleetCommand({
         SpotFleetRequestConfig: {
             SpotPrice: '0.050',
@@ -26,8 +35,9 @@ function requestEc2SpotInstance(count: number) {
                 'arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetTaggingRole',
             LaunchSpecifications: [
                 {
-                    ImageId: 'ami-02e726886cc4f5795',
-                    SecurityGroups: [{ GroupId: 'sg-005992c68c98aeca5' }],
+                    ImageId: ami,
+                    SecurityGroups: [{ GroupId: securityGroup }],
+                    KeyName: keyPairName,
                     InstanceRequirements: {
                         VCpuCount: { Min: 1, Max: 2 },
                         MemoryMiB: { Max: 8192 }
@@ -52,7 +62,7 @@ async function requestEc2OnDemandInstance(count: number) {
 
     const command = new RunInstancesCommand({
         ImageId: ami,
-        InstanceType: 't2.micro',
+        InstanceType: EC2_INSTANCE_TYPE,
         MinCount: count,
         MaxCount: count,
         KeyName: keyPairName,
@@ -60,7 +70,7 @@ async function requestEc2OnDemandInstance(count: number) {
     })
 
     const instance = await client.send(command)
-    return instance.Instances?.[0]
+    return instance.Instances
 }
 
 async function getInstanceInfoById(instanceId: string) {
@@ -68,7 +78,7 @@ async function getInstanceInfoById(instanceId: string) {
         InstanceIds: [instanceId]
     })
     const info = await client.send(command)
-    return info.Reservations?.[0].Instances?.[0]
+    return info.Reservations?.[0]?.Instances?.[0]
 }
 
 async function getInstanceStatusById(instanceId: string) {
