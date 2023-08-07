@@ -5,16 +5,17 @@ import invariant from 'invariant'
 
 import { InstanceModel } from '../../backend/database/models/instance'
 import ec2Aws from './ec2.aws'
-import { runLuaScript } from './redis'
+import redis from './redis'
 
 export async function getAllInstances() {
     return await InstanceModel.find({ status: 'running' }).lean()
 }
 
 export async function getInstanceForNewContainer(containerSlug: string) {
-    let instanceId: null | string = await runLuaScript(scheduleContainerAdd, [
-        containerSlug
-    ])
+    let instanceId: null | string = await redis.runLuaScript(
+        scheduleContainerAdd,
+        [containerSlug]
+    )
     console.log('instance Id', instanceId)
     if (!instanceId) {
         const instanceList = await ec2Aws.requestEc2OnDemandInstance(1)
@@ -35,7 +36,7 @@ export async function getInstanceForNewContainer(containerSlug: string) {
             newInstance.ImageId
         ]
 
-        const result = await runLuaScript(scheduleInstanceAdd, [
+        const result = await redis.runLuaScript(scheduleInstanceAdd, [
             instanceId,
             publicIp,
             imageId
@@ -44,7 +45,7 @@ export async function getInstanceForNewContainer(containerSlug: string) {
         invariant(result, 'Instance not scheduled')
 
         await waitTillInstanceReady(instanceId)
-        await runLuaScript(instanceUpdate, [
+        await redis.runLuaScript(instanceUpdate, [
             instanceId,
             JSON.stringify({ status: 'running' })
         ])

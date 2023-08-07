@@ -33,7 +33,7 @@ export async function getDockerClient(ipAddress: string) {
         cert: cert.toString(),
         host: ipAddress,
         port: 2376,
-        version: '1.41'
+        version: 'v1.33'
     })
     return docker
 }
