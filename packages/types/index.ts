@@ -7,6 +7,15 @@ export type WorkerQueueMessage =
           filename: string
       }
 
+export type ScheduleQueueMessage =
+    | {
+          type: 'new-instance'
+      }
+    | {
+          type: 'destroy-instance'
+          instanceId: string
+      }
+
 export type PhysicalHostType = {
     instanceId: string
     publicIp: string
@@ -20,6 +29,6 @@ export type PhysicalHostType = {
         containerSlug: string
         updatedAt: Date
         scheduledAt: Date
-        status: 'running' | 'stopped' | 'pending' | 'checkpoint'
+        status: 'running' | 'stopped' | 'pending'
     }[]
 }

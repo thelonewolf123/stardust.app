@@ -5,51 +5,49 @@ import invariant from 'invariant'
 
 import { InstanceModel } from '../../backend/database/models/instance'
 import ec2Aws from './ec2.aws'
-import redis from './redis'
+import { runLuaScript } from './redis'
 
 export async function getAllInstances() {
     return await InstanceModel.find({ status: 'running' }).lean()
 }
 
 export async function getInstanceForNewContainer(containerSlug: string) {
-    let instanceId: null | string = await redis.runLuaScript(
-        scheduleContainerAdd,
-        [containerSlug]
-    )
+    let instanceId: null | string = await runLuaScript(scheduleContainerAdd, [
+        containerSlug
+    ])
     console.log('instance Id', instanceId)
     if (!instanceId) {
         const instanceList = await ec2Aws.requestEc2OnDemandInstance(1)
-        console.log('instance list', instanceList)
         invariant(instanceList, 'Instance not created')
         const newInstance = instanceList[0]
 
         invariant(
-            newInstance && newInstance.InstanceId && newInstance.ImageId,
+            newInstance &&
+                newInstance.InstanceId &&
+                newInstance.PublicIpAddress &&
+                newInstance.ImageId,
             'Instance not created'
         )
 
-        const newInstanceId = newInstance.InstanceId
-        const imageId = newInstance.ImageId
+        instanceId = newInstance.InstanceId
+        const [publicIp, imageId] = [
+            newInstance.PublicIpAddress,
+            newInstance.ImageId
+        ]
 
-        const result = await redis.runLuaScript(scheduleInstanceAdd, [
-            newInstanceId,
+        const result = await runLuaScript(scheduleInstanceAdd, [
+            instanceId,
+            publicIp,
             imageId
         ])
 
         invariant(result, 'Instance not scheduled')
 
-        const info = await waitTillInstanceReady(newInstanceId)
-        await redis.runLuaScript(instanceUpdate, [
-            newInstanceId,
-            JSON.stringify({
-                status: 'running',
-                ipAddress: info?.PublicIpAddress
-            })
+        await waitTillInstanceReady(instanceId)
+        await runLuaScript(instanceUpdate, [
+            instanceId,
+            JSON.stringify({ status: 'running' })
         ])
-        instanceId = await redis.runLuaScript(scheduleContainerAdd, [
-            containerSlug
-        ])
-        invariant(instanceId, 'Instance not scheduled')
     }
 
     return instanceId
@@ -64,5 +62,6 @@ export async function waitTillInstanceReady(id: string) {
         console.log('Waiting for instance to be ready...')
         await new Promise((resolve) => setTimeout(resolve, 1000))
     }
-    return await ec2Aws.getInstanceInfoById(id)
+
+    return true
 }

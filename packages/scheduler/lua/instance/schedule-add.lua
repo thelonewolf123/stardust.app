@@ -1,6 +1,7 @@
 -- Extract the arguments passed from Node.js
 local instanceId = ARGV[1] -- The unique identifier for the instance
 local amiId = ARGV[2]      -- The AMI (Amazon Machine Image) ID of the instance
+local publicIp = ARGV[3]   -- The public IP address of the instance
 
 -- Get the current 'physicalHost' data from Redis
 local data = redis.call('GET', 'physicalHost')
@@ -21,6 +22,7 @@ local newInstance = {
     status = 'pending',
     createdAt = currentTime,
     updatedAt = currentTime,
+    publicIp = publicIp,
     containers = {}
 }
 

@@ -24,7 +24,7 @@ interface ReadonlyArray<T> {
     filter(predicate: BooleanConstructor, thisArg?: any): TSReset.NonFalsy<T>[]
 }
 
-declare module 'inline:*.lua' {
+declare module '*.lua' {
     const scriptSource: string
     export default scriptSource
 }

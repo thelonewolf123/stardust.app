@@ -1,7 +1,8 @@
 import Docker from 'dockerode'
+import invariant from 'invariant'
 
 import {
-    EC2_PRIVATE_KEY_NAME,
+    REMOTE_DOCKER_CRED,
     SSM_PARAMETER_KEYS
 } from '../../../constants/aws-infra'
 import s3Aws from '../../core/s3.aws'
@@ -12,28 +13,27 @@ import ssmAws from './ssm.aws'
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 
 export async function getDockerClient(ipAddress: string) {
-    const ec2BucketName = await ssmAws.getSSMParameter(
-        SSM_PARAMETER_KEYS.ec2PrivateKeyBucket
+    const remoteDockerBucketName = await ssmAws.getSSMParameter(
+        SSM_PARAMETER_KEYS.dockerKeysBucket
     )
-    const s3Client = s3Aws(ec2BucketName)
+    const s3Client = s3Aws(remoteDockerBucketName)
 
-    const sshKeyBuffer = await s3Client.downloadFileBuffer(EC2_PRIVATE_KEY_NAME)
+    const [ca, key, cert] = await Promise.all([
+        s3Client.downloadFileBuffer(REMOTE_DOCKER_CRED.ca),
+        s3Client.downloadFileBuffer(REMOTE_DOCKER_CRED.key),
+        s3Client.downloadFileBuffer(REMOTE_DOCKER_CRED.cert)
+    ])
 
-    const decoder = new TextDecoder('utf-8')
-    const sshKey = decoder.decode(sshKeyBuffer)
+    invariant(ca && key && cert, 'Failed to download docker credentials')
 
     const docker = new Docker({
-        protocol: 'ssh',
-        port: 22,
-        username: 'ubuntu',
+        protocol: 'https',
+        ca: ca.toString(),
+        key: key.toString(),
+        cert: cert.toString(),
         host: ipAddress,
-        sshOptions: {
-            privateKey: sshKey
-        },
-        version: '1.41',
-        timeout: 12000_000
-    } as Docker.DockerOptions & { sshOptions: { privateKey: string } })
+        port: 2376,
+        version: '1.41'
+    })
     return docker
 }
-
-//https://github.com/apocas/dockerode/issues/621

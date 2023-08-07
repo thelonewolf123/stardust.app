@@ -1,25 +1,21 @@
 import { createClient, RedisClientOptions } from 'redis'
 
-import { env } from '../../env'
-
 const config: RedisClientOptions = {
-    url: env.REDIS_HOST
+    url: process.env.REDIS_HOST || 'localhost'
     // Add more configuration options here if needed.
 }
 
-const redis = createClient(config)
+const redisClient = createClient(config)
 
 // Optional: Add error handling for the Redis client
-redis.on('error', (err) => {
+redisClient.on('error', (err) => {
     console.error('Redis Client Error:', err)
 })
-
-const connectionPromise = redis.connect() // returns a Promise
 
 async function runLuaScript(luaScript: string, args: string[]) {
     try {
         // Execute the script with the container slug argument using EVAL
-        const result = await redis.eval(luaScript, {
+        const result = await redisClient.eval(luaScript, {
             arguments: args
         })
         console.log('Result:', result)
@@ -30,4 +26,4 @@ async function runLuaScript(luaScript: string, args: string[]) {
     return null
 }
 
-export default { client: redis, runLuaScript, connect: () => connectionPromise }
+export { redisClient, runLuaScript }
