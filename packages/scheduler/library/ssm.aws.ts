@@ -12,7 +12,13 @@ import { env } from '../../env'
 // Function to set a parameter in the SSM Parameter Store
 async function setSSMParameter(name: string, value: string) {
     // Create an SSM client
-    const ssmClient = new SSMClient({ region: env.AWS_REGION })
+    const ssmClient = new SSMClient({
+        region: env.AWS_REGION,
+        credentials: {
+            accessKeyId: env.AWS_ACCESS_KEY_ID,
+            secretAccessKey: env.AWS_ACCESS_KEY_SECRET
+        }
+    })
 
     // Prepare the PutParameterCommand
     const params = {
