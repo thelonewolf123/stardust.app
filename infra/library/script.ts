@@ -5,7 +5,15 @@ const dockerKey = generateDockerKey()
 
 export const ec2UserData = `#!/bin/bash
 sudo apt-get update
-sudo apt-get install -y docker.io git curl
+sudo apt-get install -y git curl
+sudo apt-get install ca-certificates curl gnupg -y
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo docker run hello-world
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
 sudo mkdir -p /data/certs
@@ -24,7 +32,7 @@ sudo systemctl daemon-reload
 sudo systemctl start docker
 `
 // https://www.ibm.com/docs/en/rtas/10.0.2_dev?topic=hosts-setting-up-remote-docker
-// curl -k https://3.83.215.203:2376/images/json \
+// curl -k https://54.196.176.121:2376/images/json \
 //   --cert ./infra/certs/client-docker-cert.pem \
 //   --key ./infra/certs/client-docker-key.pem \
 //   --cacert ./infra/certs/ca-key.pem
