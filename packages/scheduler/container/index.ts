@@ -17,7 +17,7 @@ export const setupNewContainerConsumer = async () => {
         const data = ContainerSchedulerSchema.parse(
             JSON.parse(content.toString())
         )
-        createNewContainer(data)
+        await createNewContainer(data)
         console.log(data)
         channel.receiver.ack(message)
     })

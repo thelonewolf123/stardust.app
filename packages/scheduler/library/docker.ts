@@ -10,24 +10,14 @@ import ssmAws from './ssm.aws'
 
 // NOTE: This is a workaround for the following error:
 // Error: self signed certificate in certificate chain
-// process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 
 export async function getDockerClient(ipAddress: string) {
-    const remoteDockerBucketName = await ssmAws.getSSMParameter(
-        SSM_PARAMETER_KEYS.dockerKeysBucket
-    )
-    const s3Client = s3Aws(remoteDockerBucketName)
-
-    const dockerKeys = await Promise.all([
-        s3Client.downloadFileBuffer(REMOTE_DOCKER_CRED.ca),
-        s3Client.downloadFileBuffer(REMOTE_DOCKER_CRED.key),
-        s3Client.downloadFileBuffer(REMOTE_DOCKER_CRED.cert)
+    const [ca, key, cert] = await Promise.all([
+        ssmAws.getSSMParameter(REMOTE_DOCKER_CRED.ca),
+        ssmAws.getSSMParameter(REMOTE_DOCKER_CRED.key),
+        ssmAws.getSSMParameter(REMOTE_DOCKER_CRED.cert)
     ])
-
-    const decoder = new TextDecoder('utf-8')
-    const [ca, key, cert] = dockerKeys.map((z) => decoder.decode(z))
-
-    invariant(ca && key && cert, 'Failed to download docker credentials')
 
     const docker = new Docker({
         protocol: 'https',
@@ -36,7 +26,7 @@ export async function getDockerClient(ipAddress: string) {
         cert: cert,
         host: ipAddress,
         port: 2376,
-        version: '1.44'
+        version: 'v1.41'
     })
     return docker
 }

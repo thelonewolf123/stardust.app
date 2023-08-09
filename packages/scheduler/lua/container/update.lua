@@ -1,5 +1,5 @@
 -- Arguments passed from Node.js
-local containerId = ARGV[1]       -- The unique identifier for the container
+local containerSlug = ARGV[1]     -- The unique identifier for the container
 local keyValuePairsJson = ARGV[2] -- The JSON string containing the key-value pairs to update or add
 
 -- Get the current 'physicalHost' data from Redis
@@ -17,14 +17,14 @@ local physicalHost = cjson.decode(data)
 local function findContainerIndex()
     for i, instance in ipairs(physicalHost) do
         for j, container in ipairs(instance.containers) do
-            if container.containerId == containerId then
+            if container.containerSlug == containerSlug then
                 return i, j
             end
         end
     end
 end
 
--- Find the container index using the provided containerId or containerSlug
+-- Find the container index using the provided containerSlug or containerSlug
 local instanceIndex, containerIndex = findContainerIndex()
 
 -- Check if the container was found
@@ -49,5 +49,5 @@ local updatedData = cjson.encode(physicalHost)
 -- Update the 'physicalHost' key in Redis with the updated data
 redis.call('SET', 'physicalHost', updatedData)
 
--- Return the containerId to confirm that the container was updated successfully
-return containerId
+-- Return the containerSlug to confirm that the container was updated successfully
+return containerSlug

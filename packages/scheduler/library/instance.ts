@@ -1,21 +1,11 @@
-import scheduleContainerAdd from 'inline:../lua/container/schedule-add.lua'
-import scheduleInstanceAdd from 'inline:../lua/instance/schedule-add.lua'
-import instanceUpdate from 'inline:../lua/instance/update.lua'
 import invariant from 'invariant'
 
-import { InstanceModel } from '../../backend/database/models/instance'
+import { scheduleContainer } from '../lua/container'
+import { scheduleInstance, updateInstance } from '../lua/instance'
 import ec2Aws from './ec2.aws'
-import redis from './redis'
-
-export async function getAllInstances() {
-    return await InstanceModel.find({ status: 'running' }).lean()
-}
 
 export async function getInstanceForNewContainer(containerSlug: string) {
-    let instanceId: null | string = await redis.runLuaScript(
-        scheduleContainerAdd,
-        [containerSlug]
-    )
+    let instanceId: null | string = await scheduleContainer(containerSlug)
     console.log('instance Id', instanceId)
     if (!instanceId) {
         const instanceList = await ec2Aws.requestEc2OnDemandInstance(1)
@@ -31,24 +21,18 @@ export async function getInstanceForNewContainer(containerSlug: string) {
         )
 
         instanceId = newInstance.InstanceId
-        const [publicIp, imageId] = [
-            newInstance.PublicIpAddress,
-            newInstance.ImageId
-        ]
+        const imageId = newInstance.ImageId
 
-        const result = await redis.runLuaScript(scheduleInstanceAdd, [
-            instanceId,
-            publicIp,
-            imageId
-        ])
+        const result = await scheduleInstance(instanceId, imageId)
 
         invariant(result, 'Instance not scheduled')
 
         await waitTillInstanceReady(instanceId)
-        await redis.runLuaScript(instanceUpdate, [
-            instanceId,
-            JSON.stringify({ status: 'running' })
-        ])
+        const info = await ec2Aws.getInstanceInfoById(instanceId)
+        await updateInstance(instanceId, {
+            publicIp: info?.PublicIpAddress,
+            status: 'running'
+        })
     }
 
     return instanceId

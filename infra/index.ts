@@ -2,11 +2,7 @@ import { SSM_PARAMETER_KEYS } from '../constants/aws-infra'
 import { createAmiFromInstance } from './library/ami'
 import { dockerCerts } from './library/docker-keystore'
 import { instance } from './library/instance'
-import {
-    containerBucket,
-    privateKeyBucket,
-    remoteDockerBucket
-} from './library/s3'
+import { containerBucket } from './library/s3'
 import { securityGroup } from './library/security-group'
 import { keyPair } from './library/ssh-keystore'
 import {
@@ -21,9 +17,7 @@ const baseAmiSSM = storeBaseAmiId(ami)
 const keyPairSSM = storeKeyPairName(keyPair)
 const securityGroupSSM = storeSecurityGroup(securityGroup)
 const bucketSSM = [
-    storeBucketId(containerBucket, SSM_PARAMETER_KEYS.dockerSnapshotBucket),
-    storeBucketId(privateKeyBucket, SSM_PARAMETER_KEYS.ec2PrivateKeyBucket),
-    storeBucketId(remoteDockerBucket, SSM_PARAMETER_KEYS.dockerKeysBucket)
+    storeBucketId(containerBucket, SSM_PARAMETER_KEYS.dockerSnapshotBucket)
 ]
 
 export const amiId = ami.id

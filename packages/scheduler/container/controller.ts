@@ -1,4 +1,3 @@
-import updateContainer from 'inline:../lua/container/update.lua'
 import invariant from 'invariant'
 import { nanoid } from 'nanoid'
 import { z } from 'zod'
@@ -6,7 +5,7 @@ import { z } from 'zod'
 import { getDockerClient } from '../library/docker'
 import ec2Aws from '../library/ec2.aws'
 import { getInstanceForNewContainer } from '../library/instance'
-import { runLuaScript } from '../library/redis'
+import { updateContainer } from '../lua/container'
 import { ContainerSchedulerSchema } from '../schema'
 
 export async function createNewContainer(
@@ -20,21 +19,18 @@ export async function createNewContainer(
     console.log('instance', instance)
 
     const docker = await getDockerClient(instance.PublicIpAddress!)
-    const container = await docker.createContainer({
+    const newContainer = await docker.createContainer({
         Image: data.image,
         Cmd: data.command
     })
-    await container.start()
 
-    const info = await container.inspect()
+    await newContainer.start()
+    const info = await newContainer.inspect()
 
-    await runLuaScript(updateContainer, [
-        containerSlug,
-        JSON.stringify({
-            containerId: info.Id,
-            status: 'running'
-        })
-    ])
+    await updateContainer(containerSlug, {
+        containerId: info.Id,
+        status: 'running'
+    })
 
     console.log('docker', docker, info)
 }

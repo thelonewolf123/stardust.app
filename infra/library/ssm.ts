@@ -33,3 +33,11 @@ export function storeBucketId(bucket: aws.s3.Bucket, key: string) {
         value: bucket.id.apply((id) => id)
     })
 }
+
+export function storeSecret(secret: string, key: string) {
+    return new aws.ssm.Parameter(key, {
+        name: key,
+        type: 'SecureString',
+        value: secret
+    })
+}
