@@ -1,6 +1,6 @@
-import { createCheckpoint, getAllContainers } from '../core/docker'
-import { queueManager } from '../core/queue'
-import { WorkerQueueMessage } from '../types'
+import { WorkerQueueMessage } from '@/types'
+import { createCheckpoint, getAllContainers } from '@core/docker'
+import { queueManager } from '@core/queue'
 
 const setupListener = async () => {
     const exchange = 'worker_exchange'

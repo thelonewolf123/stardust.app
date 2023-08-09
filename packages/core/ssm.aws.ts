@@ -7,10 +7,10 @@ import {
     SSMClient
 } from '@aws-sdk/client-ssm'
 
-import { env } from '../../env'
+import { env } from '../env'
 
 // Function to set a parameter in the SSM Parameter Store
-async function setSSMParameter(name: string, value: string) {
+async function setSSMParameter(name: string, value: string, type = 'String') {
     // Create an SSM client
     const ssmClient = new SSMClient({
         region: env.AWS_REGION,
@@ -24,7 +24,7 @@ async function setSSMParameter(name: string, value: string) {
     const params = {
         Name: name,
         Value: value,
-        Type: 'String', // Change the type if required (String, SecureString, or StringList)
+        Type: type, // Change the type if required (String, SecureString, or StringList)
         Overwrite: true
     }
 
@@ -40,14 +40,14 @@ async function setSSMParameter(name: string, value: string) {
 }
 
 // Function to get a parameter from the SSM Parameter Store
-async function getSSMParameter(name: string) {
+async function getSSMParameter(name: string, secure: boolean = false) {
     // Create an SSM client
     const ssmClient = new SSMClient({ region: env.AWS_REGION })
 
     // Prepare the GetParameterCommand
     const params = {
         Name: name,
-        WithDecryption: true // Set to true if the parameter is of type SecureString
+        WithDecryption: secure // Set to true if the parameter is of type SecureString
     }
 
     // Call GetParameterCommand to retrieve the parameter from the Parameter Store

@@ -16,9 +16,10 @@ const ami = createAmiFromInstance(instance)
 const baseAmiSSM = storeBaseAmiId(ami)
 const keyPairSSM = storeKeyPairName(keyPair)
 const securityGroupSSM = storeSecurityGroup(securityGroup)
-const bucketSSM = [
-    storeBucketId(containerBucket, SSM_PARAMETER_KEYS.dockerSnapshotBucket)
-]
+const dockerSnapshotBucket = storeBucketId(
+    containerBucket,
+    SSM_PARAMETER_KEYS.dockerSnapshotBucket
+)
 
 export const amiId = ami.id
 export const instanceId = instance.id
@@ -29,4 +30,4 @@ export const instancePublicIp = instance.publicIp
 export const containerBucketId = containerBucket.id
 export const securityGroupSSMId = securityGroupSSM.id
 export const dockerCertsS3Ids = dockerCerts.map((cert) => cert.id)
-export const bucketSSMIds = bucketSSM.map((bucket) => bucket.id)
+export const dockerSnapshotBucketId = dockerSnapshotBucket.id

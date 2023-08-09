@@ -1,6 +1,6 @@
 import invariant from 'invariant'
 
-import { InstanceModel } from '../backend/database/models/instance'
+import { InstanceModel } from '@models/instance'
 
 export const instanceHealthCheck = async () => {
     const allInstance = await InstanceModel.find({

@@ -1,5 +1,6 @@
-import { queueManager } from '../../core/queue'
-import { DESTROY_CONTAINER, NEW_CONTAINER } from '../constants'
+import { DESTROY_CONTAINER, NEW_CONTAINER } from '@constants/queue'
+import { queueManager } from '@core/queue'
+
 import { ContainerSchedulerSchema } from '../schema'
 import { createNewContainer } from './controller'
 

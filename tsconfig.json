@@ -13,7 +13,17 @@
         "strict": true,
         "forceConsistentCasingInFileNames": true,
         "experimentalDecorators": true,
-        "emitDecoratorMetadata": true
+        "emitDecoratorMetadata": true,
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["packages/*"],
+            "@core/*": ["packages/core/*"],
+            "@backend/*": ["packages/backend/*"],
+            "@cron/*": ["packages/cron/*"],
+            "@spot/*": ["packages/spot/*"],
+            "@constants/*": ["constants/*"],
+            "@models/*": ["packages/backend/database/models/*"]
+        }
     },
     "exclude": ["**/dist/**"],
     "include": ["packages/**/**.ts", "global.d.ts", "constants/aws-infra.ts"]

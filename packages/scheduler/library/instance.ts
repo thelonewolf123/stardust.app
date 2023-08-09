@@ -1,8 +1,9 @@
 import invariant from 'invariant'
 
+import ec2Aws from '@core/ec2.aws'
+
 import { scheduleContainer } from '../lua/container'
 import { scheduleInstance, updateInstance } from '../lua/instance'
-import ec2Aws from './ec2.aws'
 
 export async function getInstanceForNewContainer(containerSlug: string) {
     let instanceId: null | string = await scheduleContainer(containerSlug)
@@ -13,10 +14,7 @@ export async function getInstanceForNewContainer(containerSlug: string) {
         const newInstance = instanceList[0]
 
         invariant(
-            newInstance &&
-                newInstance.InstanceId &&
-                newInstance.PublicIpAddress &&
-                newInstance.ImageId,
+            newInstance?.InstanceId && newInstance?.ImageId,
             'Instance not created'
         )
 

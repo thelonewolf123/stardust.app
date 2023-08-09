@@ -1,6 +1,6 @@
 import { Router } from 'express'
 
-import ec2 from '../../../scheduler/library/ec2.aws'
+import ec2 from '../../../core/ec2.aws'
 import { InstanceModel } from '../../database/models/instance'
 import { NewInstanceSchema } from './validator'
 

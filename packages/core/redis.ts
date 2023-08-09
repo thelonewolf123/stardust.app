@@ -1,7 +1,9 @@
 import { createClient, RedisClientOptions } from 'redis'
 
+import { env } from '@/env'
+
 const config: RedisClientOptions = {
-    url: process.env.REDIS_HOST || 'localhost'
+    url: env.REDIS_HOST || 'localhost'
     // Add more configuration options here if needed.
 }
 

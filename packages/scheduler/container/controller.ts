@@ -2,8 +2,9 @@ import invariant from 'invariant'
 import { nanoid } from 'nanoid'
 import { z } from 'zod'
 
+import ec2Aws from '@core/ec2.aws'
+
 import { getDockerClient } from '../library/docker'
-import ec2Aws from '../library/ec2.aws'
 import { getInstanceForNewContainer } from '../library/instance'
 import { updateContainer } from '../lua/container'
 import { ContainerSchedulerSchema } from '../schema'

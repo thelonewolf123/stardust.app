@@ -1,8 +1,8 @@
+import redis from '../core/redis'
 import {
     setupDestroyContainerConsumer,
     setupNewContainerConsumer
 } from './container'
-import redis from './library/redis'
 
 const consumers = async () => {
     try {
