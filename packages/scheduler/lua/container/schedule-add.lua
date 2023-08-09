@@ -1,6 +1,8 @@
 local containerSlug = ARGV[1]
 local data = redis.call('GET', 'physicalHost')
 local currentTime = tonumber(redis.call('TIME')[1])
+---@diagnostic disable-next-line: undefined-global
+local maxContainerCount = MAX_CONTAINER_PER_INSTANCE -- It'll be dynamically replace in ts
 -- Check if 'physicalHost' key exists
 if not data then
     return nil
@@ -11,7 +13,7 @@ local physicalHost = cjson.decode(data)
 
 -- Iterate through the physicalHost array to find the instance with less than 10 containers and scheduledForDeletionAt is null
 for i, instance in ipairs(physicalHost) do
-    if #instance.containers < 10 and instance.status == 'running' and (not instance.scheduledForDeletionAt or instance.scheduledForDeletionAt == nil) then
+    if #instance.containers < maxContainerCount and instance.status == 'running' and (not instance.scheduledForDeletionAt or instance.scheduledForDeletionAt == nil) then
         -- Add a new item to the containers array for the matching instance
         local newContainer = {
             containerSlug = containerSlug,

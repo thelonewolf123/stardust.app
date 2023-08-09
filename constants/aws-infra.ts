@@ -8,15 +8,14 @@ export const EC2_SECURITY_GROUP_NAME = 'soulForgeSecurityGroup'
 
 export const EC2_EXPOSED_PORTS = [22, 80, 443, 2376]
 
-export const REMOTE_DOCKER_CRED = {
-    ca: 'ca-key.pem',
-    key: 'client-docker-key.pem',
-    cert: 'client-docker-cert.pem'
-}
-
 export const SSM_PARAMETER_KEYS = {
     baseAmiId: 'base-ami-id',
     baseSecurityGroup: 'base-security-group',
     baseKeyParName: 'base-key-pair-name',
-    dockerSnapshotBucket: 'docker-snapshot-bucket'
+    dockerSnapshotBucket: 'docker-snapshot-bucket',
+    dockerCa: 'ca-key.pem',
+    dockerKey: 'client-docker-key.pem',
+    dockerCert: 'client-docker-cert.pem'
 }
+
+export const MAX_CONTAINER_PER_INSTANCE = 2
