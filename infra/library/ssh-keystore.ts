@@ -7,8 +7,11 @@ import { storeSecret } from './ssm'
 const sshKey = generateSshKey()
 
 export const ec2Creds = [
-    storeSecret(sshKey.privateKey, awsInfra.EC2_PRIVATE_KEY_NAME),
-    storeSecret(sshKey.publicKey, awsInfra.EC2_PUBLIC_KEY_NAME)
+    storeSecret({
+        secret: sshKey.privateKey,
+        key: awsInfra.EC2_PRIVATE_KEY_NAME
+    }),
+    storeSecret({ secret: sshKey.publicKey, key: awsInfra.EC2_PUBLIC_KEY_NAME })
 ]
 
 export const keyPair = new aws.ec2.KeyPair(awsInfra.SSH_KEY_NAME, {
