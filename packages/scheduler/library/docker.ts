@@ -16,12 +16,16 @@ export async function getDockerClient(ipAddress: string) {
 
     const docker = new Docker({
         protocol: 'https',
+        headers: {
+            Authorization: 'Bearer asdfg'
+        },
         ca: ca,
         key: key,
         cert: cert,
         host: ipAddress,
         port: 2376,
-        version: 'v1.41'
+        version: 'v1.41',
+        timeout: 30_000
     })
     return docker
 }

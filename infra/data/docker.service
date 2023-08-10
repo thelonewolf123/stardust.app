@@ -11,7 +11,7 @@ Type=notify
 # the default is not to use systemd for cgroups because the delegate issues still
 # exists and systemd currently does not support the cgroup feature set required
 # for containers run by docker
-ExecStart=/usr/bin/dockerd  --tlsverify --tlscacert=/data/certs/ca.pem --tlscert=/data/certs/server-cert.pem --tlskey=/data/certs/server-key.pem  -H fd:// -H=0.0.0.0:2376
+ExecStart=/usr/bin/dockerd  --tlsverify --tlscacert=/data/certs/ca.pem --tlscert=/data/certs/server-cert.pem --tlskey=/data/certs/server-key.pem -H=0.0.0.0:2376
 ExecReload=/bin/kill -s HUP $MAINPID
 TimeoutSec=0
 RestartSec=2
