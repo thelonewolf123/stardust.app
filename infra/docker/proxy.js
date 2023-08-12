@@ -6,6 +6,7 @@ const proxy = httpProxy.createProxyServer()
 const UNIX_SOCKET_PATH = '/var/run/docker.sock'
 const BEARER_TOKEN = process.env.BEARER_TOKEN
 const TARGET_HOST = '0.0.0.0'
+const TARGET_PORT = 2375
 
 const server = http.createServer((req, res) => {
     // Extract the Bearer token from the request headers
@@ -34,6 +35,6 @@ proxy.on('error', (err, req, res) => {
     res.end('Proxy Error')
 })
 
-server.listen(2376, TARGET_HOST, () => {
-    console.log('Proxy server listening on port 8080')
+server.listen(TARGET_PORT, TARGET_HOST, () => {
+    console.log(`Proxy server listening on port ${TARGET_PORT}`)
 })
