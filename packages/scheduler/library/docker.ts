@@ -1,15 +1,13 @@
 import Docker from 'dockerode'
 
+import { env } from '@/env'
 import { SSM_PARAMETER_KEYS } from '@constants/aws-infra'
 import ssmAws from '@core/ssm.aws'
 
-// NOTE: This is a workaround for the following error:
-// Error: self signed certificate in certificate chain
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
-
 export async function getDockerClient(ipAddress: string) {
     const auth = await ssmAws.getParameter(
-        SSM_PARAMETER_KEYS.dockerRemotePassword
+        SSM_PARAMETER_KEYS.dockerRemotePassword,
+        true
     )
 
     const docker = new Docker({
@@ -18,7 +16,7 @@ export async function getDockerClient(ipAddress: string) {
         headers: {
             Authorization: `Bearer ${auth}`
         },
-        port: 2376,
+        port: 2375,
         version: 'v1.41',
         timeout: 30_000
     })
