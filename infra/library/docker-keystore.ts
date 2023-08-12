@@ -1,14 +1,8 @@
-import fs from 'fs'
-
-import * as aws from '@pulumi/aws'
-
+import { SSM_PARAMETER_KEYS } from '../../constants/aws-infra'
+import { env } from '../../packages/env'
 import { storeSecret } from './ssm'
 
-export const dockerCerts = fs.existsSync('./certs')
-    ? fs.readdirSync('./certs').map((file) => {
-          return storeSecret({
-              secret: fs.readFileSync(`./certs/${file}`).toString(),
-              key: file
-          })
-      })
-    : process.exit(1)
+export const dockerHostPassword = storeSecret({
+    secret: env.REMOTE_DOCKER_PASSWORD,
+    key: SSM_PARAMETER_KEYS.dockerRemotePassword
+})

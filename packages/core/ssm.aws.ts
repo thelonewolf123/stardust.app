@@ -10,7 +10,7 @@ import {
 import { env } from '../env'
 
 // Function to set a parameter in the SSM Parameter Store
-async function setSSMParameter(name: string, value: string, type = 'String') {
+async function setParameter(name: string, value: string, type = 'String') {
     // Create an SSM client
     const ssmClient = new SSMClient({
         region: env.AWS_REGION,
@@ -40,7 +40,7 @@ async function setSSMParameter(name: string, value: string, type = 'String') {
 }
 
 // Function to get a parameter from the SSM Parameter Store
-async function getSSMParameter(name: string, secure: boolean = false) {
+async function getParameter(name: string, secure: boolean = false) {
     // Create an SSM client
     const ssmClient = new SSMClient({ region: env.AWS_REGION })
 
@@ -62,4 +62,4 @@ async function getSSMParameter(name: string, secure: boolean = false) {
     }
 }
 
-export default { setSSMParameter, getSSMParameter }
+export default { setParameter, getParameter }

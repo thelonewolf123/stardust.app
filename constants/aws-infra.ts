@@ -13,9 +13,7 @@ export const SSM_PARAMETER_KEYS = {
     baseSecurityGroup: 'base-security-group',
     baseKeyParName: 'base-key-pair-name',
     dockerSnapshotBucket: 'docker-snapshot-bucket',
-    dockerCa: 'ca-key.pem',
-    dockerKey: 'client-docker-key.pem',
-    dockerCert: 'client-docker-cert.pem'
+    dockerRemotePassword: 'docker-remote-host-password'
 }
 
 export const MAX_CONTAINER_PER_INSTANCE = 2

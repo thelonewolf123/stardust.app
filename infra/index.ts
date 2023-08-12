@@ -1,6 +1,6 @@
 import { SSM_PARAMETER_KEYS } from '../constants/aws-infra'
 import { createAmiFromInstance } from './library/ami'
-import { dockerCerts } from './library/docker-keystore'
+import { dockerHostPassword } from './library/docker-keystore'
 import { instance } from './library/instance'
 import { containerBucket } from './library/s3'
 import { securityGroup } from './library/security-group'
@@ -29,5 +29,5 @@ export const keyPairSSMId = keyPairSSM.id
 export const instancePublicIp = instance.publicIp
 export const containerBucketId = containerBucket.id
 export const securityGroupSSMId = securityGroupSSM.id
-export const dockerCertsS3Ids = dockerCerts.map((cert) => cert.id)
+export const dockerHostPasswordId = dockerHostPassword.id
 export const dockerSnapshotBucketId = dockerSnapshotBucket.id

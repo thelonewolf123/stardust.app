@@ -1,7 +1,6 @@
+import axios from 'axios'
 import { execSync } from 'child_process'
 import { existsSync, readFileSync } from 'fs'
-
-import { env } from '../../packages/env'
 
 export function generateSshKey() {
     const isKeyExist =
@@ -23,34 +22,34 @@ mv ./infra-private-key.pub ./infra-public-key.pub
         publicKey: readFileSync('./infra-public-key.pub').toString()
     }
 }
-
-export function generateDockerKey() {
-    const keyPath = {
-        ca: './certs/ca.pem',
-        cert: './certs/server-cert.pem',
-        key: './certs/server-key.pem'
-    }
-    const isKeyExist = Object.values(keyPath).every(existsSync)
-
-    if (!isKeyExist) {
-        console.log("Generating docker's key")
-        const command = `
-#!/bin/bash
-rm -rf ./certs
-./scripts/create-certs.sh -m ca -pw ${env.REMOTE_DOCKER_PASSWORD} -t certs -e 900
-./scripts/create-certs.sh -m server -h docker.soulforge.com -pw ${env.REMOTE_DOCKER_PASSWORD} -t certs -e 365
-./scripts/create-certs.sh -m client -h docker -pw ${env.REMOTE_DOCKER_PASSWORD} -t certs -e 365`
-
-        console.log(
-            'Please run the command to generate docker certificate',
-            command
+export async function getArchLinuxAmiId(region: string) {
+    return axios
+        .get(
+            `https://5nplxwo1k1.execute-api.eu-central-1.amazonaws.com/prod/${region}`
         )
-        process.exit(1)
-    }
+        .then((r) => Promise.resolve(r.data))
+        .then((r) => {
+            const amiList = r.arch_amis
+            const ami = amiList.find(
+                (a: {
+                    ami: string
+                    region: string
+                    arch: string
+                    type: string
+                    creation_time: string
+                }) => a.arch === 'x86_64'
+            )
 
-    return {
-        ca: readFileSync(keyPath.ca).toString(),
-        cert: readFileSync(keyPath.cert).toString(),
-        key: readFileSync(keyPath.key).toString()
-    }
+            if (!ami) {
+                throw new Error('No arch linux ami found')
+            }
+
+            return ami.ami
+        })
+}
+
+export const getFileContent = (path: string, replaceSingleQuotes: boolean) => {
+    return readFileSync(path)
+        .toString()
+        .replace(/\'/g, replaceSingleQuotes ? "\\'" : "'")
 }

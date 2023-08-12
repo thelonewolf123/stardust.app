@@ -23,9 +23,9 @@ const client = new EC2Client({
 
 async function requestEc2SpotInstance(count: number) {
     const [ami, securityGroup, keyPairName] = await Promise.all([
-        ssmAws.getSSMParameter(SSM_PARAMETER_KEYS.baseAmiId),
-        ssmAws.getSSMParameter(SSM_PARAMETER_KEYS.baseSecurityGroup),
-        ssmAws.getSSMParameter(SSM_PARAMETER_KEYS.baseKeyParName)
+        ssmAws.getParameter(SSM_PARAMETER_KEYS.baseAmiId),
+        ssmAws.getParameter(SSM_PARAMETER_KEYS.baseSecurityGroup),
+        ssmAws.getParameter(SSM_PARAMETER_KEYS.baseKeyParName)
     ])
 
     const command = new RequestSpotFleetCommand({
@@ -55,9 +55,9 @@ async function requestEc2SpotInstance(count: number) {
 
 async function requestEc2OnDemandInstance(count: number) {
     const [ami, securityGroup, keyPairName] = await Promise.all([
-        ssmAws.getSSMParameter(SSM_PARAMETER_KEYS.baseAmiId),
-        ssmAws.getSSMParameter(SSM_PARAMETER_KEYS.baseSecurityGroup),
-        ssmAws.getSSMParameter(SSM_PARAMETER_KEYS.baseKeyParName)
+        ssmAws.getParameter(SSM_PARAMETER_KEYS.baseAmiId),
+        ssmAws.getParameter(SSM_PARAMETER_KEYS.baseSecurityGroup),
+        ssmAws.getParameter(SSM_PARAMETER_KEYS.baseKeyParName)
     ])
 
     const command = new RunInstancesCommand({
