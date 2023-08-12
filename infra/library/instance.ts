@@ -3,8 +3,8 @@ import * as aws from '@pulumi/aws'
 import * as awsInfra from '../../constants/aws-infra'
 import { ec2UserData } from '../scripts'
 import { getAmi } from './ami'
+import { keyPair } from './keystore-ssh'
 import { securityGroup } from './security-group'
-import { keyPair } from './ssh-keystore'
 
 export const instance = new aws.ec2.Instance(awsInfra.EC2_INSTANCE_NAME, {
     ami: getAmi().apply((ami) => ami.id),

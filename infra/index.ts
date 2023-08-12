@@ -1,10 +1,10 @@
 import { SSM_PARAMETER_KEYS } from '../constants/aws-infra'
 import { createAmiFromInstance } from './library/ami'
-import { dockerHostPassword } from './library/docker-keystore'
 import { instance } from './library/instance'
+import { dockerHostPassword } from './library/keystore-docker'
+import { keyPair } from './library/keystore-ssh'
 import { containerBucket } from './library/s3'
 import { securityGroup } from './library/security-group'
-import { keyPair } from './library/ssh-keystore'
 import {
     storeBaseAmiId,
     storeBucketId,
