@@ -1,0 +1,11 @@
+FROM alpine
+
+RUN apk update
+RUN apk add --no-cache nodejs npm
+RUN mkdir /app
+WORKDIR /app
+COPY proxy.js .
+COPY package.json .
+RUN npm i
+
+CMD [ "node", "proxy.js" ]
