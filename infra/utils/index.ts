@@ -48,7 +48,7 @@ export async function getArchLinuxAmiId(region: string) {
         })
 }
 
-export const getFileContent = (path: string, replaceSingleQuotes: boolean) => {
+export const getFileContent = (path: string, replaceSingleQuotes?: boolean) => {
     return readFileSync(path)
         .toString()
         .replace(/\'/g, replaceSingleQuotes ? "\\'" : "'")

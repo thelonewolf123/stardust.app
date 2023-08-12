@@ -1,8 +1,8 @@
 import * as aws from '@pulumi/aws'
 
 import * as awsInfra from '../../constants/aws-infra'
+import { ec2UserData } from '../scripts'
 import { getAmi } from './ami'
-import { ec2UserData } from './script'
 import { securityGroup } from './security-group'
 import { keyPair } from './ssh-keystore'
 
