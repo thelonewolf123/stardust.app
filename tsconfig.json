@@ -29,5 +29,5 @@
         "require": ["tsconfig-paths/register"]
     },
     "exclude": ["**/dist/**"],
-    "include": ["packages/**/**.ts", "global.d.ts", "constants/aws-infra.ts"]
+    "include": ["packages/**/**.ts", "global.d.ts", "constants/*.ts"]
 }

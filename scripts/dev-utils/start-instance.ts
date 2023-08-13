@@ -1,7 +1,7 @@
-import ec2 from '../../packages/scheduler/library/ec2.aws'
+import ec2Aws from '../../packages/core/ec2.aws'
 
 async function main() {
-    const instance = await ec2.requestEc2OnDemandInstance(1)
+    const instance = await ec2Aws.requestEc2OnDemandInstance(1)
     console.log(instance)
 }
 

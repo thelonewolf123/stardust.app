@@ -1,4 +1,5 @@
 import deleteContainerScript from 'inline:./delete.lua'
+import getInstanceScript from 'inline:./get-instance.lua'
 import scheduleContainerScript from 'inline:./schedule-add.lua'
 import updateContainerScript from 'inline:./update.lua'
 
@@ -28,4 +29,13 @@ function updateContainer(
     ])
 }
 
-export { deleteContainer, scheduleContainer, updateContainer }
+function getInstanceIdByContainerId(containerId: string) {
+    return redis.runLuaScript(getInstanceScript, [containerId])
+}
+
+export {
+    deleteContainer,
+    scheduleContainer,
+    updateContainer,
+    getInstanceIdByContainerId
+}

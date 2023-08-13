@@ -1,13 +1,15 @@
 -- Arguments passed from Node.js
-local instanceId = ARGV[1]  -- The unique identifier for the instance
-local scheduledForDeletionAt = ARGV[2]  -- The date when the instance should be scheduled for deletion
+local instanceId = ARGV[1] -- The unique identifier for the instance
+
+local currentTime = tonumber(redis.call('TIME')[1])
+local scheduledForDeletionAt = currentTime + 120 -- The date when the instance should be scheduled for deletion
 
 -- Get the current 'physicalHost' data from Redis
 local data = redis.call('GET', 'physicalHost')
 
 -- Check if 'physicalHost' data exists in Redis
 if not data then
-    return nil  -- If it doesn't exist, return nil as there are no instances to schedule
+    return nil -- If it doesn't exist, return nil as there are no instances to schedule
 end
 
 -- Decode the JSON data into a Lua table
@@ -24,7 +26,7 @@ end
 
 -- Check if the instance with the given instanceId was found
 if not targetInstanceIndex then
-    return nil  -- If it was not found, return nil as we cannot schedule an instance that doesn't exist
+    return nil -- If it was not found, return nil as we cannot schedule an instance that doesn't exist
 end
 
 -- Update the 'scheduledForDeletionAt' field of the target instance with the provided value

@@ -6,7 +6,7 @@ local data = redis.call('GET', 'physicalHost')
 
 -- Check if 'physicalHost' data exists in Redis
 if not data then
-    return nil  -- If it doesn't exist, return nil as there are no instances to check
+    return nil -- If it doesn't exist, return nil as there are no instances to check
 end
 
 -- Decode the JSON data into a Lua table
@@ -15,7 +15,7 @@ local physicalHost = cjson.decode(data)
 -- Function to check if an instance is scheduled for deletion and past 2 minutes
 local function isScheduledForDeletionPastTwoMinutes(instance)
     local scheduledForDeletionAt = instance.scheduledForDeletionAt
-    if scheduledForDeletionAt and scheduledForDeletionAt ~= 'null' then
+    if scheduledForDeletionAt and scheduledForDeletionAt ~= nil then
         local scheduledTimestamp = tonumber(scheduledForDeletionAt)
         if currentTime - scheduledTimestamp >= 120 then -- 120 seconds = 2 minutes
             return true

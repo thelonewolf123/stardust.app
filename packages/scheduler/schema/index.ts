@@ -10,6 +10,10 @@ export const ContainerSchedulerSchema = z
     })
     .strict()
 
+export const ContainerDestroySchema = z.object({
+    containerId: z.string().min(1)
+})
+
 const instanceEnum = z.enum(['new-instance', 'destroy-instance'])
 
 const NewInstanceScheduleSchema = z.object({

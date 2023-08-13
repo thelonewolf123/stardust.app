@@ -7,7 +7,7 @@ export const securityGroup = new aws.ec2.SecurityGroup(
     {
         description: `Allow inbound traffic on ports ${awsInfra.EC2_EXPOSED_PORTS.join(
             ', '
-        )}} from anywhere and allow all outbound traffic`,
+        )}} from anywhere and allow all outbound traffic.`,
         egress: [
             {
                 protocol: '-1', // all protocols

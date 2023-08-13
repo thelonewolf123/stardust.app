@@ -1,7 +1,8 @@
+import { nanoid } from 'nanoid'
 import { z } from 'zod'
 
+import { NEW_CONTAINER } from '../../constants/queue'
 import { queueManager } from '../../packages/core/queue'
-import { NEW_CONTAINER } from '../../packages/scheduler/constants'
 import { ContainerSchedulerSchema } from '../../packages/scheduler/schema/index'
 
 async function start() {
@@ -9,8 +10,8 @@ async function start() {
     const queue = NEW_CONTAINER.QUEUE_NAME
     const routingKey = NEW_CONTAINER.ROUTING_KEY
     const message: z.infer<typeof ContainerSchedulerSchema> = {
-        containerSlug: 'test',
-        image: 'ubuntu',
+        containerSlug: nanoid(),
+        image: 'docker.io/library/alpine',
         command: ['echo', 'hello']
     }
 

@@ -1,8 +1,8 @@
 import { DESTROY_CONTAINER, NEW_CONTAINER } from '@constants/queue'
 import { queueManager } from '@core/queue'
 
-import { ContainerSchedulerSchema } from '../schema'
-import { createNewContainer } from './controller'
+import { ContainerDestroySchema, ContainerSchedulerSchema } from '../schema'
+import { createNewContainer, destroyContainer } from './controller'
 
 export const setupNewContainerConsumer = async () => {
     const { onMessage, channel, cleanup } = await queueManager({
@@ -18,9 +18,14 @@ export const setupNewContainerConsumer = async () => {
         const data = ContainerSchedulerSchema.parse(
             JSON.parse(content.toString())
         )
-        await createNewContainer(data)
-        console.log(data)
-        channel.receiver.ack(message)
+        createNewContainer(data)
+            .then(() => {
+                channel.receiver.ack(message)
+            })
+            .catch((error) => {
+                console.error(error)
+                channel.receiver.nack(message)
+            })
     })
 }
 
@@ -35,10 +40,17 @@ export const setupDestroyContainerConsumer = async () => {
     onMessage(async (message) => {
         if (!message) return
         const { content } = message
-        const data = ContainerSchedulerSchema.parse(
+        const data = ContainerDestroySchema.parse(
             JSON.parse(content.toString())
         )
         console.log(data)
-        channel.receiver.ack(message)
+        destroyContainer(data)
+            .then(() => {
+                channel.receiver.ack(message)
+            })
+            .catch((error) => {
+                console.error(error)
+                channel.receiver.nack(message)
+            })
     })
 }

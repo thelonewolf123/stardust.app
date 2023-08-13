@@ -10,8 +10,8 @@ function scheduleInstance(instanceId: string, imageId: string) {
     return redis.runLuaScript(scheduleInstanceScript, [instanceId, imageId])
 }
 
-function scheduleInstanceDelete(instanceId: string, amiId: string) {
-    return redis.runLuaScript(scheduleDeleteScript, [instanceId, amiId])
+function scheduleInstanceDelete(instanceId: string) {
+    return redis.runLuaScript(scheduleDeleteScript, [instanceId])
 }
 
 function updateInstance(

@@ -1,5 +1,4 @@
 import * as aws from '@pulumi/aws'
-import { region } from '@pulumi/aws/config'
 import * as pulumi from '@pulumi/pulumi'
 
 import * as awsInfra from '../../constants/aws-infra'

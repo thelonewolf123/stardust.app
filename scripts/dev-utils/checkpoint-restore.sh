@@ -4,7 +4,7 @@ container_name=$1
 
 # Check if both arguments are provided
 if [ -z "$container_name" ] then
-    echo "Usage: $0 <container_name> <backup_file>"
+    echo "Usage: $0 <container_name>"
     exit 1
 fi
 
