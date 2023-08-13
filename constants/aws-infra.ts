@@ -17,3 +17,4 @@ export const SSM_PARAMETER_KEYS = {
 }
 
 export const MAX_CONTAINER_PER_INSTANCE = 2
+export const INSTANCE_SCHEDULE_KEY = 'instance-schedule'

@@ -3,7 +3,8 @@ import {
     DescribeInstanceStatusCommand,
     EC2Client,
     RequestSpotFleetCommand,
-    RunInstancesCommand
+    RunInstancesCommand,
+    TerminateInstancesCommand
 } from '@aws-sdk/client-ec2'
 
 import {
@@ -89,9 +90,18 @@ async function getInstanceStatusById(instanceId: string) {
     return info.InstanceStatuses?.[0]?.InstanceStatus
 }
 
+async function terminateInstance(instanceId: string) {
+    const command = new TerminateInstancesCommand({
+        InstanceIds: [instanceId]
+    })
+    const info = await client.send(command)
+    return info.TerminatingInstances?.[0]
+}
+
 export default {
     requestEc2SpotInstance,
     requestEc2OnDemandInstance,
     getInstanceInfoById,
-    getInstanceStatusById
+    getInstanceStatusById,
+    terminateInstance
 }

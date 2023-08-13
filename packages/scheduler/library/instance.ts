@@ -1,20 +1,28 @@
 import invariant from 'invariant'
 
-import { Instance } from '@aws-sdk/client-ec2'
+import { INSTANCE_SCHEDULE_KEY } from '@constants/aws-infra'
 import ec2Aws from '@core/ec2.aws'
 
 import { scheduleContainer } from '../lua/container'
 import { scheduleInstance, updateInstance } from '../lua/instance'
+import { addLock, releaseLock } from '../lua/lock'
 
 export async function getInstanceForNewContainer(containerSlug: string) {
     let instanceId: null | string
     while (true) {
         instanceId = await scheduleContainer(containerSlug)
-        console.log('instance Id', instanceId)
         if (instanceId) {
             break
         }
-        instanceId = await scheduleNewInstance(1)
+
+        console.log('instance Id', instanceId)
+        const lock = await addLock(INSTANCE_SCHEDULE_KEY)
+        console.log('lock: ', lock)
+        if (lock === 'added') {
+            await scheduleNewInstance(1)
+            await releaseLock(INSTANCE_SCHEDULE_KEY)
+        }
+        await new Promise((resolve) => setTimeout(resolve, 1000))
     }
 
     return instanceId
