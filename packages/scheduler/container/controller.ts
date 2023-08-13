@@ -1,3 +1,4 @@
+import Dockerode, { ContainerInspectInfo } from 'dockerode'
 import invariant from 'invariant'
 import { z } from 'zod'
 
@@ -14,43 +15,103 @@ import { ContainerDestroySchema, ContainerSchedulerSchema } from '../schema'
 export async function createNewContainer(
     data: z.infer<typeof ContainerSchedulerSchema>
 ) {
-    const containerSlug = data.containerSlug
-    const instanceId = await getInstanceForNewContainer(containerSlug)
-    const instance = await ec2Aws.getInstanceInfoById(instanceId)
+    const getInstanceInfo = async (instanceId: string) => {
+        const instance = await ec2Aws.getInstanceInfoById(instanceId)
+        return instance
+    }
 
-    invariant(instance, 'Instance not found')
-    console.log('instance', instance)
+    const checkImageExistence = async (docker: Dockerode, image: string) => {
+        const images = await docker.listImages()
+        return images.some((imageData) => {
+            return imageData.RepoTags?.some((tag) => tag === image)
+        })
+    }
 
-    await waitTillInstanceReady(instanceId)
+    const pullImageIfNeeded = async (docker: Dockerode, image: string) => {
+        const imageExists = await checkImageExistence(docker, image)
 
-    const docker = await getDockerClient(instance.PublicIpAddress!)
-    const newContainer = await docker.createContainer({
-        Image: data.image,
-        Cmd: data.command
-    })
+        if (!imageExists) {
+            const stream = await docker.pull(image)
 
-    await newContainer.start()
-    const info = await newContainer.inspect()
+            await new Promise<void>((resolve, reject) => {
+                docker.modem.followProgress(stream, (err, res) => {
+                    if (err) {
+                        reject(err)
+                    } else {
+                        resolve()
+                    }
+                })
+            })
+        }
+    }
 
-    await updateContainer(containerSlug, {
-        containerId: info.Id,
-        status: 'running'
-    })
+    const startContainer = async (
+        docker: Dockerode,
+        image: string,
+        command: string[]
+    ) => {
+        const newContainer = await docker.createContainer({
+            Image: image,
+            Cmd: command
+        })
 
-    console.log('docker', docker, info)
+        await newContainer.start()
+        return newContainer.inspect()
+    }
+
+    const updateContainerStatus = async (
+        containerSlug: string,
+        info: ContainerInspectInfo
+    ) => {
+        await updateContainer(containerSlug, {
+            containerId: info.Id,
+            status: 'running'
+        })
+    }
+
+    return getInstanceForNewContainer(data.containerSlug)
+        .then(waitTillInstanceReady)
+        .then((info) => info?.InstanceId!)
+        .then(getInstanceInfo)
+        .then((info) => info?.PublicIpAddress!)
+        .then(getDockerClient)
+        .then(async (docker) => {
+            await pullImageIfNeeded(docker, data.image)
+            return docker
+        })
+        .then(async (docker) => {
+            const info = await startContainer(docker, data.image, data.command)
+            await updateContainerStatus(data.containerSlug, info)
+            console.log('docker', docker, info)
+        })
 }
 
 export async function destroyContainer(
     data: z.infer<typeof ContainerDestroySchema>
-) {
+): Promise<void> {
     console.log('destroy', data)
-    const instanceId = await getInstanceIdByContainerId(data.containerId)
-    invariant(instanceId, 'Instance not found')
-    const instance = await ec2Aws.getInstanceInfoById(instanceId)
-    invariant(instance, 'Instance not found')
 
-    const docker = await getDockerClient(instance.PublicIpAddress!)
-    const container = await docker.getContainer(data.containerId)
-    await container.stop()
-    await container.remove()
+    const getInstance = async (containerId: string) => {
+        const instanceId = await getInstanceIdByContainerId(containerId)
+        invariant(instanceId, 'Instance not found')
+        const instance = await ec2Aws.getInstanceInfoById(instanceId)
+        invariant(instance, 'Instance not found')
+        return instance
+    }
+
+    const stopAndRemoveContainer = async (
+        docker: Dockerode,
+        containerId: string
+    ) => {
+        const container = await docker.getContainer(containerId)
+        await container.stop()
+        await container.remove()
+    }
+
+    return getInstance(data.containerId)
+        .then((instance) => instance?.PublicIpAddress!)
+        .then(getDockerClient)
+        .then(async (docker) => {
+            await stopAndRemoveContainer(docker, data.containerId)
+        })
 }

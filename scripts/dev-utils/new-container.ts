@@ -1,4 +1,4 @@
-import { nanoid } from 'nanoid'
+import { v4 } from 'uuid'
 import { z } from 'zod'
 
 import { NEW_CONTAINER } from '../../constants/queue'
@@ -10,7 +10,7 @@ async function start() {
     const queue = NEW_CONTAINER.QUEUE_NAME
     const routingKey = NEW_CONTAINER.ROUTING_KEY
     const message: z.infer<typeof ContainerSchedulerSchema> = {
-        containerSlug: nanoid(),
+        containerSlug: v4(),
         image: 'docker.io/library/alpine',
         command: ['echo', 'hello']
     }

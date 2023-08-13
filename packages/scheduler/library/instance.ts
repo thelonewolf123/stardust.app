@@ -1,5 +1,6 @@
 import invariant from 'invariant'
 
+import { Instance } from '@aws-sdk/client-ec2'
 import ec2Aws from '@core/ec2.aws'
 
 import { scheduleContainer } from '../lua/container'
@@ -59,5 +60,5 @@ export async function waitTillInstanceReady(id: string) {
         status: 'running'
     })
 
-    return true
+    return info
 }
