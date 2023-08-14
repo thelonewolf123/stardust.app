@@ -13,12 +13,13 @@ local physicalHost = cjson.decode(data)
 
 -- Iterate through the physicalHost array to find the instance with less than 10 containers and scheduledForDeletionAt is null
 for i, instance in ipairs(physicalHost) do
-    if #instance.containers < maxContainerCount and instance.scheduledForDeletionAt == nil then
+    if #instance.containers < maxContainerCount and instance.status ~= 'failed' then
         -- Add a new item to the containers array for the matching instance
         local newContainer = {
             containerSlug = containerSlug,
             status = 'pending',
-            scheduledAt = currentTime -- assuming you want to set the current timestamp
+            scheduledAt = currentTime, -- assuming you want to set the current timestamp
+            updatedAt = currentTime
         }
         table.insert(instance.containers, newContainer)
 

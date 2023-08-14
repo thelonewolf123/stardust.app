@@ -4,6 +4,12 @@ export const NEW_CONTAINER = {
     ROUTING_KEY: 'new-container'
 }
 
+export const BUILD_CONTAINER = {
+    QUEUE_NAME: 'build-container',
+    EXCHANGE_NAME: 'build-container',
+    ROUTING_KEY: 'build-container'
+}
+
 export const DESTROY_CONTAINER = {
     QUEUE_NAME: 'destroy-container',
     EXCHANGE_NAME: 'destroy-container',

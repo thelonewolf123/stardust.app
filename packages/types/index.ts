@@ -22,7 +22,7 @@ export type PhysicalHostType = {
     scheduledForDeletionAt: Date | null
     createdAt: Date
     updatedAt: Date
-    status: 'running' | 'pending' | 'scheduled-for-deletion'
+    status: 'running' | 'pending' | 'scheduled-for-deletion' | 'failed'
     amiId: string
     containers: {
         containerId: string

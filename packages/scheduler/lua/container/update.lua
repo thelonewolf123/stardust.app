@@ -1,6 +1,7 @@
 -- Arguments passed from Node.js
 local containerSlug = ARGV[1]     -- The unique identifier for the container
 local keyValuePairsJson = ARGV[2] -- The JSON string containing the key-value pairs to update or add
+local currentTime = tonumber(redis.call('TIME')[1])
 
 -- Get the current 'physicalHost' data from Redis
 local data = redis.call('GET', 'physicalHost')
@@ -37,6 +38,9 @@ local container = physicalHost[instanceIndex].containers[containerIndex]
 
 -- Decode the JSON string containing the key-value pairs to update or add
 local keyValuePairs = cjson.decode(keyValuePairsJson)
+
+-- Update the 'updatedAt' field of the container with the current timestamp
+container.updatedAt = currentTime
 
 -- Update or add the key-value pairs in the container object
 for key, value in pairs(keyValuePairs) do

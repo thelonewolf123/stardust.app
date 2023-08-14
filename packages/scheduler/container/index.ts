@@ -1,11 +1,12 @@
 import { DESTROY_CONTAINER, NEW_CONTAINER } from '@constants/queue'
 import { queueManager } from '@core/queue'
 
+import { deleteContainer } from '../lua/container'
 import { ContainerDestroySchema, ContainerSchedulerSchema } from '../schema'
 import { createNewContainer, destroyContainer } from './controller'
 
 export const setupNewContainerConsumer = async () => {
-    const { onMessage, channel, cleanup } = await queueManager({
+    const { onMessage, channel, cleanup, publish } = await queueManager({
         exchange: NEW_CONTAINER.EXCHANGE_NAME,
         queue: NEW_CONTAINER.QUEUE_NAME,
         routingKey: NEW_CONTAINER.ROUTING_KEY
@@ -18,7 +19,7 @@ export const setupNewContainerConsumer = async () => {
         const data = ContainerSchedulerSchema.parse(
             JSON.parse(content.toString())
         )
-        createNewContainer(data)
+        createNewContainer(data, publish)
             .then(() => {
                 channel.receiver.ack(message)
             })

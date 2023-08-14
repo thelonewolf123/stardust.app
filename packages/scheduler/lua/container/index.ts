@@ -9,7 +9,7 @@ import redis from '@core/redis'
 
 function scheduleContainer(containerSlug: string) {
     const script = scheduleContainerScript.replace(
-        'MAX_CONTAINER_PER_INSTANCE',
+        /MAX_CONTAINER_PER_INSTANCE/g,
         `${MAX_CONTAINER_PER_INSTANCE}`
     )
     return redis.runLuaScript(script, [containerSlug])

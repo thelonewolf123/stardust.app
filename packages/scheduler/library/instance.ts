@@ -1,6 +1,10 @@
 import invariant from 'invariant'
 
-import { INSTANCE_SCHEDULE_KEY } from '@constants/aws-infra'
+import {
+    ERROR_CODES,
+    INSTANCE_SCHEDULE_KEY,
+    MAX_INSTANCE_STATUS_ATTEMPTS
+} from '@constants/aws-infra'
 import ec2Aws from '@core/ec2.aws'
 import { sleep } from '@core/utils'
 
@@ -50,12 +54,21 @@ export async function scheduleNewInstance(count: number) {
 }
 
 export async function waitTillInstanceReady(id: string) {
+    let attempts = 0
     while (true) {
         const instanceInfo = await ec2Aws.getInstanceStatusById(id)
         if (instanceInfo?.Status === 'ok') {
             break
         }
-        console.log('Waiting for instance to be ready...')
+
+        if (attempts > MAX_INSTANCE_STATUS_ATTEMPTS) {
+            await updateInstance(id, {
+                status: 'failed'
+            })
+            throw new Error(ERROR_CODES.INSTANCE_PROVISION_FAILED)
+        }
+
+        console.log('Waiting for instance to be ready...', instanceInfo)
         await sleep(1000)
     }
 

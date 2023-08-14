@@ -1,6 +1,5 @@
 import Docker from 'dockerode'
 
-import { env } from '@/env'
 import { SSM_PARAMETER_KEYS } from '@constants/aws-infra'
 import ssmAws from '@core/ssm.aws'
 
