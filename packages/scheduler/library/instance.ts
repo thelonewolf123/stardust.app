@@ -2,6 +2,7 @@ import invariant from 'invariant'
 
 import { INSTANCE_SCHEDULE_KEY } from '@constants/aws-infra'
 import ec2Aws from '@core/ec2.aws'
+import { sleep } from '@core/utils'
 
 import { scheduleContainer } from '../lua/container'
 import { scheduleInstance, updateInstance } from '../lua/instance'
@@ -22,7 +23,7 @@ export async function getInstanceForNewContainer(containerSlug: string) {
             await scheduleNewInstance(1)
             await releaseLock(INSTANCE_SCHEDULE_KEY)
         }
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        await sleep(1000)
     }
 
     return instanceId
@@ -55,13 +56,13 @@ export async function waitTillInstanceReady(id: string) {
             break
         }
         console.log('Waiting for instance to be ready...')
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        await sleep(1000)
     }
 
     const info = await ec2Aws.getInstanceInfoById(id)
 
     invariant(info && info?.PublicIpAddress, 'Instance not found')
-    const publicIp = info?.PublicIpAddress
+    const publicIp = info.PublicIpAddress
 
     await updateInstance(id, {
         publicIp,

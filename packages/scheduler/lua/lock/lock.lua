@@ -8,7 +8,7 @@ if action == "add" then
     else
         return "exists"
     end
-elseif action == "remove" then
+elseif action == "release" then
     local result = redis.call("HDEL", key, "lock")
     if result == 1 then
         return "released"

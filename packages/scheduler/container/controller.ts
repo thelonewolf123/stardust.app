@@ -71,9 +71,10 @@ export async function createNewContainer(
 
     return getInstanceForNewContainer(data.containerSlug)
         .then(waitTillInstanceReady)
-        .then((info) => info?.InstanceId!)
-        .then(getInstanceInfo)
-        .then((info) => info?.PublicIpAddress!)
+        .then((info) => {
+            if (info.PublicIpAddress) return info.PublicIpAddress
+            throw new Error('Public IP not found')
+        })
         .then(getDockerClient)
         .then(async (docker) => {
             await pullImageIfNeeded(docker, data.image)
