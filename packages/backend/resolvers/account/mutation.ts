@@ -1,33 +1,40 @@
+import crypto from 'crypto'
 import gql from 'graphql-tag'
+import jwt from 'jsonwebtoken'
 
-import { User } from '@/backend/database/models/user'
+import { UserModel } from '@/backend/database/models/user'
+import { env } from '@/env'
 import { Resolvers } from '@/types/graphql-server'
 
 export const mutation: Resolvers['Mutation'] = {
     signup: async (_, { username, email, password }, ctx) => {
-        const isUserTaken = await User.count({
+        const isUserTaken = await UserModel.count({
             $or: [{ username: username }, { email: email }]
         })
         if (isUserTaken) {
             throw new Error('Username/email is already taken')
         }
 
-        const user = await User.create({
+        const hashedPassword = crypto
+            .createHash('sha256')
+            .update(password)
+            .digest('hex')
+
+        await UserModel.create({
             username,
             email,
-            password
+            password: hashedPassword
         })
 
-        return {
-            username: user.username,
-            email: user.email,
-            createdAt: user.createdAt.getMilliseconds()
-        }
+        const token = jwt.sign({ username, count: 0 }, env.JWT_SECRET, {
+            expiresIn: '60h'
+        })
+        return token
     }
 }
 
 export const mutationType = gql`
     type Mutation {
-        signup(username: String!, email: String!, password: String!): User!
+        signup(username: String!, email: String!, password: String!): String!
     }
 `

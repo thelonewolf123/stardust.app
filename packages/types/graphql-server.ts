@@ -27,7 +27,7 @@ export type Container = {
 export type Mutation = {
   __typename?: 'Mutation';
   createProject: Scalars['Boolean'];
-  signup: User;
+  signup: Scalars['String'];
 };
 
 
@@ -166,7 +166,7 @@ export type ContainerResolvers<ContextType = Context, ParentType extends Resolve
 
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   createProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'input'>>;
-  signup?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'email' | 'password' | 'username'>>;
+  signup?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'email' | 'password' | 'username'>>;
 };
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {

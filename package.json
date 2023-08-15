@@ -4,14 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev:spot": "ts-node packages/spot/index.ts",
     "dev:server": "ts-node packages/backend/index.ts",
     "infra:up": "cd ./infra && pulumi up --stack dev -y",
     "infra:down": "cd ./infra && pulumi destroy --stack dev -y",
     "build": "node scripts/build.js",
-    "gc-server": "graphql-codegen --config codegen-server.yml",
-    "gc": "yarn gc-server"
+    "gc": "graphql-codegen --config codegen-server.yml"
   },
   "keywords": [],
   "author": "",

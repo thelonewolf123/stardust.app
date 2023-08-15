@@ -5,13 +5,20 @@ import { ApolloServer } from '@apollo/server'
 import { startStandaloneServer } from '@apollo/server/standalone'
 import { mergeResolvers, mergeTypeDefs } from '@graphql-tools/merge'
 
-import { User } from './database/models/user'
+import { UserModel } from './database/models/user'
 import { dbConnect } from './database/mongoose'
+import accountSchema from './resolvers/account'
 import containerSchema from './resolvers/container'
 
 const server = new ApolloServer({
-    typeDefs: mergeTypeDefs([...containerSchema.typeDefs]),
-    resolvers: mergeResolvers([containerSchema.resolvers])
+    typeDefs: mergeTypeDefs([
+        ...containerSchema.typeDefs,
+        ...accountSchema.typeDefs
+    ]),
+    resolvers: mergeResolvers([
+        containerSchema.resolvers,
+        accountSchema.resolvers
+    ])
 })
 
 server.addPlugin({
@@ -22,7 +29,7 @@ server.addPlugin({
 })
 
 startStandaloneServer(server, {
-    listen: { port: 4000 },
+    listen: { port: 4000, path: '/graphql' },
     context: async ({ req, res }) => {
         const token = req.headers['x-access-token']
 
@@ -38,16 +45,20 @@ startStandaloneServer(server, {
                         return reject(err)
                     }
 
-                    if (!decoded) return reject('No decoded token')
-
                     if (typeof decoded === 'string')
                         return reject('Decoded token is string')
 
-                    resolve(decoded.username)
+                    if (!decoded || !decoded.exp)
+                        return reject('No decoded token')
+
+                    if (decoded.exp < Date.now() / 1000)
+                        return reject('Token expired')
+
+                    resolve(decoded as any)
                 })
             })
 
-            const user = await User.findOne({ username })
+            const user = await UserModel.findOne({ username })
 
             if (!user) return { user: null }
             if (user.count !== count) return { user: null }
