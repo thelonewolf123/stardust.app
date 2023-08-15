@@ -3,12 +3,9 @@ const path = require('path')
 const inlineImportPlugin = require('esbuild-plugin-inline-import')
 const { execSync } = require('child_process')
 
-// const { dependencies, peerDependencies } = require('./package.json')
-
 const sharedConfig = {
     bundle: true,
     minify: true
-    // external: Object.keys(dependencies).concat(Object.keys(peerDependencies))
 }
 
 execSync('rm -rf dist')

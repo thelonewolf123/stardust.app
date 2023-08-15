@@ -1,4 +1,4 @@
-import { BaseContext, GraphQLRequestContext, HeaderMap } from '@apollo/server'
+import { User } from './graphql-server'
 
 export type WorkerQueueMessage =
     | {
@@ -35,6 +35,6 @@ export type PhysicalHostType = {
     }[]
 }
 
-export type Context = GraphQLRequestContext<BaseContext> & {
-    user: null | { userId: string }
+export type Context = {
+    user: null | User
 }
