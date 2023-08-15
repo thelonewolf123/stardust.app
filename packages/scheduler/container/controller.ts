@@ -50,7 +50,7 @@ export async function createNewContainer(
     const startContainer = async (
         docker: Dockerode,
         image: string,
-        command: string[]
+        command?: string[]
     ) => {
         const newContainer = await docker.createContainer({
             Image: image,
