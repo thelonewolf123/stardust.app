@@ -1,5 +1,7 @@
 import invariant from 'invariant'
 
+import redis from '@/core/redis'
+import { cleanupInstance } from '@/scheduler/lua/instance'
 import { InstanceModel } from '@models/instance'
 
 export const instanceHealthCheck = async () => {
@@ -21,4 +23,14 @@ export const instanceHealthCheck = async () => {
     )
     const result = inactiveInstance.filter(Boolean)
     console.log('health-check', result)
+}
+
+export const instanceCleanup = async () => {
+    // clean up logic handled in lua script
+    console.log('cron: instance cleanup')
+    const deletedInstance = await cleanupInstance()
+    const deletedInstanceObj = deletedInstance
+        ? JSON.parse(deletedInstance)
+        : []
+    console.log('deletedInstance', deletedInstanceObj)
 }

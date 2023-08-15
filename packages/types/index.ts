@@ -1,3 +1,5 @@
+import { BaseContext, GraphQLRequestContext, HeaderMap } from '@apollo/server'
+
 export type WorkerQueueMessage =
     | {
           type: 's3-backup'
@@ -31,4 +33,8 @@ export type PhysicalHostType = {
         scheduledAt: Date
         status: 'running' | 'stopped' | 'pending'
     }[]
+}
+
+export type Context = GraphQLRequestContext<BaseContext> & {
+    user: null | { userId: string }
 }

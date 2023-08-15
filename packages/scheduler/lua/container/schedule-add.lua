@@ -21,6 +21,10 @@ for i, instance in ipairs(physicalHost) do
             scheduledAt = currentTime, -- assuming you want to set the current timestamp
             updatedAt = currentTime
         }
+
+        instance.updatedAt = currentTime
+        instance.scheduledForDeletionAt = nil
+
         table.insert(instance.containers, newContainer)
 
         -- Convert the modified physicalHost table back to JSON string

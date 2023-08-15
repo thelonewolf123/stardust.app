@@ -1,65 +1,23 @@
-import { spawn } from 'child_process'
-import path from 'path'
+import Docker from 'dockerode'
 
-import { env } from '../env'
+import { SSM_PARAMETER_KEYS } from '@constants/aws-infra'
+import ssmAws from '@core/ssm.aws'
 
-async function startContainer(imageName: string) {
-    const ps = spawn('podman', ['run', '--rm', '-d', imageName])
-    let containerId = ''
-    ps.stdout.on('data', (chunk) => (containerId += chunk))
-    await new Promise((r) => ps.on('exit', r))
-    return containerId
-}
+export async function getDockerClient(ipAddress: string) {
+    const auth = await ssmAws.getParameter(
+        SSM_PARAMETER_KEYS.dockerRemotePassword,
+        true
+    )
 
-async function killContainer(containerId: string) {
-    const ps = spawn('podman', ['kill', containerId])
-    await new Promise((r) => ps.on('exit', r))
-    return containerId
-}
-
-async function createCheckpoint(containerId: string) {
-    const backup = path.join(env.CHECKPOINT_PATH, `${containerId}.tar.gz`)
-    const ps = spawn('podman', [
-        'container',
-        'checkpoint',
-        containerId,
-        '-e',
-        backup
-    ])
-    await new Promise((resolve, reject) => {
-        ps.on('error', (error) => reject(error))
-        ps.on('exit', resolve)
+    const docker = new Docker({
+        protocol: 'http',
+        host: ipAddress,
+        headers: {
+            Authorization: `Bearer ${auth}`
+        },
+        port: 2375,
+        version: 'v1.41',
+        timeout: 30_000
     })
-    return backup
+    return docker
 }
-
-async function restoreCheckpoint(backupFileName: string) {
-    const backupFullPath = path.join(env.CHECKPOINT_PATH, backupFileName)
-    const ps = spawn('podman', ['container', 'restore', '-i', backupFullPath])
-    await new Promise((resolve, reject) => {
-        ps.on('error', (error) => reject(error))
-        ps.on('exit', resolve)
-    })
-    let containerId = ''
-    ps.stdout.on('data', (chunk) => (containerId += chunk))
-    return containerId
-}
-
-async function getAllContainers() {
-    // podman ps -a -q
-    const ps = spawn('podman', ['ps', '-q'])
-    let containerIds = ''
-    ps.stdout.on('data', (chunk) => (containerIds += chunk))
-    await new Promise((r) => ps.on('exit', r))
-    return containerIds.split('\n').filter(Boolean)
-}
-
-export {
-    startContainer,
-    killContainer,
-    createCheckpoint,
-    restoreCheckpoint,
-    getAllContainers
-}
-
-// https://docs.podman.io/en/latest/_static/api.html#tag/containers/operation/ContainerCheckpointLibpod

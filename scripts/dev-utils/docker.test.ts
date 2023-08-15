@@ -1,4 +1,4 @@
-import { getDockerClient } from '../../packages/scheduler/library/docker'
+import { getDockerClient } from '../../packages/core/docker'
 
 async function main() {
     console.log(process.argv[2])

@@ -1,0 +1,11 @@
+schema:
+    - 'packages/backend/resolvers/**/*.ts'
+generates:
+    ./packages/types/graphql-server.ts:
+        plugins:
+            - typescript
+            - typescript-resolvers
+        config:
+            contextType: 'packages/types/index#Context'
+require:
+    - 'ts-node/register/transpile-only'

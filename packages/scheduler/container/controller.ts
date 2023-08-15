@@ -3,9 +3,9 @@ import invariant from 'invariant'
 import { z } from 'zod'
 
 import { ERROR_CODES } from '@constants/aws-infra'
+import { getDockerClient } from '@core/docker'
 import ec2Aws from '@core/ec2.aws'
 
-import { getDockerClient } from '../library/docker'
 import {
     getInstanceForNewContainer,
     waitTillInstanceReady

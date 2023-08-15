@@ -1,7 +1,6 @@
 import { DESTROY_CONTAINER, NEW_CONTAINER } from '@constants/queue'
 import { queueManager } from '@core/queue'
 
-import { deleteContainer } from '../lua/container'
 import { ContainerDestroySchema, ContainerSchedulerSchema } from '../schema'
 import { createNewContainer, destroyContainer } from './controller'
 

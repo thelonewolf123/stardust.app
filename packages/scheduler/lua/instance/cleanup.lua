@@ -24,9 +24,17 @@ local function isScheduledForDeletionPastTwoMinutes(instance)
     return false
 end
 
+-- Function to add schedule delete timestamp to an instance
+local function scheduleInstancesDeletion(instance)
+    if (not instance.scheduledForDeletionAt and #instance.containers == 0) or instance.status == 'failed' then
+        instance.scheduledForDeletionAt = currentTime
+    end
+end
+
 -- Iterate through the 'physicalHost' data and remove instances scheduled for deletion past 2 minutes
 local deletedInstances = {}
 for i, instance in ipairs(physicalHost) do
+    scheduleInstancesDeletion(instance) -- Add schedule delete timestamp to instances with no containers or failed status
     if isScheduledForDeletionPastTwoMinutes(instance) then
         table.insert(deletedInstances, instance.instanceId)
         table.remove(physicalHost, i)
@@ -35,6 +43,7 @@ end
 
 -- Encode the modified 'physicalHost' table back to JSON
 local updatedData = cjson.encode(physicalHost)
+local deletedInstances = cjson.encode(deletedInstances)
 
 -- Update the 'physicalHost' key in Redis with the updated data
 redis.call('SET', 'physicalHost', updatedData)

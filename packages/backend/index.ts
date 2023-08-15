@@ -1,27 +1,31 @@
-import bodyParser from 'body-parser'
-import express from 'express'
+import { Express } from 'express'
+import gql from 'graphql-tag'
+
+import { Context } from '@/types'
+import { ApolloServer } from '@apollo/server'
+import { startStandaloneServer } from '@apollo/server/standalone'
+import { mergeResolvers, mergeTypeDefs } from '@graphql-tools/merge'
 
 import { dbConnect } from './database/mongoose'
-import containerRoute from './modules/container'
-import instanceRoute from './modules/instance'
+import containerSchema from './resolvers/container'
 
-const app = express()
-
-app.use(bodyParser)
-
-app.get('/api/health', (req, res) => {
-    return res.send('OK')
+const server = new ApolloServer({
+    typeDefs: mergeTypeDefs([...containerSchema.typeDefs]),
+    resolvers: mergeResolvers([containerSchema.resolvers])
 })
 
-app.use(containerRoute)
-app.use(instanceRoute)
+server.addPlugin({
+    async serverWillStart() {
+        console.log('Server starting up!')
+        await dbConnect()
+    }
+})
 
-async function start() {
-    console.log('start server')
-    await Promise.all([dbConnect()])
-    app.listen(process.env.PORT || 3000, () => {
-        console.log('Server started at ', process.env.PORT || 3000)
+startStandaloneServer(server, {
+    listen: { port: 4000 },
+    context: async ({ req, res }) => ({
+        authScope: req.headers.authorization
     })
-}
-
-start()
+}).then(({ url }) => {
+    console.log(`🚀 Server listening at: ${url}`)
+})

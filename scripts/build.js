@@ -1,6 +1,7 @@
 const { build } = require('esbuild')
 const path = require('path')
 const inlineImportPlugin = require('esbuild-plugin-inline-import')
+const { execSync } = require('child_process')
 
 // const { dependencies, peerDependencies } = require('./package.json')
 
@@ -10,9 +11,10 @@ const sharedConfig = {
     // external: Object.keys(dependencies).concat(Object.keys(peerDependencies))
 }
 
+execSync('rm -rf dist')
+
 const entries = {
     backend: path.resolve(__dirname, '../packages/backend/index.ts'),
-    spot: path.resolve(__dirname, '../packages/spot/index.ts'),
     lambda: path.resolve(__dirname, '../packages/lambda/index.ts'),
     cron: path.resolve(__dirname, '../packages/cron/index.ts'),
     scheduler: path.resolve(__dirname, '../packages/scheduler/index.ts')
