@@ -1,16 +1,16 @@
 import { SSM_PARAMETER_KEYS } from '../constants/aws-infra'
-import { createAmiFromInstance } from './library/ami'
-import { instance } from './library/instance'
-import { dockerHostPassword } from './library/keystore-docker'
-import { keyPair } from './library/keystore-ssh'
-import { containerBucket } from './library/s3'
-import { securityGroup } from './library/security-group'
+import { createAmiFromInstance } from './resource/ami'
+import { instance } from './resource/instance'
+import { dockerHostPassword } from './resource/keystore-docker'
+import { keyPair } from './resource/keystore-ec2'
+import { containerBucket } from './resource/s3'
+import { securityGroup } from './resource/security-group'
 import {
     storeBaseAmiId,
     storeBucketId,
     storeKeyPairName,
     storeSecurityGroup
-} from './library/ssm'
+} from './resource/ssm'
 
 const ami = createAmiFromInstance(instance)
 const baseAmiSSM = storeBaseAmiId(ami)

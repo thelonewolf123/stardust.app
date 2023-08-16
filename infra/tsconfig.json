@@ -13,5 +13,5 @@
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true
     },
-    "include": ["*.ts", "library/*.ts", "utils/*.ts", "scripts/index.ts"]
+    "include": ["*.ts", "resource/*.ts", "utils/*.ts", "scripts/index.ts"]
 }
