@@ -3,7 +3,7 @@ import { getModelForClass, prop, PropType, Ref } from '@typegoose/typegoose'
 import { InstanceModel } from './instance'
 import { UserModel } from './user'
 
-class ContainerClass {
+class Container {
     @prop({ type: String, required: true })
     public containerSlug!: string
 
@@ -42,4 +42,4 @@ class ContainerClass {
     public createdBy!: Ref<typeof UserModel>
 }
 
-export const ContainerModel = getModelForClass(ContainerClass)
+export const ContainerModel = getModelForClass(Container)

@@ -1,6 +1,6 @@
 import { getModelForClass, prop } from '@typegoose/typegoose'
 
-class InstanceClass {
+class Instance {
     @prop({ type: String, required: true })
     public amiId!: string
 
@@ -33,4 +33,4 @@ class InstanceClass {
     public region!: string
 }
 
-export const InstanceModel = getModelForClass(InstanceClass)
+export const InstanceModel = getModelForClass(Instance)

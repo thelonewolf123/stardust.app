@@ -1,6 +1,6 @@
 import { getModelForClass, prop } from '@typegoose/typegoose'
 
-class UserClass {
+class User {
     @prop({ type: String, required: true })
     public username!: string
 
@@ -18,4 +18,4 @@ class UserClass {
     public createdAt!: Date
 }
 
-export const UserModel = getModelForClass(UserClass)
+export const UserModel = getModelForClass(User)
