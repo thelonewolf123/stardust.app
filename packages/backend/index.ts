@@ -6,7 +6,7 @@ import { startStandaloneServer } from '@apollo/server/standalone'
 import { mergeResolvers, mergeTypeDefs } from '@graphql-tools/merge'
 
 import { UserModel } from './database/models/user'
-import { dbConnect } from './database/mongoose'
+import { connect } from './database/mongoose'
 import accountSchema from './resolvers/account'
 import containerSchema from './resolvers/container'
 
@@ -24,7 +24,7 @@ const server = new ApolloServer({
 server.addPlugin({
     async serverWillStart() {
         console.log('Server starting up!')
-        await dbConnect()
+        await connect()
     }
 })
 

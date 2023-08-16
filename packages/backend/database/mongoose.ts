@@ -1,4 +1,4 @@
-import mongoose, { connect, Connection } from 'mongoose'
+import mongoose from 'mongoose'
 
 import { env } from '../../env'
 
@@ -34,3 +34,6 @@ export async function dbConnect() {
     cached.conn = await cached.promise
     return cached.conn
 }
+
+const connectPromise = dbConnect()
+export const connect = () => connectPromise
