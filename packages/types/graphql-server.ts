@@ -20,6 +20,7 @@ export type ContainerInput = {
   description: Scalars['String'];
   env?: InputMaybe<Array<EnvInput>>;
   image: Scalars['String'];
+  metaData?: InputMaybe<Array<MetaDataInput>>;
   port?: InputMaybe<Scalars['String']>;
 };
 
@@ -81,6 +82,11 @@ export type User = {
   createdAt: Scalars['Float'];
   email: Scalars['String'];
   username: Scalars['String'];
+};
+
+export type MetaDataInput = {
+  name: Scalars['String'];
+  value: Scalars['String'];
 };
 
 
@@ -163,6 +169,7 @@ export type ResolversTypes = {
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']>;
   User: ResolverTypeWrapper<User>;
+  metaDataInput: MetaDataInput;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -175,6 +182,7 @@ export type ResolversParentTypes = {
   Query: {};
   String: Scalars['String'];
   User: User;
+  metaDataInput: MetaDataInput;
 };
 
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {

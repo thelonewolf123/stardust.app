@@ -6,12 +6,18 @@ export const typeDefs = gql`
         value: String!
     }
 
+    input metaDataInput {
+        name: String!
+        value: String!
+    }
+
     input ContainerInput {
         description: String!
         image: String!
         command: [String!]
         port: String
         env: [EnvInput!]
+        metaData: [metaDataInput!]
     }
 
     enum ContainerStatus {

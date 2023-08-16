@@ -13,9 +13,9 @@ class Container {
     @prop({
         type: String,
         required: true,
-        enum: ['pending', 'running', 'stopped', 'checkpoint', 'deleted']
+        enum: ['pending', 'running', 'checkpoint', 'terminated']
     })
-    public status!: 'pending' | 'running' | 'stopped' | 'checkpoint' | 'deleted'
+    public status!: 'pending' | 'running' | 'checkpoint' | 'terminated'
 
     @prop({ type: Date, required: true, default: Date.now() })
     public createdAt!: Date
@@ -24,7 +24,7 @@ class Container {
     public updatedAt!: Date
 
     @prop({ type: Date, required: false })
-    public deletedAt!: Date
+    public terminatedAt!: Date
 
     @prop({ type: String, required: false }, PropType.MAP)
     public metaData!: Record<string, string>

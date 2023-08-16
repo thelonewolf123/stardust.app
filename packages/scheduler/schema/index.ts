@@ -6,7 +6,7 @@ export const ContainerSchedulerSchema = z
         image: z.string().min(1),
         command: z.array(z.string().min(1)).optional(),
         env: z.record(z.string().min(1)).optional(),
-        ports: z.record(z.string().min(1), z.number()).optional()
+        ports: z.array(z.number().min(0).max(65535)).optional()
     })
     .strict()
 
