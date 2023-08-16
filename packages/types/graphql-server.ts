@@ -15,24 +15,40 @@ export type Scalars = {
   Float: number;
 };
 
-export type Container = {
-  __typename?: 'Container';
+export type ContainerInput = {
+  command?: InputMaybe<Array<Scalars['String']>>;
   description: Scalars['String'];
-  id: Scalars['ID'];
+  env?: InputMaybe<Array<EnvInput>>;
   image: Scalars['String'];
+  port?: InputMaybe<Scalars['String']>;
+};
+
+export enum ContainerStatus {
+  Pending = 'pending',
+  Running = 'running',
+  Stopped = 'stopped'
+}
+
+export type EnvInput = {
   name: Scalars['String'];
-  price: Scalars['Float'];
+  value: Scalars['String'];
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createProject: Scalars['Boolean'];
+  createContainer: Scalars['Boolean'];
+  deleteContainer: Scalars['Boolean'];
   signup: Scalars['String'];
 };
 
 
-export type MutationCreateProjectArgs = {
-  input: Scalars['String'];
+export type MutationCreateContainerArgs = {
+  input: ContainerInput;
+};
+
+
+export type MutationDeleteContainerArgs = {
+  slug: Scalars['String'];
 };
 
 
@@ -44,9 +60,14 @@ export type MutationSignupArgs = {
 
 export type Query = {
   __typename?: 'Query';
-  getProjects: Array<Scalars['String']>;
+  containerStatus: ContainerStatus;
   login: Scalars['String'];
   logout: Scalars['Boolean'];
+};
+
+
+export type QueryContainerStatusArgs = {
+  slug: Scalars['String'];
 };
 
 
@@ -134,9 +155,10 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
-  Container: ResolverTypeWrapper<Container>;
+  ContainerInput: ContainerInput;
+  ContainerStatus: ContainerStatus;
+  EnvInput: EnvInput;
   Float: ResolverTypeWrapper<Scalars['Float']>;
-  ID: ResolverTypeWrapper<Scalars['ID']>;
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']>;
@@ -146,31 +168,23 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean'];
-  Container: Container;
+  ContainerInput: ContainerInput;
+  EnvInput: EnvInput;
   Float: Scalars['Float'];
-  ID: Scalars['ID'];
   Mutation: {};
   Query: {};
   String: Scalars['String'];
   User: User;
 };
 
-export type ContainerResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Container'] = ResolversParentTypes['Container']> = {
-  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  image?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  price?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  createProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'input'>>;
+  createContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationCreateContainerArgs, 'input'>>;
+  deleteContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteContainerArgs, 'slug'>>;
   signup?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'email' | 'password' | 'username'>>;
 };
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  getProjects?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  containerStatus?: Resolver<ResolversTypes['ContainerStatus'], ParentType, ContextType, RequireFields<QueryContainerStatusArgs, 'slug'>>;
   login?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<QueryLoginArgs, 'password' | 'username'>>;
   logout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
 };
@@ -183,7 +197,6 @@ export type UserResolvers<ContextType = Context, ParentType extends ResolversPar
 };
 
 export type Resolvers<ContextType = Context> = {
-  Container?: ContainerResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
