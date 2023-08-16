@@ -17,8 +17,7 @@ import { updateInstance } from '../lua/instance'
 import { ContainerDestroySchema, ContainerSchedulerSchema } from '../schema'
 
 export async function createNewContainer(
-    data: z.infer<typeof ContainerSchedulerSchema>,
-    publish: (message: Record<string, unknown>) => boolean
+    data: z.infer<typeof ContainerSchedulerSchema>
 ) {
     const instance = new InstanceStrategy(CLOUD_PROVIDER)
 
@@ -73,11 +72,12 @@ export async function createNewContainer(
 
     const handleError = async (error: Error) => {
         console.error('Container provision error: ', error)
+        await deleteContainer(data.containerSlug)
+
         if (error.message === ERROR_CODES.INSTANCE_PROVISION_FAILED) {
-            await deleteContainer(data.containerSlug)
-            publish(data)
-            return
+            console.log('Instance provision failed, retrying...')
         }
+
         throw error
     }
 
@@ -86,6 +86,7 @@ export async function createNewContainer(
         .then(instance.waitTillInstanceReady)
         .then((info) => {
             if (info.PublicIpAddress) return info.PublicIpAddress
+            // most likely instance terminated! or provision failed
             throw new Error('Public IP not found')
         })
         .then(getDockerClient)

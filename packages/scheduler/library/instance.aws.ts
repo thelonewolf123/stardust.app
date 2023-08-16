@@ -34,22 +34,30 @@ class InstanceStrategyAws {
         this.instanceAttempts = 0
         let isInstanceReady = false
 
-        while (!isInstanceReady) {
-            isInstanceReady = await this.#isInstanceReady(id)
-            await sleep(1000)
+        try {
+            while (!isInstanceReady) {
+                isInstanceReady = await this.#isInstanceReady(id)
+                await sleep(1000)
+            }
+
+            const info = await ec2Aws.getInstanceInfoById(id)
+            const publicIp = info?.PublicIpAddress
+
+            invariant(publicIp, 'Instance not found')
+
+            await updateInstance(id, {
+                publicIp,
+                status: 'running'
+            })
+
+            return info
+        } catch (error) {
+            console.log('error: ', error)
+            await updateInstance(id, {
+                status: 'failed'
+            })
+            throw error
         }
-
-        const info = await ec2Aws.getInstanceInfoById(id)
-        const publicIp = info?.PublicIpAddress
-
-        invariant(publicIp, 'Instance not found')
-
-        await updateInstance(id, {
-            publicIp,
-            status: 'running'
-        })
-
-        return info
     }
 
     async terminateInstance(instanceId: string) {

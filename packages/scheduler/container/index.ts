@@ -18,12 +18,12 @@ export const setupNewContainerConsumer = async () => {
         const data = ContainerSchedulerSchema.parse(
             JSON.parse(content.toString())
         )
-        createNewContainer(data, publish)
+        createNewContainer(data)
             .then(() => {
                 channel.receiver.ack(message)
             })
             .catch((error) => {
-                console.error(error)
+                console.error('New container provision failed: ', error)
                 channel.receiver.nack(message)
             })
     })
