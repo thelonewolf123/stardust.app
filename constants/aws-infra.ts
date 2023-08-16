@@ -18,10 +18,13 @@ export const SSM_PARAMETER_KEYS = {
 
 export const MAX_CONTAINER_PER_INSTANCE = 2
 export const MAX_INSTANCE_STATUS_ATTEMPTS = 300
+export const MAX_CONTAINER_SCHEDULE_ATTEMPTS = 300
+
 export const INSTANCE_SCHEDULE_KEY = 'instance-schedule'
 
 export const ERROR_CODES = {
     INSTANCE_PROVISION_FAILED: 'Instance provision failed',
     INSTANCE_NOT_FOUND: 'Instance not found',
-    CONTAINER_DELETE_FAILED: 'Container delete failed'
+    CONTAINER_DELETE_FAILED: 'Container delete failed',
+    CONTAINER_SCHEDULE_FAILED: 'Container schedule failed'
 }

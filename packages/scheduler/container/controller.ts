@@ -3,13 +3,11 @@ import invariant from 'invariant'
 import { z } from 'zod'
 
 import { ERROR_CODES } from '@constants/aws-infra'
+import { CLOUD_PROVIDER } from '@constants/provider'
 import { getDockerClient } from '@core/docker'
 import ec2Aws from '@core/ec2.aws'
 
-import {
-    getInstanceForNewContainer,
-    waitTillInstanceReady
-} from '../library/instance'
+import InstanceStrategy from '../library/instance'
 import {
     deleteContainer,
     getInstanceIdByContainerId,
@@ -22,6 +20,8 @@ export async function createNewContainer(
     data: z.infer<typeof ContainerSchedulerSchema>,
     publish: (message: Record<string, unknown>) => boolean
 ) {
+    const instance = new InstanceStrategy(CLOUD_PROVIDER)
+
     const checkImageExistence = async (docker: Dockerode, image: string) => {
         const images = await docker.listImages()
         return images.some((imageData) => {
@@ -81,8 +81,9 @@ export async function createNewContainer(
         throw error
     }
 
-    return getInstanceForNewContainer(data.containerSlug)
-        .then(waitTillInstanceReady)
+    return instance
+        .getInstanceForNewContainer(data.containerSlug)
+        .then(instance.waitTillInstanceReady)
         .then((info) => {
             if (info.PublicIpAddress) return info.PublicIpAddress
             throw new Error('Public IP not found')

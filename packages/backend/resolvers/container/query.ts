@@ -6,6 +6,6 @@ export const query: Resolvers['Query'] = {}
 
 export const queryType = gql`
     type Query {
-        getProjects: [String!]!
+        containerStatus(slug: String!): ContainerStatus!
     }
 `

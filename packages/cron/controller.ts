@@ -1,6 +1,8 @@
 import invariant from 'invariant'
 
+import InstanceStrategy from '@/scheduler/library/instance'
 import { cleanupInstance } from '@/scheduler/lua/instance'
+import { CLOUD_PROVIDER } from '@constants/provider'
 import { InstanceModel } from '@models/instance'
 
 export const instanceHealthCheck = async () => {
@@ -27,9 +29,18 @@ export const instanceHealthCheck = async () => {
 export const instanceCleanup = async () => {
     // clean up logic handled in lua script
     console.log('cron: instance cleanup')
+    const instance = new InstanceStrategy(CLOUD_PROVIDER)
     const deletedInstance = await cleanupInstance()
+
     const deletedInstanceObj: string[] = deletedInstance
         ? JSON.parse(deletedInstance)
         : []
+
     console.log('deletedInstance', deletedInstanceObj)
+
+    await Promise.all(
+        deletedInstanceObj.map(async (instanceId) => {
+            return instance.terminateInstance(instanceId)
+        })
+    )
 }

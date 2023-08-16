@@ -1,11 +1,22 @@
 import gql from 'graphql-tag'
 
 export const typeDefs = gql`
-    type Container {
-        id: ID!
+    input EnvInput {
         name: String!
+        value: String!
+    }
+
+    input ContainerInput {
         description: String!
         image: String!
-        price: Float!
+        command: [String!]
+        port: String
+        env: [EnvInput!]
+    }
+
+    enum ContainerStatus {
+        running
+        stopped
+        pending
     }
 `

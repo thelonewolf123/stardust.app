@@ -11,6 +11,7 @@
         "rootDir": ".",
         "esModuleInterop": true,
         "strict": true,
+        "target": "ESNext",
         "forceConsistentCasingInFileNames": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,

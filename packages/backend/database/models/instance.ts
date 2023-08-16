@@ -4,9 +4,6 @@ class InstanceClass {
     @prop({ type: String, required: true })
     public amiId!: string
 
-    @prop({ type: String, required: true })
-    public instanceSlug!: string
-
     @prop({ type: String, required: false })
     public instanceId!: string
 
@@ -17,7 +14,7 @@ class InstanceClass {
     })
     public status!: 'pending' | 'running' | 'stopped' | 'terminated'
 
-    @prop({ type: String, required: false })
+    @prop({ type: Boolean, required: false, default: false })
     public isTerminatedByHealthCheck!: boolean
 
     @prop({ type: Date, required: true })
