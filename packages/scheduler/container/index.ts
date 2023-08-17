@@ -1,8 +1,20 @@
-import { DESTROY_CONTAINER, NEW_CONTAINER } from '@constants/queue'
+import {
+    BUILD_CONTAINER,
+    DESTROY_CONTAINER,
+    NEW_CONTAINER
+} from '@constants/queue'
 import { queueManager } from '@core/queue'
 
-import { ContainerDestroySchema, ContainerSchedulerSchema } from '../schema'
-import { createNewContainer, destroyContainer } from './controller'
+import {
+    ContainerBuildSchema,
+    ContainerDestroySchema,
+    ContainerSchedulerSchema
+} from '../schema'
+import {
+    buildContainer,
+    createNewContainer,
+    destroyContainer
+} from './controller'
 
 export const setupNewContainerConsumer = async () => {
     const { onMessage, channel, cleanup, publish } = await queueManager({
@@ -45,6 +57,30 @@ export const setupDestroyContainerConsumer = async () => {
         )
         console.log(data)
         destroyContainer(data)
+            .then(() => {
+                channel.receiver.ack(message)
+            })
+            .catch((error) => {
+                console.error(error)
+                channel.receiver.nack(message)
+            })
+    })
+}
+
+export const setupBuildContainerConsumer = async () => {
+    const { onMessage, channel, cleanup } = await queueManager({
+        exchange: BUILD_CONTAINER.EXCHANGE_NAME,
+        queue: BUILD_CONTAINER.QUEUE_NAME,
+        routingKey: BUILD_CONTAINER.ROUTING_KEY
+    })
+    process.on('SIGINT', () => cleanup())
+
+    onMessage(async (message) => {
+        if (!message) return
+        const { content } = message
+        const data = ContainerBuildSchema.parse(JSON.parse(content.toString()))
+        console.log(data)
+        buildContainer(data)
             .then(() => {
                 channel.receiver.ack(message)
             })

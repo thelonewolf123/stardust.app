@@ -13,3 +13,10 @@ export const ContainerSchedulerSchema = z
 export const ContainerDestroySchema = z.object({
     containerId: z.string().min(1)
 })
+
+export const ContainerBuildSchema = z.object({
+    githubRepoUrl: z.string().min(1),
+    dockerPath: z.string().min(1),
+    ecrRepo: z.string().min(1),
+    buildArgs: z.record(z.string().optional()).optional()
+})

@@ -14,7 +14,11 @@ import {
     updateContainer
 } from '../lua/container'
 import { updateInstance } from '../lua/instance'
-import { ContainerDestroySchema, ContainerSchedulerSchema } from '../schema'
+import {
+    ContainerBuildSchema,
+    ContainerDestroySchema,
+    ContainerSchedulerSchema
+} from '../schema'
 
 export async function createNewContainer(
     data: z.infer<typeof ContainerSchedulerSchema>
@@ -152,4 +156,9 @@ export async function destroyContainer(
         .then(getDockerClient)
         .then((docker) => stopAndRemoveContainer(docker, data.containerId))
         .catch(handleError)
+}
+export async function buildContainer(
+    data: z.infer<typeof ContainerBuildSchema>
+) {
+    console.log('Build container!')
 }
