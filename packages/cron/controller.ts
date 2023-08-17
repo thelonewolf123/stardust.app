@@ -1,29 +1,30 @@
 import invariant from 'invariant'
 
+import { getDockerClient } from '@/core/docker'
 import InstanceStrategy from '@/scheduler/library/instance'
-import { cleanupInstance } from '@/scheduler/lua/instance'
+import { cleanupInstance, getAllPhysicalHosts } from '@/scheduler/lua/instance'
 import { CLOUD_PROVIDER } from '@constants/provider'
-import { InstanceModel } from '@models/instance'
 
 export const instanceHealthCheck = async () => {
-    const allInstance = await InstanceModel.find({
-        status: 'running'
-    }).lean()
+    const allInstance = await getAllPhysicalHosts()
     const inactiveInstance = await Promise.all(
-        allInstance.map(async (instance) => {
-            try {
-                const data = await fetch(
-                    `http://${instance.ipAddress}/_health`
-                ).then((r) => r.json())
-                invariant(data.ok, 'Instance is not healthy')
-            } catch (err) {
-                console.log((err as Error).message)
-                return instance
-            }
-        })
+        allInstance
+            .filter(({ status }) => status === 'running')
+            .map(async (instance) => {
+                try {
+                    const docker = await getDockerClient(instance.publicIp)
+                    const containers = await docker.listContainers()
+                    console.log('containers', containers)
+                } catch (err) {
+                    console.log((err as Error).message)
+                    return instance
+                }
+            })
     )
-    const result = inactiveInstance.filter(Boolean)
-    console.log('health-check', result)
+    const deadInstances = inactiveInstance
+        .filter(Boolean)
+        .map(({ instanceId }) => instanceId)
+    console.log('health-check', deadInstances)
 }
 
 export const instanceCleanup = async () => {
@@ -32,14 +33,10 @@ export const instanceCleanup = async () => {
     const instance = new InstanceStrategy(CLOUD_PROVIDER)
     const deletedInstance = await cleanupInstance()
 
-    const deletedInstanceObj: string[] = deletedInstance
-        ? JSON.parse(deletedInstance)
-        : []
-
-    console.log('deletedInstance', deletedInstanceObj)
+    console.log('deletedInstance', deletedInstance)
 
     await Promise.all(
-        deletedInstanceObj.map(async (instanceId) => {
+        deletedInstance.map(async (instanceId) => {
             return instance.terminateInstance(instanceId)
         })
     )

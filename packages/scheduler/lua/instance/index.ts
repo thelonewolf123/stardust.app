@@ -24,13 +24,22 @@ function updateInstance(
     ])
 }
 
-function cleanupInstance() {
-    return redis.runLuaScript(instanceCleanup, [])
+async function cleanupInstance(): Promise<string[]> {
+    const deletedInstance = await redis.runLuaScript(instanceCleanup, [])
+    const result = deletedInstance ? JSON.parse(deletedInstance) : []
+    return result
+}
+
+async function getAllPhysicalHosts(): Promise<PhysicalHostType[]> {
+    const hosts = await redis.client.get('physicalHost')
+    const result = hosts ? JSON.parse(hosts) : []
+    return result
 }
 
 export {
     scheduleInstance,
     scheduleInstanceDelete,
     updateInstance,
-    cleanupInstance
+    cleanupInstance,
+    getAllPhysicalHosts
 }
