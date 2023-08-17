@@ -1,7 +1,5 @@
 export const EC2_INSTANCE_TYPE = 't2.micro'
 export const EC2_INSTANCE_NAME = 'soulForgeBaseInstance'
-export const EC2_PRIVATE_KEY_NAME = 'ec2-privateKey.pem'
-export const EC2_PUBLIC_KEY_NAME = 'ec2-publicKey.pub'
 export const SSH_KEY_NAME = 'infra-soulbound-keypair'
 export const EC2_AMI_NAME = 'soulForgeBaseAmi'
 export const EC2_SECURITY_GROUP_NAME = 'soulForgeSecurityGroup'
@@ -13,7 +11,9 @@ export const SSM_PARAMETER_KEYS = {
     baseSecurityGroup: 'base-security-group',
     baseKeyParName: 'base-key-pair-name',
     dockerSnapshotBucket: 'docker-snapshot-bucket',
-    dockerRemotePassword: 'docker-remote-host-password'
+    dockerRemotePassword: 'docker-remote-host-password',
+    ec2PublicKey: 'ec2-public-key.pem',
+    ec2PrivateKey: 'ec2-private-key.pem'
 }
 
 export const MAX_CONTAINER_PER_INSTANCE = 2

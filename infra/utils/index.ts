@@ -7,14 +7,14 @@ export function generateSshKey() {
         existsSync('./infra-private-key.pem') &&
         existsSync('./infra-public-key.pub')
 
-    if (!isKeyExist) {
-        execSync(`
-#!/bin/bash
+    const sshScript = `#!/bin/bash
 rm -rf ./infra-private-key.pem ./infra-public-key.pub
 ssh-keygen -t rsa -b 4096 -f ./infra-private-key -N ""
 mv ./infra-private-key ./infra-private-key.pem
 mv ./infra-private-key.pub ./infra-public-key.pub
-        `)
+`
+    if (!isKeyExist) {
+        execSync(sshScript)
     }
 
     return {
@@ -22,6 +22,7 @@ mv ./infra-private-key.pub ./infra-public-key.pub
         publicKey: readFileSync('./infra-public-key.pub').toString()
     }
 }
+
 export async function getArchLinuxAmiId(region: string) {
     return axios
         .get(

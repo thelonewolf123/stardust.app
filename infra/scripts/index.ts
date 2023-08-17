@@ -34,7 +34,7 @@ ExecStop=/usr/bin/podman stop -t 2 docker-proxy-container
 WantedBy=default.target' | sudo tee /etc/systemd/system/docker-proxy.service
 
 # Create the proxy container without running it
-sudo podman create --name docker-proxy-container -v /var/run/podman/podman.sock:/var/run/docker.sock -p 2375:2375 -e BEARER_TOKEN='${env.REMOTE_DOCKER_PASSWORD}' docker.io/thelonewolf123/docker-proxy 2> /home/ubuntu/docker-proxy/create.log 
+sudo podman create --restart always --name docker-proxy-container -v /var/run/podman/podman.sock:/var/run/docker.sock -p 2375:2375 -e BEARER_TOKEN='${env.REMOTE_DOCKER_PASSWORD}' docker.io/thelonewolf123/docker-proxy 2> /home/ubuntu/docker-proxy/create.log 
 
 # Enable and start the service, making the container run on boot
 sudo systemctl enable docker-proxy.service
