@@ -11,7 +11,7 @@ async function getClient() {
     return connection
 }
 
-async function createQueue(
+async function createQueue<T>(
     amqp: Connection,
     args: {
         queue: string
@@ -27,7 +27,7 @@ async function createQueue(
         .catch(console.error)
     await channel.assertQueue(queue, { durable: true })
     await channel.bindQueue(queue, exchange, routingKey)
-    const publish = (message: Record<string, unknown>) => {
+    const publish = (message: T) => {
         return channel.publish(
             exchange,
             routingKey,
@@ -38,9 +38,17 @@ async function createQueue(
     return { channel, publish }
 }
 
-async function createConsumer(amqp: Connection, args: { queue: string }) {
+async function createConsumer(
+    amqp: Connection,
+    args: { queue: string; prefetch?: number }
+) {
     var channel = await amqp.createChannel()
     await channel.assertQueue(args.queue, { durable: true })
+
+    if (typeof args.prefetch === 'number') {
+        await channel.prefetch(1)
+    }
+
     const onMessage = (
         fn: (msg: ConsumeMessage | null) => void,
         consumerTag?: string
@@ -50,11 +58,14 @@ async function createConsumer(amqp: Connection, args: { queue: string }) {
     return { channel, onMessage }
 }
 
-const queueManager = async (args: {
-    queue: string
-    routingKey: string
-    exchange: string
-}) => {
+const queueManager = async (
+    args: {
+        queue: string
+        routingKey: string
+        exchange: string
+    },
+    options?: { prefetch?: number }
+) => {
     const { queue, routingKey, exchange } = args
     const client = await getClient()
     invariant(client, 'AMQP connection missing!')
@@ -64,7 +75,8 @@ const queueManager = async (args: {
         exchange
     })
     const { channel: receiver, onMessage } = await createConsumer(client, {
-        queue
+        queue,
+        prefetch: options?.prefetch
     })
     return {
         onMessage,

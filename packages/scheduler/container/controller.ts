@@ -157,8 +157,9 @@ export async function destroyContainer(
         .then((docker) => stopAndRemoveContainer(docker, data.containerId))
         .catch(handleError)
 }
+
 export async function buildContainer(
     data: z.infer<typeof ContainerBuildSchema>
 ) {
-    console.log('Build container!')
+    console.log('Build container!', data)
 }

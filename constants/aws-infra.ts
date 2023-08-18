@@ -13,7 +13,8 @@ export const SSM_PARAMETER_KEYS = {
     dockerSnapshotBucket: 'docker-snapshot-bucket',
     dockerRemotePassword: 'docker-remote-host-password',
     ec2PublicKey: 'ec2-public-key.pem',
-    ec2PrivateKey: 'ec2-private-key.pem'
+    ec2PrivateKey: 'ec2-private-key.pem',
+    dockerBuildInstanceId: 'docker-build-instance-id'
 }
 
 export const MAX_CONTAINER_PER_INSTANCE = 2

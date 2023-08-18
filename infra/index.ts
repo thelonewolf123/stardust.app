@@ -9,6 +9,7 @@ import {
     storeBaseAmiId,
     storeBucketId,
     storeKeyPairName,
+    storeSecret,
     storeSecurityGroup
 } from './resource/ssm'
 
@@ -20,12 +21,17 @@ const dockerSnapshotBucket = storeBucketId(
     containerBucket,
     SSM_PARAMETER_KEYS.dockerSnapshotBucket
 )
+const ec2InstanceSSM = storeSecret({
+    secret: instance.id,
+    key: SSM_PARAMETER_KEYS.dockerBuildInstanceId
+})
 
 export const amiId = ami.id
 export const instanceId = instance.id
 export const sshKeyName = keyPair.keyName
 export const baseAmiSSMId = baseAmiSSM.id
 export const keyPairSSMId = keyPairSSM.id
+export const ec2InstanceSSMId = ec2InstanceSSM.id
 export const instancePublicIp = instance.publicIp
 export const containerBucketId = containerBucket.id
 export const securityGroupSSMId = securityGroupSSM.id

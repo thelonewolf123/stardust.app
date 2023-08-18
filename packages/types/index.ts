@@ -1,4 +1,13 @@
-import { User } from './graphql-server'
+import { z } from 'zod'
+
+import { createQueue } from '@/core/queue'
+import {
+    ContainerBuildSchema,
+    ContainerDestroySchema,
+    ContainerSchedulerSchema
+} from '@/scheduler/schema'
+import { UserModel } from '@models/user'
+import { ReturnModelType } from '@typegoose/typegoose'
 
 export type WorkerQueueMessage =
     | {
@@ -27,5 +36,14 @@ export type PhysicalHostType = {
 }
 
 export type Context = {
-    user: null | User
+    user: null | ReturnModelType<typeof UserModel>
+    createContainerQueue: Awaited<
+        ReturnType<typeof createQueue<z.infer<typeof ContainerSchedulerSchema>>>
+    >
+    destroyContainerQueue: Awaited<
+        ReturnType<typeof createQueue<z.infer<typeof ContainerDestroySchema>>>
+    >
+    buildContainerQueue: Awaited<
+        ReturnType<typeof createQueue<z.infer<typeof ContainerBuildSchema>>>
+    >
 }

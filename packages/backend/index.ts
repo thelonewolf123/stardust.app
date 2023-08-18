@@ -1,8 +1,15 @@
 import jwt from 'jsonwebtoken'
 
+import { createQueue, getClient } from '@/core/queue'
 import { env } from '@/env'
+import { Context } from '@/types'
 import { ApolloServer } from '@apollo/server'
 import { startStandaloneServer } from '@apollo/server/standalone'
+import {
+    BUILD_CONTAINER,
+    DESTROY_CONTAINER,
+    NEW_CONTAINER
+} from '@constants/queue'
 import { mergeResolvers, mergeTypeDefs } from '@graphql-tools/merge'
 
 import { UserModel } from './database/models/user'
@@ -33,7 +40,37 @@ startStandaloneServer(server, {
     context: async ({ req, res }) => {
         const token = req.headers['x-access-token']
 
-        if (!token) return { user: null }
+        const client = await getClient()
+        const [
+            createContainerQueue,
+            destroyContainerQueue,
+            buildContainerQueue
+        ] = await Promise.all([
+            createQueue(client, {
+                exchange: NEW_CONTAINER.EXCHANGE_NAME,
+                queue: NEW_CONTAINER.QUEUE_NAME,
+                routingKey: NEW_CONTAINER.ROUTING_KEY
+            }),
+            createQueue(client, {
+                exchange: DESTROY_CONTAINER.EXCHANGE_NAME,
+                queue: DESTROY_CONTAINER.QUEUE_NAME,
+                routingKey: DESTROY_CONTAINER.ROUTING_KEY
+            }),
+            createQueue(client, {
+                exchange: BUILD_CONTAINER.EXCHANGE_NAME,
+                queue: BUILD_CONTAINER.QUEUE_NAME,
+                routingKey: BUILD_CONTAINER.ROUTING_KEY
+            })
+        ])
+
+        const ctx: Context = {
+            createContainerQueue,
+            destroyContainerQueue,
+            buildContainerQueue,
+            user: null
+        }
+
+        if (!token) return ctx
 
         try {
             const { username, count } = await new Promise<{
@@ -58,19 +95,16 @@ startStandaloneServer(server, {
                 })
             })
 
-            const user = await UserModel.findOne({ username })
+            const user = await UserModel.findOne({ username }).lean()
 
-            if (!user) return { user: null }
-            if (user.count !== count) return { user: null }
+            ctx.user = user && user.count === count ? (user as any) : null
 
-            return { user }
+            return ctx
         } catch (err) {
             console.log(err)
         }
 
-        return {
-            user: null
-        }
+        return ctx
     }
 }).then(({ url }) => {
     console.log(`🚀 Server listening at: ${url}`)

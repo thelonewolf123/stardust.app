@@ -68,11 +68,14 @@ export const setupDestroyContainerConsumer = async () => {
 }
 
 export const setupBuildContainerConsumer = async () => {
-    const { onMessage, channel, cleanup } = await queueManager({
-        exchange: BUILD_CONTAINER.EXCHANGE_NAME,
-        queue: BUILD_CONTAINER.QUEUE_NAME,
-        routingKey: BUILD_CONTAINER.ROUTING_KEY
-    })
+    const { onMessage, channel, cleanup } = await queueManager(
+        {
+            exchange: BUILD_CONTAINER.EXCHANGE_NAME,
+            queue: BUILD_CONTAINER.QUEUE_NAME,
+            routingKey: BUILD_CONTAINER.ROUTING_KEY
+        },
+        { prefetch: 1 }
+    )
     process.on('SIGINT', () => cleanup())
 
     onMessage(async (message) => {

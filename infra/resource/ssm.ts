@@ -1,4 +1,5 @@
 import * as aws from '@pulumi/aws'
+import { Output } from '@pulumi/pulumi'
 
 import { SSM_PARAMETER_KEYS } from '../../constants/aws-infra'
 
@@ -34,7 +35,10 @@ export function storeBucketId(bucket: aws.s3.Bucket, key: string) {
     })
 }
 
-export function storeSecret(param: { secret: string; key: string }) {
+export function storeSecret(param: {
+    secret: string | Output<string>
+    key: string
+}) {
     return new aws.ssm.Parameter(param.key, {
         name: param.key,
         type: aws.ssm.ParameterType.SecureString,
