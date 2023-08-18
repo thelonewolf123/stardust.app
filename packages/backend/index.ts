@@ -28,24 +28,19 @@ const server = new ApolloServer({
     ])
 })
 
+let queuePromise: [
+    Awaited<ReturnType<typeof createQueue>>,
+    Awaited<ReturnType<typeof createQueue>>,
+    Awaited<ReturnType<typeof createQueue>>
+]
+
 server.addPlugin({
     async serverWillStart() {
         console.log('Server starting up!')
         await connect()
-    }
-})
-
-startStandaloneServer(server, {
-    listen: { port: 4000, path: '/graphql' },
-    context: async ({ req, res }) => {
-        const token = req.headers['x-access-token']
 
         const client = await getClient()
-        const [
-            createContainerQueue,
-            destroyContainerQueue,
-            buildContainerQueue
-        ] = await Promise.all([
+        queuePromise = await Promise.all([
             createQueue(client, {
                 exchange: NEW_CONTAINER.EXCHANGE_NAME,
                 queue: NEW_CONTAINER.QUEUE_NAME,
@@ -62,6 +57,18 @@ startStandaloneServer(server, {
                 routingKey: BUILD_CONTAINER.ROUTING_KEY
             })
         ])
+    }
+})
+
+startStandaloneServer(server, {
+    listen: { port: 4000, path: '/graphql' },
+    context: async ({ req, res }) => {
+        const token = req.headers['x-access-token']
+        const [
+            createContainerQueue,
+            destroyContainerQueue,
+            buildContainerQueue
+        ] = await queuePromise
 
         const ctx: Context = {
             createContainerQueue,
