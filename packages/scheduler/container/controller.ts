@@ -32,11 +32,11 @@ export async function createNewContainer(
         })
     }
 
-    const pullImageIfNeeded = async (docker: Dockerode, image: string) => {
-        const imageExists = await checkImageExistence(docker, image)
+    const pullImageIfNeeded = async (docker: Dockerode) => {
+        const imageExists = await checkImageExistence(docker, data.image)
 
         if (!imageExists) {
-            const stream = await docker.pull(image)
+            const stream = await docker.pull(data.image)
 
             await new Promise<void>((resolve, reject) => {
                 docker.modem.followProgress(stream, (err, res) => {
@@ -50,14 +50,26 @@ export async function createNewContainer(
         }
     }
 
-    const startContainer = async (
-        docker: Dockerode,
-        image: string,
-        command?: string[]
-    ) => {
+    const startContainer = async (docker: Dockerode) => {
+        const env = data.env || {}
+        const ports = data.ports || []
+
+        const PortBindings: Record<string, { HostPort: string }[]> = {}
+        ports.forEach((port) => {
+            PortBindings[`${port}/tcp`] = [{ HostPort: `10000-11000` }]
+        })
+
+        const Env = Object.entries(env).map(([key, value]) => {
+            return `${key}=${value}`
+        })
+
         const newContainer = await docker.createContainer({
-            Image: image,
-            Cmd: command
+            Image: data.image,
+            Cmd: data.command,
+            Env,
+            HostConfig: {
+                PortBindings
+            }
         })
 
         await newContainer.start()
@@ -95,11 +107,11 @@ export async function createNewContainer(
         })
         .then(getDockerClient)
         .then(async (docker) => {
-            await pullImageIfNeeded(docker, data.image)
+            await pullImageIfNeeded(docker)
             return docker
         })
         .then(async (docker) => {
-            const info = await startContainer(docker, data.image, data.command)
+            const info = await startContainer(docker)
             await updateContainerStatus(data.containerSlug, info)
             console.log('docker', info)
         })

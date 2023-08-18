@@ -15,7 +15,7 @@ export const typeDefs = gql`
         description: String!
         image: String!
         command: [String!]
-        port: String
+        port: Int
         env: [EnvInput!]
         metaData: [metaDataInput!]
     }

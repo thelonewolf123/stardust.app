@@ -21,7 +21,7 @@ export type ContainerInput = {
   env?: InputMaybe<Array<EnvInput>>;
   image: Scalars['String'];
   metaData?: InputMaybe<Array<MetaDataInput>>;
-  port?: InputMaybe<Scalars['String']>;
+  port?: InputMaybe<Scalars['Int']>;
 };
 
 export enum ContainerStatus {
@@ -165,6 +165,7 @@ export type ResolversTypes = {
   ContainerStatus: ContainerStatus;
   EnvInput: EnvInput;
   Float: ResolverTypeWrapper<Scalars['Float']>;
+  Int: ResolverTypeWrapper<Scalars['Int']>;
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']>;
@@ -178,6 +179,7 @@ export type ResolversParentTypes = {
   ContainerInput: ContainerInput;
   EnvInput: EnvInput;
   Float: Scalars['Float'];
+  Int: Scalars['Int'];
   Mutation: {};
   Query: {};
   String: Scalars['String'];

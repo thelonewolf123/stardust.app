@@ -9,10 +9,17 @@ export const mutation: Resolvers['Mutation'] = {
         getRegularUser(ctx)
         const containerSlug = v4()
 
+        const env: Record<string, string> = {}
+        input.env?.forEach((envron) => {
+            env[envron.name] = envron.value
+        })
+
         ctx.createContainerQueue.publish({
             containerSlug,
             image: input.image,
-            command: input.command ?? []
+            command: input.command ?? [],
+            env,
+            ports: input.port ? [input.port] : []
         })
 
         return true
