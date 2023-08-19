@@ -25,4 +25,15 @@ export const typeDefs = gql`
         stopped
         pending
     }
+
+    type Container {
+        slug: String!
+        description: String!
+        image: String!
+        command: [String!]
+        port: Int
+        env: [EnvInput!]
+        metaData: [metaDataInput!]
+        status: ContainerStatus!
+    }
 `

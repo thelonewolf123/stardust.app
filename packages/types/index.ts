@@ -6,7 +6,7 @@ import {
     ContainerDestroySchema,
     ContainerSchedulerSchema
 } from '@/scheduler/schema'
-import { UserModel } from '@models/user'
+import { User, UserModel } from '@models/user'
 import { ReturnModelType } from '@typegoose/typegoose'
 
 export type WorkerQueueMessage =
@@ -36,7 +36,7 @@ export type PhysicalHostType = {
 }
 
 export type Context = {
-    user: null | ReturnModelType<typeof UserModel>
+    user: null | (User & { _id: string })
     createContainerQueue: Awaited<
         ReturnType<typeof createQueue<z.infer<typeof ContainerSchedulerSchema>>>
     >

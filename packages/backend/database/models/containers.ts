@@ -3,7 +3,7 @@ import { getModelForClass, prop, PropType, Ref } from '@typegoose/typegoose'
 import { InstanceModel } from './instance'
 import { UserModel } from './user'
 
-class Container {
+export class Container {
     @prop({ type: String, required: true })
     public containerSlug!: string
 
@@ -29,6 +29,9 @@ class Container {
     @prop({ type: String, required: false }, PropType.MAP)
     public metaData!: Record<string, string>
 
+    @prop({ type: String, required: false }, PropType.MAP)
+    public env!: Record<string, string>
+
     @prop({ type: String, required: false })
     public containerId!: string
 
@@ -37,6 +40,12 @@ class Container {
 
     @prop({ ref: InstanceModel, required: true })
     public instanceId!: Ref<typeof InstanceModel>
+
+    @prop({ type: Number, required: true })
+    public port!: number
+
+    @prop({ type: Number, required: true })
+    public version!: number
 
     @prop({ type: UserModel, required: false })
     public createdBy!: Ref<typeof UserModel>

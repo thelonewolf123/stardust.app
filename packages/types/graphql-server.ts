@@ -15,6 +15,18 @@ export type Scalars = {
   Float: number;
 };
 
+export type Container = {
+  __typename?: 'Container';
+  command?: Maybe<Array<Scalars['String']>>;
+  description: Scalars['String'];
+  env?: Maybe<Array<EnvInput>>;
+  image: Scalars['String'];
+  metaData?: Maybe<Array<MetaDataInput>>;
+  port?: Maybe<Scalars['Int']>;
+  slug: Scalars['String'];
+  status: ContainerStatus;
+};
+
 export type ContainerInput = {
   command?: InputMaybe<Array<Scalars['String']>>;
   description: Scalars['String'];
@@ -38,6 +50,7 @@ export type EnvInput = {
 export type Mutation = {
   __typename?: 'Mutation';
   createContainer: Scalars['Boolean'];
+  createProject: Scalars['String'];
   deleteContainer: Scalars['Boolean'];
   signup: Scalars['String'];
 };
@@ -45,6 +58,11 @@ export type Mutation = {
 
 export type MutationCreateContainerArgs = {
   input: ContainerInput;
+};
+
+
+export type MutationCreateProjectArgs = {
+  input: ProjectInput;
 };
 
 
@@ -59,15 +77,44 @@ export type MutationSignupArgs = {
   username: Scalars['String'];
 };
 
+export type Project = {
+  __typename?: 'Project';
+  createdAt: Scalars['Float'];
+  current?: Maybe<Container>;
+  description: Scalars['String'];
+  dockerContext: Scalars['String'];
+  dockerPath: Scalars['String'];
+  githubBranch: Scalars['String'];
+  githubUrl: Scalars['String'];
+  history?: Maybe<Array<Container>>;
+  name: Scalars['String'];
+  slug: Scalars['String'];
+};
+
+export type ProjectInput = {
+  description: Scalars['String'];
+  dockerContext: Scalars['String'];
+  dockerPath: Scalars['String'];
+  githubBranch: Scalars['String'];
+  githubUrl: Scalars['String'];
+  name: Scalars['String'];
+};
+
 export type Query = {
   __typename?: 'Query';
   containerStatus: ContainerStatus;
+  getProjectBySlug: Project;
   login: Scalars['String'];
   logout: Scalars['Boolean'];
 };
 
 
 export type QueryContainerStatusArgs = {
+  slug: Scalars['String'];
+};
+
+
+export type QueryGetProjectBySlugArgs = {
   slug: Scalars['String'];
 };
 
@@ -161,12 +208,15 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  Container: ResolverTypeWrapper<Container>;
   ContainerInput: ContainerInput;
   ContainerStatus: ContainerStatus;
   EnvInput: EnvInput;
   Float: ResolverTypeWrapper<Scalars['Float']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   Mutation: ResolverTypeWrapper<{}>;
+  Project: ResolverTypeWrapper<Project>;
+  ProjectInput: ProjectInput;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']>;
   User: ResolverTypeWrapper<User>;
@@ -176,25 +226,56 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean'];
+  Container: Container;
   ContainerInput: ContainerInput;
   EnvInput: EnvInput;
   Float: Scalars['Float'];
   Int: Scalars['Int'];
   Mutation: {};
+  Project: Project;
+  ProjectInput: ProjectInput;
   Query: {};
   String: Scalars['String'];
   User: User;
   metaDataInput: MetaDataInput;
 };
 
+export type ContainerResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Container'] = ResolversParentTypes['Container']> = {
+  command?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
+  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  env?: Resolver<Maybe<Array<ResolversTypes['EnvInput']>>, ParentType, ContextType>;
+  image?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  metaData?: Resolver<Maybe<Array<ResolversTypes['metaDataInput']>>, ParentType, ContextType>;
+  port?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['ContainerStatus'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   createContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationCreateContainerArgs, 'input'>>;
+  createProject?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'input'>>;
   deleteContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteContainerArgs, 'slug'>>;
   signup?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'email' | 'password' | 'username'>>;
 };
 
+export type ProjectResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Project'] = ResolversParentTypes['Project']> = {
+  createdAt?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  current?: Resolver<Maybe<ResolversTypes['Container']>, ParentType, ContextType>;
+  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  dockerContext?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  dockerPath?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  githubBranch?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  githubUrl?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  history?: Resolver<Maybe<Array<ResolversTypes['Container']>>, ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   containerStatus?: Resolver<ResolversTypes['ContainerStatus'], ParentType, ContextType, RequireFields<QueryContainerStatusArgs, 'slug'>>;
+  getProjectBySlug?: Resolver<ResolversTypes['Project'], ParentType, ContextType, RequireFields<QueryGetProjectBySlugArgs, 'slug'>>;
   login?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<QueryLoginArgs, 'password' | 'username'>>;
   logout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
 };
@@ -207,7 +288,9 @@ export type UserResolvers<ContextType = Context, ParentType extends ResolversPar
 };
 
 export type Resolvers<ContextType = Context> = {
+  Container?: ContainerResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
+  Project?: ProjectResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 };
