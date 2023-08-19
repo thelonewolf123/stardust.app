@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken'
 
 import { env } from '@/env'
 import { Resolvers } from '@/types/graphql-server'
-import { UserModel } from '@models/user'
 
 // Get the JWT_SECRET from environment variables
 const JWT_SECRET = env.JWT_SECRET
@@ -20,7 +19,7 @@ export const query: Resolvers['Query'] = {
             .update(password)
             .digest('hex')
 
-        const user = await UserModel.findOne({
+        const user = await ctx.db.User.findOne({
             username,
             password: hashedPassword
         })
@@ -29,7 +28,7 @@ export const query: Resolvers['Query'] = {
             throw new Error('User not found')
         }
 
-        await UserModel.updateOne(
+        await ctx.db.User.updateOne(
             {
                 username,
                 password: hashedPassword
@@ -59,7 +58,7 @@ export const query: Resolvers['Query'] = {
         if (!user) throw new Error('User not found')
 
         // Destroy the session
-        await UserModel.updateOne(
+        await ctx.db.User.updateOne(
             {
                 username: user.username
             },

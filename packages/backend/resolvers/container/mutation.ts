@@ -14,7 +14,7 @@ export const mutation: Resolvers['Mutation'] = {
             env[envron.name] = envron.value
         })
 
-        ctx.createContainerQueue.publish({
+        ctx.queue.createContainer.publish({
             containerSlug,
             image: input.image,
             command: input.command ?? [],

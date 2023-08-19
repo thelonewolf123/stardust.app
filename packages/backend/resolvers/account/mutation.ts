@@ -2,13 +2,20 @@ import crypto from 'crypto'
 import gql from 'graphql-tag'
 import jwt from 'jsonwebtoken'
 
-import { UserModel } from '@/backend/database/models/user'
 import { env } from '@/env'
 import { Resolvers } from '@/types/graphql-server'
 
 export const mutation: Resolvers['Mutation'] = {
     signup: async (_, { username, email, password }, ctx) => {
-        const isUserTaken = await UserModel.count({
+        const isValidUsername = /^[a-zA-Z0-9_]+$/.test(username)
+        const isValidEmail =
+            /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(email)
+
+        if (!isValidUsername || !isValidEmail) {
+            throw new Error('Invalid username/email')
+        }
+
+        const isUserTaken = await ctx.db.User.count({
             $or: [{ username: username }, { email: email }]
         })
         if (isUserTaken) {
@@ -20,7 +27,7 @@ export const mutation: Resolvers['Mutation'] = {
             .update(password)
             .digest('hex')
 
-        await UserModel.create({
+        await ctx.db.User.create({
             username,
             email,
             password: hashedPassword

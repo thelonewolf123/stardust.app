@@ -9,7 +9,7 @@ export class Project {
     @prop({ type: String, required: true })
     public name!: string
 
-    @prop({ type: String, required: true })
+    @prop({ type: String, required: true, unique: true })
     public slug!: string
 
     @prop({ type: String, required: true })

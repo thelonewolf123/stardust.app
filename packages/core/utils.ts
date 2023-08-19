@@ -1,3 +1,5 @@
+import invariant from 'invariant'
+
 import { Context } from '@/types'
 
 export async function sleep(ms: number) {
@@ -5,6 +7,6 @@ export async function sleep(ms: number) {
 }
 
 export function getRegularUser(ctx: Context) {
-    if (!ctx.user) throw new Error('User not found')
+    invariant(ctx.user, 'User is not authenticated')
     return ctx.user
 }

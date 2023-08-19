@@ -12,19 +12,22 @@ import {
 } from '@constants/queue'
 import { mergeResolvers, mergeTypeDefs } from '@graphql-tools/merge'
 
-import { UserModel } from './database/models/user'
+import models from './database/models'
 import { connect } from './database/mongoose'
 import accountSchema from './resolvers/account'
 import containerSchema from './resolvers/container'
+import projectSchema from './resolvers/project'
 
 const server = new ApolloServer({
     typeDefs: mergeTypeDefs([
         ...containerSchema.typeDefs,
-        ...accountSchema.typeDefs
+        ...accountSchema.typeDefs,
+        ...projectSchema.typeDefs
     ]),
     resolvers: mergeResolvers([
         containerSchema.resolvers,
-        accountSchema.resolvers
+        accountSchema.resolvers,
+        projectSchema.resolvers
     ])
 })
 
@@ -64,16 +67,16 @@ startStandaloneServer(server, {
     listen: { port: 4000, path: '/graphql' },
     context: async ({ req, res }) => {
         const token = req.headers['x-access-token']
-        const [
-            createContainerQueue,
-            destroyContainerQueue,
-            buildContainerQueue
-        ] = await queuePromise
+        const [createContainer, destroyContainer, buildContainer] =
+            await queuePromise
 
         const ctx: Context = {
-            createContainerQueue,
-            destroyContainerQueue,
-            buildContainerQueue,
+            queue: {
+                createContainer,
+                destroyContainer,
+                buildContainer
+            },
+            db: models,
             user: null
         }
 
@@ -102,7 +105,7 @@ startStandaloneServer(server, {
                 })
             })
 
-            const user = await UserModel.findOne({ username }).lean()
+            const user = await models.User.findOne({ username }).lean()
 
             ctx.user = user && user.count === count ? (user as any) : null
 

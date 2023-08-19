@@ -30,6 +30,8 @@ export const query: Resolvers['Query'] = {
 
         if (!project) throw new Error('Project not found')
 
+        console.log(project)
+
         return project
     }
 }
