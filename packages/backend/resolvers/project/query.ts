@@ -7,10 +7,10 @@ import { DocumentType } from '@typegoose/typegoose'
 
 export const query: Resolvers['Query'] = {
     async getProjectBySlug(_, { slug }, ctx) {
-        getRegularUser(ctx)
+        const user = getRegularUser(ctx)
 
         const project = (await ProjectModel.findOne(
-            { slug, userId: ctx.user?._id },
+            { slug, userId: user._id },
             {
                 history: 1,
                 name: 1,
