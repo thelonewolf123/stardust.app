@@ -174,6 +174,8 @@ export async function destroyContainer(
 export async function buildContainer(
     data: z.infer<typeof ContainerBuildSchema>
 ) {
+    const instance = new InstanceStrategy(CLOUD_PROVIDER)
+
     console.log('Build container!', data)
     const buildDockerImage = async (docker: Dockerode) => {
         const context = data.dockerContext || '.'
@@ -186,8 +188,7 @@ export async function buildContainer(
             },
             {
                 buildargs: data.buildArgs || {},
-
-                t: v4() || 'latest'
+                t: data.ecrRepo
             }
         )
 
@@ -202,5 +203,45 @@ export async function buildContainer(
         })
 
         console.log('Image built successfully.')
+
+        return docker
     }
+
+    const pushDockerImage = async (docker: Dockerode) => {
+        const image = await docker.getImage(data.ecrRepo)
+        const stream = await image.push()
+
+        await new Promise<void>((resolve, reject) => {
+            docker.modem.followProgress(stream, (err, res) => {
+                if (err) {
+                    reject(err)
+                } else {
+                    resolve()
+                }
+            })
+        })
+
+        return docker
+    }
+
+    return instance
+        .getInstanceForContainerBuild(data.projectSlug)
+        .then(instance.waitTillInstanceReady)
+        .then((info) => {
+            invariant(
+                info.PublicIpAddress && info.InstanceId,
+                'Instance not found'
+            )
+            return [info.InstanceId, info.PublicIpAddress]
+        })
+        .then(async ([instanceId, publicIp]) => {
+            return publicIp
+        })
+        .then(getDockerClient)
+        .then(buildDockerImage)
+        .then(pushDockerImage)
+        .catch((error) => {
+            console.error('Container provision error: ', error)
+            throw error
+        })
 }

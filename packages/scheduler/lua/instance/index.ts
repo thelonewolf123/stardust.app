@@ -3,13 +3,13 @@ import scheduleInstanceScript from 'inline:./schedule-add.lua'
 import scheduleDeleteScript from 'inline:./schedule-delete.lua'
 import instanceUpdate from 'inline:./update.lua'
 
-import { PhysicalHostType } from '@/types'
+import { Ec2InstanceType, PhysicalHostType } from '@/types'
 import redis from '@core/redis'
 
 function scheduleInstance(
     instanceId: string,
     imageId: string,
-    instanceType: 'builder' | 'runner'
+    instanceType: Ec2InstanceType
 ) {
     return redis.runLuaScript(scheduleInstanceScript, [
         instanceId,

@@ -10,7 +10,7 @@ export const query: Resolvers['Query'] = {
         const user = getRegularUser(ctx)
 
         const project = (await ProjectModel.findOne(
-            { slug, userId: user._id },
+            { slug, user: user._id },
             {
                 history: 1,
                 name: 1,
@@ -27,6 +27,8 @@ export const query: Resolvers['Query'] = {
         )
             .populate(['current', 'history'])
             .lean()) as DocumentType<Project>
+
+        console.log(project)
 
         if (!project) throw new Error('Project not found')
 

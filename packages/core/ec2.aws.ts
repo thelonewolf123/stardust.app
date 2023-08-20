@@ -1,3 +1,5 @@
+import { Client as SSHClient } from 'ssh2'
+
 import {
     DescribeInstancesCommand,
     DescribeInstanceStatusCommand,
@@ -98,7 +100,49 @@ async function terminateInstance(instanceId: string) {
     return info.TerminatingInstances?.[0]
 }
 
+async function execCommand(command: string, ipAddress: string) {
+    const privateKey = await ssmAws.getParameter(
+        SSM_PARAMETER_KEYS.ec2PrivateKey,
+        true
+    )
+
+    return new Promise<string>((resolve, reject) => {
+        const ssh = new SSHClient()
+
+        ssh.on('ready', () => {
+            ssh.exec(command, (err, stream) => {
+                if (err) {
+                    reject(err)
+                    ssh.end()
+                    return
+                }
+
+                let output = ''
+                stream
+                    .on('data', (data: Buffer) => {
+                        output += data.toString()
+                    })
+                    .on('end', () => {
+                        resolve(output)
+                        ssh.end()
+                    })
+            })
+        })
+
+        ssh.on('error', (err) => {
+            reject(err)
+        })
+
+        ssh.connect({
+            host: ipAddress,
+            port: 22,
+            username: 'ec2-user', // Modify this if your instance uses a different username
+            privateKey: privateKey
+        })
+    })
+}
 export default {
+    execCommand,
     requestEc2SpotInstance,
     requestEc2OnDemandInstance,
     getInstanceInfoById,

@@ -18,12 +18,11 @@ export type Scalars = {
 export type Container = {
   __typename?: 'Container';
   command?: Maybe<Array<Scalars['String']>>;
-  description: Scalars['String'];
-  env?: Maybe<Array<EnvInput>>;
+  containerSlug: Scalars['String'];
+  env?: Maybe<Array<Env>>;
   image: Scalars['String'];
-  metaData?: Maybe<Array<MetaDataInput>>;
+  metaData?: Maybe<Array<MetaData>>;
   port?: Maybe<Scalars['Int']>;
-  slug: Scalars['String'];
   status: ContainerStatus;
 };
 
@@ -37,10 +36,17 @@ export type ContainerInput = {
 };
 
 export enum ContainerStatus {
+  Checkpoint = 'checkpoint',
   Pending = 'pending',
   Running = 'running',
-  Stopped = 'stopped'
+  Terminated = 'terminated'
 }
+
+export type Env = {
+  __typename?: 'Env';
+  name: Scalars['String'];
+  value: Scalars['String'];
+};
 
 export type EnvInput = {
   name: Scalars['String'];
@@ -102,14 +108,14 @@ export type ProjectInput = {
 
 export type Query = {
   __typename?: 'Query';
-  containerStatus: ContainerStatus;
+  getContainerInfo: Container;
   getProjectBySlug: Project;
   login: Scalars['String'];
   logout: Scalars['Boolean'];
 };
 
 
-export type QueryContainerStatusArgs = {
+export type QueryGetContainerInfoArgs = {
   slug: Scalars['String'];
 };
 
@@ -129,6 +135,12 @@ export type User = {
   createdAt: Scalars['Float'];
   email: Scalars['String'];
   username: Scalars['String'];
+};
+
+export type MetaData = {
+  __typename?: 'metaData';
+  name: Scalars['String'];
+  value: Scalars['String'];
 };
 
 export type MetaDataInput = {
@@ -211,6 +223,7 @@ export type ResolversTypes = {
   Container: ResolverTypeWrapper<Container>;
   ContainerInput: ContainerInput;
   ContainerStatus: ContainerStatus;
+  Env: ResolverTypeWrapper<Env>;
   EnvInput: EnvInput;
   Float: ResolverTypeWrapper<Scalars['Float']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
@@ -220,6 +233,7 @@ export type ResolversTypes = {
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']>;
   User: ResolverTypeWrapper<User>;
+  metaData: ResolverTypeWrapper<MetaData>;
   metaDataInput: MetaDataInput;
 };
 
@@ -228,6 +242,7 @@ export type ResolversParentTypes = {
   Boolean: Scalars['Boolean'];
   Container: Container;
   ContainerInput: ContainerInput;
+  Env: Env;
   EnvInput: EnvInput;
   Float: Scalars['Float'];
   Int: Scalars['Int'];
@@ -237,18 +252,24 @@ export type ResolversParentTypes = {
   Query: {};
   String: Scalars['String'];
   User: User;
+  metaData: MetaData;
   metaDataInput: MetaDataInput;
 };
 
 export type ContainerResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Container'] = ResolversParentTypes['Container']> = {
   command?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
-  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  env?: Resolver<Maybe<Array<ResolversTypes['EnvInput']>>, ParentType, ContextType>;
+  containerSlug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  env?: Resolver<Maybe<Array<ResolversTypes['Env']>>, ParentType, ContextType>;
   image?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  metaData?: Resolver<Maybe<Array<ResolversTypes['metaDataInput']>>, ParentType, ContextType>;
+  metaData?: Resolver<Maybe<Array<ResolversTypes['metaData']>>, ParentType, ContextType>;
   port?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   status?: Resolver<ResolversTypes['ContainerStatus'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type EnvResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Env'] = ResolversParentTypes['Env']> = {
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  value?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -274,7 +295,7 @@ export type ProjectResolvers<ContextType = Context, ParentType extends Resolvers
 };
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  containerStatus?: Resolver<ResolversTypes['ContainerStatus'], ParentType, ContextType, RequireFields<QueryContainerStatusArgs, 'slug'>>;
+  getContainerInfo?: Resolver<ResolversTypes['Container'], ParentType, ContextType, RequireFields<QueryGetContainerInfoArgs, 'slug'>>;
   getProjectBySlug?: Resolver<ResolversTypes['Project'], ParentType, ContextType, RequireFields<QueryGetProjectBySlugArgs, 'slug'>>;
   login?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<QueryLoginArgs, 'password' | 'username'>>;
   logout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
@@ -287,11 +308,19 @@ export type UserResolvers<ContextType = Context, ParentType extends ResolversPar
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type MetaDataResolvers<ContextType = Context, ParentType extends ResolversParentTypes['metaData'] = ResolversParentTypes['metaData']> = {
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  value?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type Resolvers<ContextType = Context> = {
   Container?: ContainerResolvers<ContextType>;
+  Env?: EnvResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Project?: ProjectResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
+  metaData?: MetaDataResolvers<ContextType>;
 };
 

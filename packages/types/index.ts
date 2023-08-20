@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongoose'
 import { z } from 'zod'
 
 import models from '@/backend/database'
@@ -18,6 +19,11 @@ export type WorkerQueueMessage =
           filename: string
       }
 
+export enum Ec2InstanceType {
+    builder = 'builder',
+    runner = 'runner'
+}
+
 export type PhysicalHostType = {
     instanceId: string
     publicIp: string
@@ -37,7 +43,8 @@ export type PhysicalHostType = {
 }
 
 export type Context = {
-    user: null | (User & { _id: string })
+    // user: null | any
+    user: null | (User & { _id: ObjectId })
     queue: {
         createContainer: Awaited<
             ReturnType<

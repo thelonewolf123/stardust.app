@@ -1,5 +1,6 @@
 import invariant from 'invariant'
 
+import { Ec2InstanceType } from '@/types'
 import {
     ERROR_CODES,
     LOCK,
@@ -30,22 +31,25 @@ class InstanceStrategyAws {
         return instanceId
     }
 
-    async getInstanceForContainerBuild(
-        containerSlug: string,
-        projectSlug: string
-    ): Promise<string> {
+    async getInstanceForContainerBuild(projectSlug: string): Promise<string> {
         this.containerBuildAttempts = 0
         let instanceId: null | string = null
 
         while (!instanceId) {
-            instanceId = await this.#isContainerBuildScheduled(
-                containerSlug,
-                projectSlug
-            )
+            instanceId = await this.#isContainerBuildScheduled(projectSlug)
             await sleep(1000)
         }
 
-        return ''
+        return instanceId
+    }
+
+    async exec(command: string, instanceId: string) {
+        const info = await ec2Aws.getInstanceInfoById(instanceId)
+        const publicIp = info?.PublicIpAddress
+
+        invariant(publicIp, 'Instance not found')
+
+        return ec2Aws.execCommand(command, publicIp)
     }
 
     async waitTillInstanceReady(id: string) {
@@ -82,7 +86,7 @@ class InstanceStrategyAws {
         console.log('lock: ', lock)
 
         if (lock === 'added') {
-            await this.#scheduleNewInstance(1)
+            await this.#scheduleNewInstance(1, Ec2InstanceType.runner)
             await releaseLock(LOCK.CONTAINER_INSTANCE)
         }
 
@@ -95,21 +99,15 @@ class InstanceStrategyAws {
         return null
     }
 
-    async #isContainerBuildScheduled(
-        containerSlug: string,
-        projectSlug: string
-    ) {
-        const instanceId = await scheduleContainerBuild(
-            containerSlug,
-            projectSlug
-        )
+    async #isContainerBuildScheduled(projectSlug: string) {
+        const instanceId = await scheduleContainerBuild(projectSlug)
         if (instanceId) return instanceId
 
         const lock = await addLock(LOCK.BUILDER_INSTANCE)
         console.log('lock: ', lock)
 
         if (lock === 'added') {
-            await this.#scheduleNewInstance(1)
+            await this.#scheduleNewInstance(1, Ec2InstanceType.builder)
             await releaseLock(LOCK.BUILDER_INSTANCE)
         }
 
@@ -121,7 +119,8 @@ class InstanceStrategyAws {
 
         return null
     }
-    async #scheduleNewInstance(count: number) {
+
+    async #scheduleNewInstance(count: number, type: Ec2InstanceType) {
         const instanceList = await ec2Aws.requestEc2OnDemandInstance(count)
         invariant(instanceList, 'Instance not created')
 
@@ -130,7 +129,7 @@ class InstanceStrategyAws {
 
         invariant(InstanceId && ImageId, 'Instance not created')
 
-        const result = await scheduleInstance(InstanceId, ImageId, 'runner')
+        const result = await scheduleInstance(InstanceId, ImageId, type)
         invariant(result, 'Instance not scheduled')
 
         return InstanceId

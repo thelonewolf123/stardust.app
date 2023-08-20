@@ -21,19 +21,29 @@ export const typeDefs = gql`
     }
 
     enum ContainerStatus {
-        running
-        stopped
         pending
+        running
+        checkpoint
+        terminated
+    }
+
+    type Env {
+        name: String!
+        value: String!
+    }
+
+    type metaData {
+        name: String!
+        value: String!
     }
 
     type Container {
-        slug: String!
-        description: String!
+        containerSlug: String!
         image: String!
         command: [String!]
         port: Int
-        env: [EnvInput!]
-        metaData: [metaDataInput!]
+        env: [Env!]
+        metaData: [metaData!]
         status: ContainerStatus!
     }
 `

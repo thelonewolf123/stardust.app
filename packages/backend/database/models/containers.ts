@@ -1,7 +1,24 @@
+import { ContainerStatus } from '@/types/graphql-server'
 import { getModelForClass, prop, PropType, Ref } from '@typegoose/typegoose'
 
 import { InstanceModel } from './instance'
 import { UserModel } from './user'
+
+class MetaData {
+    @prop({ type: String, required: true })
+    public name!: string
+
+    @prop({ type: String, required: true })
+    public value!: string
+}
+
+class Env {
+    @prop({ type: String, required: true })
+    public name!: string
+
+    @prop({ type: String, required: true })
+    public value!: string
+}
 
 export class Container {
     @prop({ type: String, required: true })
@@ -15,7 +32,7 @@ export class Container {
         required: true,
         enum: ['pending', 'running', 'checkpoint', 'terminated']
     })
-    public status!: 'pending' | 'running' | 'checkpoint' | 'terminated'
+    public status!: ContainerStatus
 
     @prop({ type: Date, required: true, default: Date.now() })
     public createdAt!: Date
@@ -26,11 +43,11 @@ export class Container {
     @prop({ type: Date, required: false })
     public terminatedAt!: Date
 
-    @prop({ type: String, required: false }, PropType.MAP)
-    public metaData!: Record<string, string>
+    @prop({ type: MetaData, required: false }, PropType.ARRAY)
+    public metaData!: MetaData[]
 
-    @prop({ type: String, required: false }, PropType.MAP)
-    public env!: Record<string, string>
+    @prop({ type: Env, required: false }, PropType.ARRAY)
+    public env!: Env[]
 
     @prop({ type: String, required: false })
     public containerId!: string
@@ -47,7 +64,7 @@ export class Container {
     @prop({ type: Number, required: true })
     public version!: number
 
-    @prop({ type: UserModel, required: false })
+    @prop({ ref: () => UserModel, required: false })
     public createdBy!: Ref<typeof UserModel>
 }
 
