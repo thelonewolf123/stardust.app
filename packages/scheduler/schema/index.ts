@@ -15,11 +15,13 @@ export const ContainerDestroySchema = z.object({
 })
 
 export const ContainerBuildSchema = z.object({
+    containerSlug: z.string().min(1),
     projectSlug: z.string().min(1),
     githubRepoUrl: z.string().min(1),
     githubRepoBranch: z.string().min(1),
     dockerContext: z.string().min(1),
     dockerPath: z.string().min(1),
     ecrRepo: z.string().min(1),
+    version: z.number().min(0),
     buildArgs: z.record(z.string()).optional()
 })

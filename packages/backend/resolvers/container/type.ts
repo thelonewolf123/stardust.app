@@ -23,6 +23,7 @@ export const typeDefs = gql`
     enum ContainerStatus {
         pending
         running
+        failed
         checkpoint
         terminated
     }

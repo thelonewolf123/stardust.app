@@ -1,6 +1,11 @@
 import gql from 'graphql-tag'
 
 export const typeDefs = gql`
+    input BuildArgsInput {
+        name: String!
+        value: String!
+    }
+
     input ProjectInput {
         name: String!
         description: String!
@@ -8,6 +13,10 @@ export const typeDefs = gql`
         githubBranch: String!
         dockerPath: String!
         dockerContext: String!
+        buildArgs: [BuildArgsInput!]
+        port: Int
+        env: [Env!]
+        metaData: [metaData!]
     }
 
     type Project {

@@ -225,7 +225,7 @@ export async function buildContainer(
     }
 
     return instance
-        .getInstanceForContainerBuild(data.projectSlug)
+        .getInstanceForContainerBuild(data.containerSlug, data.projectSlug)
         .then(instance.waitTillInstanceReady)
         .then((info) => {
             invariant(

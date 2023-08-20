@@ -16,12 +16,12 @@ function scheduleContainer(containerSlug: string) {
     return redis.runLuaScript(script, [containerSlug])
 }
 
-function scheduleContainerBuild(projectSlug: string) {
+function scheduleContainerBuild(containerSlug: string, projectSlug: string) {
     const script = scheduleContainerBuildScript.replace(
         /MAX_CONTAINER_PER_INSTANCE/g,
         `${MAX_CONTAINER_PER_INSTANCE}`
     )
-    return redis.runLuaScript(script, [projectSlug])
+    return redis.runLuaScript(script, [containerSlug, projectSlug])
 }
 
 function deleteContainer(containerSlug: string) {

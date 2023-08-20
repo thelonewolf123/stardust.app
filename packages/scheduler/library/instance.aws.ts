@@ -31,12 +31,18 @@ class InstanceStrategyAws {
         return instanceId
     }
 
-    async getInstanceForContainerBuild(projectSlug: string): Promise<string> {
+    async getInstanceForContainerBuild(
+        projectSlug: string,
+        containerSlug: string
+    ): Promise<string> {
         this.containerBuildAttempts = 0
         let instanceId: null | string = null
 
         while (!instanceId) {
-            instanceId = await this.#isContainerBuildScheduled(projectSlug)
+            instanceId = await this.#isContainerBuildScheduled(
+                projectSlug,
+                containerSlug
+            )
             await sleep(1000)
         }
 
@@ -99,8 +105,14 @@ class InstanceStrategyAws {
         return null
     }
 
-    async #isContainerBuildScheduled(projectSlug: string) {
-        const instanceId = await scheduleContainerBuild(projectSlug)
+    async #isContainerBuildScheduled(
+        projectSlug: string,
+        containerSlug: string
+    ) {
+        const instanceId = await scheduleContainerBuild(
+            projectSlug,
+            containerSlug
+        )
         if (instanceId) return instanceId
 
         const lock = await addLock(LOCK.BUILDER_INSTANCE)

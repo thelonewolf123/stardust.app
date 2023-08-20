@@ -30,7 +30,7 @@ export class Container {
     @prop({
         type: String,
         required: true,
-        enum: ['pending', 'running', 'checkpoint', 'terminated']
+        enum: ['pending', 'running', 'checkpoint', 'terminated', 'failed']
     })
     public status!: ContainerStatus
 
@@ -55,7 +55,7 @@ export class Container {
     @prop({ type: String, required: false })
     public checkpointId!: string
 
-    @prop({ ref: InstanceModel, required: true })
+    @prop({ ref: InstanceModel, required: false })
     public instanceId!: Ref<typeof InstanceModel>
 
     @prop({ type: Number, required: true })

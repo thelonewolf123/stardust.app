@@ -1,3 +1,4 @@
+local containerSlug = ARGV[1]
 local projectSlug = ARGV[2]
 
 local data = redis.call('GET', 'physicalHost')
@@ -16,8 +17,17 @@ local physicalHost = cjson.decode(data)
 for _, instance in ipairs(physicalHost) do
     if instance.status ~= 'failed' and instance.instanceType == 'builder' then
         -- Check if any existing container in the instance has the same projectSlug
-        for _, container in ipairs(instance.containers) do
-            if container.containerSlug == projectSlug then
+        for idx, container in ipairs(instance.containers) do
+            if container.projectSlug == projectSlug then
+                container.containerSlug = containerSlug
+                container.status = 'pending'
+                container.scheduledAt = currentTime
+                container.updatedAt = currentTime
+                table.remove(instance.containers, idx)
+                table.insert(instance.containers, container) -- Update the containerSlug and status of the matching container
+                local updatedData = cjson.encode(physicalHost)
+                redis.call('SET', 'physicalHost', updatedData)
+
                 -- Return the instanceId of the matching instance
                 return instance.instanceId
             end
@@ -26,9 +36,10 @@ for _, instance in ipairs(physicalHost) do
         if #instance.containers < maxContainerCount then
             -- Add a new item to the containers array for the matching instance
             local newContainer = {
-                containerSlug = projectSlug, -- projectSlug is the containerSlug
+                containerSlug = containerSlug,
+                projectSlug = projectSlug,
                 status = 'pending',
-                scheduledAt = currentTime,   -- assuming you want to set the current timestamp
+                scheduledAt = currentTime, -- assuming you want to set the current timestamp
                 updatedAt = currentTime
             }
 

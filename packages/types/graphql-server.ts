@@ -15,6 +15,11 @@ export type Scalars = {
   Float: number;
 };
 
+export type BuildArgsInput = {
+  name: Scalars['String'];
+  value: Scalars['String'];
+};
+
 export type Container = {
   __typename?: 'Container';
   command?: Maybe<Array<Scalars['String']>>;
@@ -37,6 +42,7 @@ export type ContainerInput = {
 
 export enum ContainerStatus {
   Checkpoint = 'checkpoint',
+  Failed = 'failed',
   Pending = 'pending',
   Running = 'running',
   Terminated = 'terminated'
@@ -98,12 +104,16 @@ export type Project = {
 };
 
 export type ProjectInput = {
+  buildArgs?: InputMaybe<Array<BuildArgsInput>>;
   description: Scalars['String'];
   dockerContext: Scalars['String'];
   dockerPath: Scalars['String'];
+  env?: InputMaybe<Array<Env>>;
   githubBranch: Scalars['String'];
   githubUrl: Scalars['String'];
+  metaData?: InputMaybe<Array<MetaData>>;
   name: Scalars['String'];
+  port?: InputMaybe<Scalars['Int']>;
 };
 
 export type Query = {
@@ -220,6 +230,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  BuildArgsInput: BuildArgsInput;
   Container: ResolverTypeWrapper<Container>;
   ContainerInput: ContainerInput;
   ContainerStatus: ContainerStatus;
@@ -240,6 +251,7 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean'];
+  BuildArgsInput: BuildArgsInput;
   Container: Container;
   ContainerInput: ContainerInput;
   Env: Env;
