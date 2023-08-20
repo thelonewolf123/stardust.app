@@ -36,6 +36,7 @@ export type PhysicalHostType = {
     containers: {
         containerId: string
         containerSlug: string
+        projectSlug?: string
         updatedAt: Date
         scheduledAt: Date
         status: 'running' | 'pending'
@@ -61,4 +62,10 @@ export type Context = {
         >
     }
     db: typeof models
+}
+
+export type QueryablePromise<T> = Promise<T> & {
+    isFulfilled: boolean
+    isResolved: boolean
+    isRejected: boolean
 }

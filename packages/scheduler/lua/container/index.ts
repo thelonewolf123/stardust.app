@@ -1,4 +1,5 @@
 import deleteContainerScript from 'inline:./delete.lua'
+import getContainerScript from 'inline:./get-container.lua'
 import getInstanceScript from 'inline:./get-instance.lua'
 import scheduleContainerScript from 'inline:./schedule-add.lua'
 import scheduleContainerBuildScript from 'inline:./schedule-build.lua'
@@ -42,7 +43,25 @@ function getInstanceIdByContainerId(containerId: string) {
     return redis.runLuaScript(getInstanceScript, [containerId])
 }
 
+async function getContainer(params: {
+    containerSlug: string
+    projectSlug: string
+}): Promise<PhysicalHostType['containers'][number] | null> {
+    const { containerSlug, projectSlug } = params
+    const result = await redis.runLuaScript(getContainerScript, [
+        containerSlug,
+        projectSlug
+    ])
+
+    if (result) {
+        return JSON.parse(result)
+    }
+
+    return null
+}
+
 export {
+    getContainer,
     deleteContainer,
     scheduleContainer,
     updateContainer,

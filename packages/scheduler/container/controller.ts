@@ -3,6 +3,7 @@ import invariant from 'invariant'
 import { v4 } from 'uuid'
 import { z } from 'zod'
 
+import { makeQueryablePromise, sleep } from '@/core/utils'
 import { ERROR_CODES } from '@constants/aws-infra'
 import { CLOUD_PROVIDER } from '@constants/provider'
 import { getDockerClient } from '@core/docker'
@@ -11,6 +12,7 @@ import ec2Aws from '@core/ec2.aws'
 import InstanceStrategy from '../library/instance'
 import {
     deleteContainer,
+    getContainer,
     getInstanceIdByContainerId,
     updateContainer
 } from '../lua/container'
@@ -211,15 +213,41 @@ export async function buildContainer(
         const image = await docker.getImage(data.ecrRepo)
         const stream = await image.push()
 
-        await new Promise<void>((resolve, reject) => {
-            docker.modem.followProgress(stream, (err, res) => {
-                if (err) {
-                    reject(err)
-                } else {
-                    resolve()
-                }
+        const containerBuildPromise = makeQueryablePromise(
+            new Promise((resolve, reject) => {
+                docker.modem.followProgress(stream, (err, res) => {
+                    if (err) {
+                        reject(err)
+                    } else {
+                        resolve(true)
+                    }
+                })
             })
-        })
+        )
+
+        while (true) {
+            // periodically check if promise is completed!
+            if (containerBuildPromise.isFulfilled) {
+                // The promise is completed
+                console.log('Image pushed successfully.')
+                break
+            }
+
+            const containerData = await getContainer({
+                containerSlug: data.containerSlug,
+                projectSlug: data.projectSlug
+            })
+
+            if (!containerData) {
+                throw new Error(ERROR_CODES.CONTAINER_BUILD_FAILED)
+            }
+
+            if (containerData.containerSlug !== data.containerSlug) {
+                throw new Error(ERROR_CODES.CONTAINER_BUILD_HAS_CANCELED)
+            }
+
+            await sleep(1000)
+        }
 
         return docker
     }
