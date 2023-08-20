@@ -1,4 +1,6 @@
 local containerSlug = ARGV[1]
+local projectSlug = ARGV[2]
+
 local data = redis.call('GET', 'physicalHost')
 local currentTime = tonumber(redis.call('TIME')[1])
 ---@diagnostic disable-next-line: undefined-global
@@ -13,10 +15,11 @@ local physicalHost = cjson.decode(data)
 
 -- Iterate through the physicalHost array to find the instance with less than 10 containers and scheduledForDeletionAt is null
 for i, instance in ipairs(physicalHost) do
-    if #instance.containers < maxContainerCount and instance.status ~= 'failed' and instance.instanceType == 'runner' then
+    if #instance.containers < maxContainerCount and instance.status ~= 'failed' and instance.instanceType == 'builder' then
         -- Add a new item to the containers array for the matching instance
         local newContainer = {
             containerSlug = containerSlug,
+            projectSlug = projectSlug,
             status = 'pending',
             scheduledAt = currentTime, -- assuming you want to set the current timestamp
             updatedAt = currentTime

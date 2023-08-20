@@ -1,5 +1,6 @@
 import Dockerode, { ContainerInspectInfo } from 'dockerode'
 import invariant from 'invariant'
+import { v4 } from 'uuid'
 import { z } from 'zod'
 
 import { ERROR_CODES } from '@constants/aws-infra'
@@ -174,4 +175,32 @@ export async function buildContainer(
     data: z.infer<typeof ContainerBuildSchema>
 ) {
     console.log('Build container!', data)
+    const buildDockerImage = async (docker: Dockerode) => {
+        const context = data.dockerContext || '.'
+        const dockerfilePath = data.dockerPath || 'Dockerfile'
+
+        const buildStream = await docker.buildImage(
+            {
+                context,
+                src: [dockerfilePath]
+            },
+            {
+                buildargs: data.buildArgs || {},
+
+                t: v4() || 'latest'
+            }
+        )
+
+        await new Promise<void>((resolve, reject) => {
+            docker.modem.followProgress(buildStream, (err, res) => {
+                if (err) {
+                    reject(err)
+                } else {
+                    resolve()
+                }
+            })
+        })
+
+        console.log('Image built successfully.')
+    }
 }

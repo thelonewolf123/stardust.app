@@ -6,8 +6,16 @@ import instanceUpdate from 'inline:./update.lua'
 import { PhysicalHostType } from '@/types'
 import redis from '@core/redis'
 
-function scheduleInstance(instanceId: string, imageId: string) {
-    return redis.runLuaScript(scheduleInstanceScript, [instanceId, imageId])
+function scheduleInstance(
+    instanceId: string,
+    imageId: string,
+    instanceType: 'builder' | 'runner'
+) {
+    return redis.runLuaScript(scheduleInstanceScript, [
+        instanceId,
+        imageId,
+        instanceType
+    ])
 }
 
 function scheduleInstanceDelete(instanceId: string) {

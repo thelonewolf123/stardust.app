@@ -12,7 +12,7 @@ import {
 } from '@constants/queue'
 import { mergeResolvers, mergeTypeDefs } from '@graphql-tools/merge'
 
-import models from './database/models'
+import models from './database'
 import { connect } from './database/mongoose'
 import accountSchema from './resolvers/account'
 import containerSchema from './resolvers/container'

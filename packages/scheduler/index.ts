@@ -1,3 +1,5 @@
+import * as mongodb from '@/backend/database/mongoose'
+
 import redis from '../core/redis'
 import {
     setupBuildContainerConsumer,
@@ -7,7 +9,8 @@ import {
 
 const consumers = async () => {
     try {
-        await redis.connect()
+        await Promise.all([mongodb.connect(), redis.connect()])
+
         return Promise.all([
             setupNewContainerConsumer(),
             setupBuildContainerConsumer(),

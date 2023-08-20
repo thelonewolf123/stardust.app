@@ -2,20 +2,21 @@ import invariant from 'invariant'
 
 import {
     ERROR_CODES,
-    INSTANCE_SCHEDULE_KEY,
+    LOCK,
     MAX_CONTAINER_SCHEDULE_ATTEMPTS,
     MAX_INSTANCE_STATUS_ATTEMPTS
 } from '@constants/aws-infra'
 import ec2Aws from '@core/ec2.aws'
 import { sleep } from '@core/utils'
 
-import { scheduleContainer } from '../lua/container'
+import { scheduleContainer, scheduleContainerBuild } from '../lua/container'
 import { scheduleInstance, updateInstance } from '../lua/instance'
 import { addLock, releaseLock } from '../lua/lock'
 
 class InstanceStrategyAws {
     instanceAttempts: number = 0
     containerAttempts: number = 0
+    containerBuildAttempts: number = 0
 
     async getInstanceForNewContainer(containerSlug: string) {
         this.containerAttempts = 0
@@ -27,6 +28,24 @@ class InstanceStrategyAws {
         }
 
         return instanceId
+    }
+
+    async getInstanceForContainerBuild(
+        containerSlug: string,
+        projectSlug: string
+    ): Promise<string> {
+        this.containerBuildAttempts = 0
+        let instanceId: null | string = null
+
+        while (!instanceId) {
+            instanceId = await this.#isContainerBuildScheduled(
+                containerSlug,
+                projectSlug
+            )
+            await sleep(1000)
+        }
+
+        return ''
     }
 
     async waitTillInstanceReady(id: string) {
@@ -59,12 +78,12 @@ class InstanceStrategyAws {
         const instanceId = await scheduleContainer(containerSlug)
         if (instanceId) return instanceId
 
-        const lock = await addLock(INSTANCE_SCHEDULE_KEY)
+        const lock = await addLock(LOCK.CONTAINER_INSTANCE)
         console.log('lock: ', lock)
 
         if (lock === 'added') {
             await this.#scheduleNewInstance(1)
-            await releaseLock(INSTANCE_SCHEDULE_KEY)
+            await releaseLock(LOCK.CONTAINER_INSTANCE)
         }
 
         if (this.containerAttempts > MAX_CONTAINER_SCHEDULE_ATTEMPTS) {
@@ -76,6 +95,32 @@ class InstanceStrategyAws {
         return null
     }
 
+    async #isContainerBuildScheduled(
+        containerSlug: string,
+        projectSlug: string
+    ) {
+        const instanceId = await scheduleContainerBuild(
+            containerSlug,
+            projectSlug
+        )
+        if (instanceId) return instanceId
+
+        const lock = await addLock(LOCK.BUILDER_INSTANCE)
+        console.log('lock: ', lock)
+
+        if (lock === 'added') {
+            await this.#scheduleNewInstance(1)
+            await releaseLock(LOCK.BUILDER_INSTANCE)
+        }
+
+        if (this.containerAttempts > MAX_CONTAINER_SCHEDULE_ATTEMPTS) {
+            throw new Error(ERROR_CODES.CONTAINER_SCHEDULE_FAILED)
+        }
+
+        this.containerAttempts++
+
+        return null
+    }
     async #scheduleNewInstance(count: number) {
         const instanceList = await ec2Aws.requestEc2OnDemandInstance(count)
         invariant(instanceList, 'Instance not created')
@@ -85,7 +130,7 @@ class InstanceStrategyAws {
 
         invariant(InstanceId && ImageId, 'Instance not created')
 
-        const result = await scheduleInstance(InstanceId, ImageId)
+        const result = await scheduleInstance(InstanceId, ImageId, 'runner')
         invariant(result, 'Instance not scheduled')
 
         return InstanceId

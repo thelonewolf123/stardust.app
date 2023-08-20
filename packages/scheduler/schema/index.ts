@@ -18,9 +18,8 @@ export const ContainerBuildSchema = z.object({
     projectSlug: z.string().min(1),
     githubRepoUrl: z.string().min(1),
     githubRepoBranch: z.string().min(1),
-    env: z.record(z.string().min(1)).optional(),
     dockerContext: z.string().min(1),
     dockerPath: z.string().min(1),
     ecrRepo: z.string().min(1),
-    buildArgs: z.record(z.string().optional()).optional()
+    buildArgs: z.record(z.string()).optional()
 })

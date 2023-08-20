@@ -1,6 +1,7 @@
 -- Extract the arguments passed from Node.js
-local instanceId = ARGV[1] -- The unique identifier for the instance
-local amiId = ARGV[2]      -- The AMI (Amazon Machine Image) ID of the instance
+local instanceId = ARGV[1]   -- The unique identifier for the instance
+local amiId = ARGV[2]        -- The AMI (Amazon Machine Image) ID of the instance
+local instanceType = ARGV[3] -- The type of instance (e.g. 'builder' | 'runner')
 
 -- Get the current 'physicalHost' data from Redis
 local data = redis.call('GET', 'physicalHost')
@@ -17,6 +18,7 @@ end
 local newInstance = {
     instanceId = instanceId,
     amiId = amiId,
+    instanceType = instanceType,
     scheduledForDeletionAt = nil,
     status = 'pending',
     createdAt = currentTime,

@@ -1,12 +1,12 @@
 import { z } from 'zod'
 
+import models from '@/backend/database'
 import { createQueue } from '@/core/queue'
 import {
     ContainerBuildSchema,
     ContainerDestroySchema,
     ContainerSchedulerSchema
 } from '@/scheduler/schema'
-import models from '@models/index'
 import { User } from '@models/user'
 
 export type WorkerQueueMessage =
@@ -22,6 +22,7 @@ export type PhysicalHostType = {
     instanceId: string
     publicIp: string
     scheduledForDeletionAt: Date | null
+    instanceType: 'builder' | 'runner'
     createdAt: Date
     updatedAt: Date
     status: 'running' | 'pending' | 'failed'

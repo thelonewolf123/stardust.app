@@ -1,6 +1,7 @@
 import deleteContainerScript from 'inline:./delete.lua'
 import getInstanceScript from 'inline:./get-instance.lua'
 import scheduleContainerScript from 'inline:./schedule-add.lua'
+import scheduleContainerBuildScript from 'inline:./schedule-build.lua'
 import updateContainerScript from 'inline:./update.lua'
 
 import { PhysicalHostType } from '@/types'
@@ -13,6 +14,14 @@ function scheduleContainer(containerSlug: string) {
         `${MAX_CONTAINER_PER_INSTANCE}`
     )
     return redis.runLuaScript(script, [containerSlug])
+}
+
+function scheduleContainerBuild(containerSlug: string, projectSlug: string) {
+    const script = scheduleContainerBuildScript.replace(
+        /MAX_CONTAINER_PER_INSTANCE/g,
+        `${MAX_CONTAINER_PER_INSTANCE}`
+    )
+    return redis.runLuaScript(script, [containerSlug, projectSlug])
 }
 
 function deleteContainer(containerSlug: string) {
@@ -37,5 +46,6 @@ export {
     deleteContainer,
     scheduleContainer,
     updateContainer,
+    scheduleContainerBuild,
     getInstanceIdByContainerId
 }

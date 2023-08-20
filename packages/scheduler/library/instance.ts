@@ -18,6 +18,16 @@ class InstanceStrategy {
         throw new Error('Provider not supported')
     }
 
+    getInstanceForContainerBuild(
+        containerSlug: string,
+        projectSlug: string
+    ): Promise<string> {
+        return this.strategy.getInstanceForContainerBuild(
+            containerSlug,
+            projectSlug
+        )
+    }
+
     getInstanceForNewContainer(containerSlug: string): Promise<string> {
         return this.strategy.getInstanceForNewContainer(containerSlug)
     }

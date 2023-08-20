@@ -20,8 +20,12 @@ export const SSM_PARAMETER_KEYS = {
 export const MAX_CONTAINER_PER_INSTANCE = 2
 export const MAX_INSTANCE_STATUS_ATTEMPTS = 300
 export const MAX_CONTAINER_SCHEDULE_ATTEMPTS = 300
+export const MAX_CONTAINER_BUILD_ATTEMPTS = 300
 
-export const INSTANCE_SCHEDULE_KEY = 'instance-schedule'
+export const LOCK = {
+    BUILDER_INSTANCE: 'builder-instance',
+    CONTAINER_INSTANCE: 'container-instance'
+}
 
 export const ERROR_CODES = {
     INSTANCE_PROVISION_FAILED: 'Instance provision failed',
