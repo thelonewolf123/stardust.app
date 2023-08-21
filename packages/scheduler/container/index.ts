@@ -1,3 +1,4 @@
+import { CLOUD_PROVIDER } from '@constants/provider'
 import {
     BUILD_CONTAINER,
     DESTROY_CONTAINER,
@@ -15,6 +16,7 @@ import {
     createNewContainer,
     destroyContainer
 } from './controller'
+import { NewContainerStrategy } from './controllers/new-container'
 
 export const setupNewContainerConsumer = async () => {
     const { onMessage, channel, cleanup, publish } = await queueManager({
@@ -24,13 +26,15 @@ export const setupNewContainerConsumer = async () => {
     })
     process.on('SIGINT', () => cleanup())
 
-    onMessage(async (message) => {
+    onMessage((message) => {
         if (!message) return
         const { content } = message
         const data = ContainerSchedulerSchema.parse(
             JSON.parse(content.toString())
         )
-        createNewContainer(data)
+        const strategy = new NewContainerStrategy(data, CLOUD_PROVIDER)
+        strategy
+            .createNewContainer()
             .then(() => {
                 channel.receiver.ack(message)
             })

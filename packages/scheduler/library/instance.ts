@@ -1,12 +1,16 @@
+import Dockerode from 'dockerode'
+
+import { getDockerClient } from '@/core/docker'
+import { ProviderType } from '@/types'
 import { Instance } from '@aws-sdk/client-ec2'
 
 import InstanceStrategyAws from './instance.aws'
 
 class InstanceStrategy {
-    provider: 'aws' | 'gcp'
+    provider: ProviderType
     strategy: InstanceStrategyAws
 
-    constructor(provider: 'aws' | 'gcp') {
+    constructor(provider: ProviderType) {
         this.provider = provider
         this.strategy = this.#createStrategy()
     }
@@ -32,16 +36,20 @@ class InstanceStrategy {
         return this.strategy.getInstanceForNewContainer(containerSlug)
     }
 
-    waitTillInstanceReady(id: string): Promise<Instance> {
+    waitTillInstanceReady(id?: string): Promise<Instance> {
         return this.strategy.waitTillInstanceReady(id)
     }
 
-    terminateInstance(id: string): Promise<void> {
+    terminateInstance(id?: string): Promise<void> {
         return this.strategy.terminateInstance(id)
     }
 
-    exec(command: string, instanceId: string): Promise<string> {
-        return this.strategy.exec(command, instanceId)
+    exec(command: string): Promise<string> {
+        return this.strategy.exec(command)
+    }
+
+    getDockerClient(): Promise<Dockerode> {
+        return this.strategy.getDockerClient()
     }
 }
 

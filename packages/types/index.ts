@@ -69,3 +69,5 @@ export type QueryablePromise<T> = Promise<T> & {
     isResolved: boolean
     isRejected: boolean
 }
+
+export type ProviderType = 'aws' | 'gcp' | 'azure'

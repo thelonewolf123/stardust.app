@@ -1,1 +1,3 @@
-export const CLOUD_PROVIDER: 'aws' | 'gcp' = 'aws'
+import { ProviderType } from '@/types'
+
+export const CLOUD_PROVIDER: ProviderType = 'aws'

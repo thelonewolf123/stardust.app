@@ -1,5 +1,6 @@
 import invariant from 'invariant'
 
+import { getDockerClient } from '@/core/docker'
 import { Ec2InstanceType } from '@/types'
 import {
     ERROR_CODES,
@@ -18,6 +19,8 @@ class InstanceStrategyAws {
     instanceAttempts: number = 0
     containerAttempts: number = 0
     containerBuildAttempts: number = 0
+    publicIp: string | null = null
+    instanceId: string | null = null
 
     async getInstanceForNewContainer(containerSlug: string) {
         this.containerAttempts = 0
@@ -28,6 +31,7 @@ class InstanceStrategyAws {
             await sleep(1000)
         }
 
+        this.instanceId = instanceId
         return instanceId
     }
 
@@ -49,18 +53,19 @@ class InstanceStrategyAws {
         return instanceId
     }
 
-    async exec(command: string, instanceId: string) {
-        const info = await ec2Aws.getInstanceInfoById(instanceId)
-        const publicIp = info?.PublicIpAddress
-
-        invariant(publicIp, 'Instance not found')
-
-        return ec2Aws.execCommand(command, publicIp)
+    async exec(command: string) {
+        invariant(this.publicIp, 'Instance not found')
+        return ec2Aws.execCommand(command, this.publicIp)
     }
 
-    async waitTillInstanceReady(id: string) {
+    async waitTillInstanceReady(id?: string) {
         this.instanceAttempts = 0
         let isInstanceReady = false
+
+        if (!id) {
+            invariant(this.instanceId, 'Instance not found')
+            id = this.instanceId
+        }
 
         while (!isInstanceReady) {
             isInstanceReady = await this.#isInstanceReady(id)
@@ -72,6 +77,8 @@ class InstanceStrategyAws {
 
         invariant(publicIp, 'Instance not found')
 
+        this.publicIp = publicIp
+
         await updateInstance(id, {
             publicIp,
             status: 'running'
@@ -80,7 +87,16 @@ class InstanceStrategyAws {
         return info
     }
 
-    async terminateInstance(instanceId: string) {
+    async getDockerClient() {
+        invariant(this.publicIp, 'Instance not found')
+        return getDockerClient(this.publicIp)
+    }
+
+    async terminateInstance(instanceId?: string) {
+        if (!instanceId) {
+            invariant(this.instanceId, 'Instance not found')
+            instanceId = this.instanceId
+        }
         await ec2Aws.terminateInstance(instanceId)
     }
 
