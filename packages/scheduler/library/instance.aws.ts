@@ -11,7 +11,11 @@ import {
 import ec2Aws from '@core/ec2.aws'
 import { sleep } from '@core/utils'
 
-import { scheduleContainer, scheduleContainerBuild } from '../lua/container'
+import {
+    getInstanceIdByContainerId,
+    scheduleContainer,
+    scheduleContainerBuild
+} from '../lua/container'
 import { scheduleInstance, updateInstance } from '../lua/instance'
 import { addLock, releaseLock } from '../lua/lock'
 
@@ -54,7 +58,7 @@ class InstanceStrategyAws {
     }
 
     async exec(command: string) {
-        invariant(this.publicIp, 'Instance not found')
+        invariant(this.publicIp, ERROR_CODES.INSTANCE_PUBLIC_IP_NOT_FOUND)
         return ec2Aws.execCommand(command, this.publicIp)
     }
 
@@ -63,7 +67,7 @@ class InstanceStrategyAws {
         let isInstanceReady = false
 
         if (!id) {
-            invariant(this.instanceId, 'Instance not found')
+            invariant(this.instanceId, ERROR_CODES.INSTANCE_NOT_FOUND)
             id = this.instanceId
         }
 
@@ -75,7 +79,7 @@ class InstanceStrategyAws {
         const info = await ec2Aws.getInstanceInfoById(id)
         const publicIp = info?.PublicIpAddress
 
-        invariant(publicIp, 'Instance not found')
+        invariant(publicIp, ERROR_CODES.INSTANCE_PUBLIC_IP_NOT_FOUND)
 
         this.publicIp = publicIp
 
@@ -87,14 +91,29 @@ class InstanceStrategyAws {
         return info
     }
 
+    async getContainerInstance(containerId: string) {
+        const instanceId = await getInstanceIdByContainerId(containerId)
+        invariant(instanceId, ERROR_CODES.INSTANCE_NOT_FOUND)
+        const info = await ec2Aws.getInstanceInfoById(instanceId)
+        invariant(
+            info && info.PublicIpAddress,
+            ERROR_CODES.INSTANCE_PUBLIC_IP_NOT_FOUND
+        )
+
+        this.publicIp = info.PublicIpAddress
+        this.instanceId = instanceId
+
+        return info
+    }
+
     async getDockerClient() {
-        invariant(this.publicIp, 'Instance not found')
+        invariant(this.publicIp, ERROR_CODES.INSTANCE_PUBLIC_IP_NOT_FOUND)
         return getDockerClient(this.publicIp)
     }
 
     async terminateInstance(instanceId?: string) {
         if (!instanceId) {
-            invariant(this.instanceId, 'Instance not found')
+            invariant(this.instanceId, ERROR_CODES.INSTANCE_NOT_FOUND)
             instanceId = this.instanceId
         }
         await ec2Aws.terminateInstance(instanceId)

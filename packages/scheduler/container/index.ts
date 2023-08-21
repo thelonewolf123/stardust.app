@@ -11,11 +11,8 @@ import {
     ContainerDestroySchema,
     ContainerSchedulerSchema
 } from '../schema'
-import {
-    buildContainer,
-    createNewContainer,
-    destroyContainer
-} from './controller'
+import { buildContainer } from './controller'
+import { DestroyContainerStrategy } from './controllers/destroy-container'
 import { NewContainerStrategy } from './controllers/new-container'
 
 export const setupNewContainerConsumer = async () => {
@@ -60,7 +57,9 @@ export const setupDestroyContainerConsumer = async () => {
             JSON.parse(content.toString())
         )
         console.log(data)
-        destroyContainer(data)
+        const strategy = new DestroyContainerStrategy(data, CLOUD_PROVIDER)
+        strategy
+            .destroyContainer()
             .then(() => {
                 channel.receiver.ack(message)
             })

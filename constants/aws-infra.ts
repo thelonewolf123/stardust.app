@@ -31,8 +31,9 @@ export const LOCK = {
 export const ERROR_CODES = {
     INSTANCE_PROVISION_FAILED: 'Instance provision failed',
     INSTANCE_NOT_FOUND: 'Instance not found',
+    INSTANCE_PUBLIC_IP_NOT_FOUND: 'Instance public ip not found',
     CONTAINER_DELETE_FAILED: 'Container delete failed',
     CONTAINER_SCHEDULE_FAILED: 'Container schedule failed',
     CONTAINER_BUILD_FAILED: 'Container build failed',
     CONTAINER_BUILD_HAS_CANCELED: 'Container build has canceled'
-}
+} as const

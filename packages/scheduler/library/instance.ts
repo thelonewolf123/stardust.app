@@ -44,12 +44,16 @@ class InstanceStrategy {
         return this.strategy.terminateInstance(id)
     }
 
-    exec(command: string): Promise<string> {
-        return this.strategy.exec(command)
+    getContainerInstance(containerId: string): Promise<Instance> {
+        return this.strategy.getContainerInstance(containerId)
     }
 
     getDockerClient(): Promise<Dockerode> {
         return this.strategy.getDockerClient()
+    }
+
+    exec(command: string): Promise<string> {
+        return this.strategy.exec(command)
     }
 }
 
