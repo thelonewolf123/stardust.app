@@ -5,7 +5,7 @@ const { execSync } = require('child_process')
 
 const sharedConfig = {
     bundle: true,
-    minify: true
+    minify: false
 }
 
 execSync('rm -rf dist')

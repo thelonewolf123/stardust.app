@@ -58,7 +58,7 @@ export class Container {
     @prop({ ref: InstanceModel, required: false })
     public instanceId!: Ref<typeof InstanceModel>
 
-    @prop({ type: Number, required: true })
+    @prop({ type: Number, required: false })
     public port!: number
 
     @prop({ type: Number, required: true })

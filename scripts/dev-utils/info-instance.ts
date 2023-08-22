@@ -1,7 +1,7 @@
 import ec2Aws from '../../packages/core/ec2.aws'
 
 async function start() {
-    const info = await ec2Aws.getInstanceInfoById('i-056b78ae9fb98c47c')
+    const info = await ec2Aws.getInstanceStatusById('i-09275d9470735b31d')
     console.log(info)
 }
 

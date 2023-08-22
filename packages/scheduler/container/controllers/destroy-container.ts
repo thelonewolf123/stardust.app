@@ -57,6 +57,6 @@ export class DestroyContainerStrategy {
             .then(() => this.#instance.getDockerClient())
             .then((docker) => (this.#docker = docker))
             .then(() => this.#stopAndRemoveContainer())
-            .catch(this.#handleError)
+            .catch((err) => this.#handleError(err))
     }
 }

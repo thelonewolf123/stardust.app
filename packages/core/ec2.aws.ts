@@ -136,7 +136,7 @@ async function execCommand(command: string, ipAddress: string) {
         ssh.connect({
             host: ipAddress,
             port: 22,
-            username: 'ec2-user', // Modify this if your instance uses a different username
+            username: 'ubuntu', // Modify this if your instance uses a different username
             privateKey: privateKey
         })
     })

@@ -108,10 +108,10 @@ export type ProjectInput = {
   description: Scalars['String'];
   dockerContext: Scalars['String'];
   dockerPath: Scalars['String'];
-  env?: InputMaybe<Array<Env>>;
+  env?: InputMaybe<Array<EnvInput>>;
   githubBranch: Scalars['String'];
   githubUrl: Scalars['String'];
-  metaData?: InputMaybe<Array<MetaData>>;
+  metaData?: InputMaybe<Array<MetaDataInput>>;
   name: Scalars['String'];
   port?: InputMaybe<Scalars['Int']>;
 };

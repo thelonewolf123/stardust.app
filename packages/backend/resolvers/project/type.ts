@@ -15,8 +15,8 @@ export const typeDefs = gql`
         dockerContext: String!
         buildArgs: [BuildArgsInput!]
         port: Int
-        env: [Env!]
-        metaData: [metaData!]
+        env: [EnvInput!]
+        metaData: [metaDataInput!]
     }
 
     type Project {

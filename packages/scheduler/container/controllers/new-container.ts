@@ -99,12 +99,12 @@ export class NewContainerStrategy {
     createNewContainer = async () => {
         return this.#instance
             .getInstanceForNewContainer(this.#data.containerSlug)
-            .then(this.#instance.waitTillInstanceReady)
-            .then(this.#instance.getDockerClient)
+            .then(() => this.#instance.waitTillInstanceReady())
+            .then(() => this.#instance.getDockerClient())
             .then((docker) => (this.#docker = docker))
-            .then(this.#pullImageIfNeeded)
-            .then(this.#startContainer)
-            .then(this.#updateContainerStatus)
-            .catch(this.#handleError)
+            .then(() => this.#pullImageIfNeeded())
+            .then(() => this.#startContainer())
+            .then(() => this.#updateContainerStatus())
+            .catch((err) => this.#handleError(err))
     }
 }

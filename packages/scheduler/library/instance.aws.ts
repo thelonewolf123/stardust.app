@@ -39,22 +39,18 @@ class InstanceStrategyAws {
         return instanceId
     }
 
-    async getInstanceForContainerBuild(
-        projectSlug: string,
+    async getInstanceForContainerBuild(args: {
+        projectSlug: string
         containerSlug: string
-    ): Promise<string> {
+    }): Promise<string> {
         this.containerBuildAttempts = 0
-        let instanceId: null | string = null
 
-        while (!instanceId) {
-            instanceId = await this.#isContainerBuildScheduled(
-                projectSlug,
-                containerSlug
-            )
+        while (!this.instanceId) {
+            this.instanceId = await this.#isContainerBuildScheduled(args)
             await sleep(1000)
         }
 
-        return instanceId
+        return this.instanceId
     }
 
     async exec(command: string) {
@@ -140,14 +136,11 @@ class InstanceStrategyAws {
         return null
     }
 
-    async #isContainerBuildScheduled(
-        projectSlug: string,
+    async #isContainerBuildScheduled(args: {
+        projectSlug: string
         containerSlug: string
-    ) {
-        const instanceId = await scheduleContainerBuild(
-            projectSlug,
-            containerSlug
-        )
+    }) {
+        const instanceId = await scheduleContainerBuild(args)
         if (instanceId) return instanceId
 
         const lock = await addLock(LOCK.BUILDER_INSTANCE)
@@ -184,6 +177,7 @@ class InstanceStrategyAws {
 
     async #isInstanceReady(id: string) {
         const instanceInfo = await ec2Aws.getInstanceStatusById(id)
+        console.log('instanceInfo: ', id, instanceInfo)
         if (instanceInfo?.Status === 'ok') {
             return true
         }

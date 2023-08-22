@@ -17,6 +17,7 @@ export class BuildImageStrategy {
     #docker: Dockerode | null = null
     #githubRepoPath: string
     #dockerBuildConfig
+    dockerContext: string
 
     constructor(
         data: z.infer<typeof ContainerBuildSchema>,
@@ -24,19 +25,17 @@ export class BuildImageStrategy {
     ) {
         this.#data = data
         this.#instance = new InstanceStrategy(provider)
-        this.#githubRepoPath = path.join(v4())
+        this.#githubRepoPath = path.join('/home/ubuntu/', v4())
+        this.dockerContext = path.join(
+            this.#githubRepoPath,
+            this.#data.dockerContext || '.'
+        )
+
         this.#dockerBuildConfig = {
             file: {
-                context: path.join(
-                    this.#githubRepoPath,
-                    this.#data.dockerContext || '.'
-                ),
-                src: [
-                    path.join(
-                        this.#githubRepoPath,
-                        this.#data.dockerPath || 'Dockerfile'
-                    )
-                ]
+                context: this.dockerContext,
+                src: []
+                // src: [this.#data.dockerPath || 'Dockerfile']
             },
             args: {
                 buildargs: this.#data.buildArgs || {},
@@ -69,7 +68,7 @@ export class BuildImageStrategy {
             // periodically check if promise is completed!
             if (containerBuildPromise.isFulfilled) {
                 // The promise is completed
-                console.log('Image pushed successfully.')
+                console.log('Image build completed!')
                 break
             }
 
@@ -99,6 +98,11 @@ export class BuildImageStrategy {
                 this.#data.githubRepoUrl
             } ${this.#githubRepoPath}`
         )
+        await sleep(45_000)
+    }
+
+    async #removeRepo() {
+        await this.#instance.exec(`rm -rf ${this.#githubRepoPath}`)
     }
 
     async #pushDockerImage() {
@@ -119,19 +123,20 @@ export class BuildImageStrategy {
     }
 
     #getInstanceForContainerBuild() {
-        return this.#instance.getInstanceForContainerBuild(
-            this.#data.containerSlug,
-            this.#data.projectSlug
-        )
+        return this.#instance.getInstanceForContainerBuild({
+            containerSlug: this.#data.containerSlug,
+            projectSlug: this.#data.projectSlug
+        })
     }
 
     buildImage() {
         return this.#getInstanceForContainerBuild()
-            .then(this.#instance.waitTillInstanceReady)
-            .then(this.#cloneRepo)
-            .then(this.#instance.getDockerClient)
+            .then(() => this.#instance.waitTillInstanceReady())
+            .then(() => this.#cloneRepo())
+            .then(() => this.#instance.getDockerClient())
             .then((docker) => (this.#docker = docker))
-            .then(this.#buildDockerImage)
-            .then(this.#pushDockerImage)
+            .then(() => this.#buildDockerImage())
+            .then(() => this.#pushDockerImage())
+            .then(() => this.#removeRepo())
     }
 }
