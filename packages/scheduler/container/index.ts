@@ -11,7 +11,7 @@ import {
     ContainerDestroySchema,
     ContainerSchedulerSchema
 } from '../schema'
-import { buildContainer } from './controller'
+import { BuildImageStrategy } from './controllers/build-image'
 import { DestroyContainerStrategy } from './controllers/destroy-container'
 import { NewContainerStrategy } from './controllers/new-container'
 
@@ -86,7 +86,10 @@ export const setupBuildContainerConsumer = async () => {
         const { content } = message
         const data = ContainerBuildSchema.parse(JSON.parse(content.toString()))
         console.log(data)
-        buildContainer(data)
+
+        const strategy = new BuildImageStrategy(data, CLOUD_PROVIDER)
+        strategy
+            .buildImage()
             .then(() => {
                 channel.receiver.ack(message)
             })

@@ -1,121 +1,22 @@
 import Dockerode from 'dockerode'
 import invariant from 'invariant'
+import path from 'path'
+import { v4 } from 'uuid'
 import { z } from 'zod'
 
 import { makeQueryablePromise, sleep } from '@/core/utils'
+import InstanceStrategy from '@/scheduler/library/instance'
+import { getContainer } from '@/scheduler/lua/container'
+import { ContainerBuildSchema } from '@/scheduler/schema'
 import { ProviderType } from '@/types'
 import { ERROR_CODES } from '@constants/aws-infra'
-import { CLOUD_PROVIDER } from '@constants/provider'
-import { getDockerClient } from '@core/docker'
-
-import InstanceStrategy from '../../library/instance'
-import { getContainer } from '../../lua/container'
-import { ContainerBuildSchema } from '../../schema'
-
-export async function buildContainer(
-    data: z.infer<typeof ContainerBuildSchema>
-) {
-    const instance = new InstanceStrategy(CLOUD_PROVIDER)
-
-    console.log('Build container!', data)
-    const buildDockerImage = async (docker: Dockerode) => {
-        const context = data.dockerContext || '.'
-        const dockerfilePath = data.dockerPath || 'Dockerfile'
-
-        const buildStream = await docker.buildImage(
-            {
-                context,
-                src: [dockerfilePath]
-            },
-            {
-                buildargs: data.buildArgs || {},
-                t: data.ecrRepo
-            }
-        )
-
-        await new Promise<void>((resolve, reject) => {
-            docker.modem.followProgress(buildStream, (err, res) => {
-                if (err) {
-                    reject(err)
-                } else {
-                    resolve()
-                }
-            })
-        })
-
-        console.log('Image built successfully.')
-
-        return docker
-    }
-
-    const pushDockerImage = async (docker: Dockerode) => {
-        const image = await docker.getImage(data.ecrRepo)
-        const stream = await image.push()
-
-        const containerBuildPromise = makeQueryablePromise(
-            new Promise((resolve, reject) => {
-                docker.modem.followProgress(stream, (err, res) => {
-                    if (err) {
-                        reject(err)
-                    } else {
-                        resolve(true)
-                    }
-                })
-            })
-        )
-
-        while (true) {
-            // periodically check if promise is completed!
-            if (containerBuildPromise.isFulfilled) {
-                // The promise is completed
-                console.log('Image pushed successfully.')
-                break
-            }
-
-            const containerData = await getContainer({
-                containerSlug: data.containerSlug,
-                projectSlug: data.projectSlug
-            })
-
-            if (!containerData) {
-                throw new Error(ERROR_CODES.CONTAINER_BUILD_FAILED)
-            }
-
-            if (containerData.containerSlug !== data.containerSlug) {
-                throw new Error(ERROR_CODES.CONTAINER_BUILD_HAS_CANCELED)
-            }
-
-            await sleep(1000)
-        }
-
-        return docker
-    }
-
-    return instance
-        .getInstanceForContainerBuild(data.containerSlug, data.projectSlug)
-        .then(instance.waitTillInstanceReady)
-        .then((info) => {
-            invariant(
-                info.PublicIpAddress && info.InstanceId,
-                'Instance not found'
-            )
-            return [info.InstanceId, info.PublicIpAddress]
-        })
-        .then(async ([instanceId, publicIp]) => {
-            return publicIp
-        })
-        .then(getDockerClient)
-        .then(buildDockerImage)
-        .then(pushDockerImage)
-        .catch((error) => {
-            console.error('Container provision error: ', error)
-            throw error
-        })
-}
 
 export class BuildImageStrategy {
     #data: z.infer<typeof ContainerBuildSchema>
     #instance: InstanceStrategy
+    #docker: Dockerode | null = null
+    #githubRepoPath: string
+    #dockerBuildConfig
 
     constructor(
         data: z.infer<typeof ContainerBuildSchema>,
@@ -123,26 +24,38 @@ export class BuildImageStrategy {
     ) {
         this.#data = data
         this.#instance = new InstanceStrategy(provider)
-    }
-
-    buildDockerImage = async (docker: Dockerode) => {
-        const context = this.#data.dockerContext || '.'
-        const dockerfilePath = this.#data.dockerPath || 'Dockerfile'
-
-        const buildStream = await docker.buildImage(
-            {
-                context,
-                src: [dockerfilePath]
+        this.#githubRepoPath = path.join(v4())
+        this.#dockerBuildConfig = {
+            file: {
+                context: path.join(
+                    this.#githubRepoPath,
+                    this.#data.dockerContext || '.'
+                ),
+                src: [
+                    path.join(
+                        this.#githubRepoPath,
+                        this.#data.dockerPath || 'Dockerfile'
+                    )
+                ]
             },
-            {
+            args: {
                 buildargs: this.#data.buildArgs || {},
                 t: this.#data.ecrRepo
             }
+        }
+    }
+
+    async #buildDockerImage() {
+        invariant(this.#docker, 'Docker client not found')
+        const buildStream: any = await this.#docker.buildImage(
+            this.#dockerBuildConfig.file,
+            this.#dockerBuildConfig.args
         )
 
         const containerBuildPromise = makeQueryablePromise(
             new Promise<void>((resolve, reject) => {
-                docker.modem.followProgress(buildStream, (err, res) => {
+                invariant(this.#docker, 'Docker client not found')
+                this.#docker.modem.followProgress(buildStream, (err, res) => {
                     if (err) {
                         reject(err)
                     } else {
@@ -170,7 +83,7 @@ export class BuildImageStrategy {
             }
 
             if (containerData.containerSlug !== this.#data.containerSlug) {
-                ;(buildStream as any).destroy() // destroy build stream
+                buildStream.destroy() // destroy build stream
                 throw new Error(ERROR_CODES.CONTAINER_BUILD_HAS_CANCELED)
             }
 
@@ -178,16 +91,24 @@ export class BuildImageStrategy {
         }
 
         console.log('Image built successfully.')
-
-        return docker
     }
 
-    pushDockerImage = async (docker: Dockerode) => {
-        const image = await docker.getImage(this.#data.ecrRepo)
+    async #cloneRepo() {
+        await this.#instance.exec(
+            `git clone -b ${this.#data.githubRepoBranch} ${
+                this.#data.githubRepoUrl
+            } ${this.#githubRepoPath}`
+        )
+    }
+
+    async #pushDockerImage() {
+        invariant(this.#docker, 'Docker client not found')
+        const image = await this.#docker.getImage(this.#data.ecrRepo)
         const stream = await image.push()
 
         await new Promise((resolve, reject) => {
-            docker.modem.followProgress(stream, (err, res) => {
+            invariant(this.#docker, 'Docker client not found')
+            this.#docker.modem.followProgress(stream, (err, res) => {
                 if (err) {
                     reject(err)
                 } else {
@@ -195,7 +116,22 @@ export class BuildImageStrategy {
                 }
             })
         })
+    }
 
-        return docker
+    #getInstanceForContainerBuild() {
+        return this.#instance.getInstanceForContainerBuild(
+            this.#data.containerSlug,
+            this.#data.projectSlug
+        )
+    }
+
+    buildImage() {
+        return this.#getInstanceForContainerBuild()
+            .then(this.#instance.waitTillInstanceReady)
+            .then(this.#cloneRepo)
+            .then(this.#instance.getDockerClient)
+            .then((docker) => (this.#docker = docker))
+            .then(this.#buildDockerImage)
+            .then(this.#pushDockerImage)
     }
 }

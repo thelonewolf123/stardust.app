@@ -2,12 +2,11 @@ import Dockerode from 'dockerode'
 import invariant from 'invariant'
 import { z } from 'zod'
 
+import InstanceStrategy from '@/scheduler/library/instance'
+import { deleteContainer, updateContainer } from '@/scheduler/lua/container'
+import { ContainerSchedulerSchema } from '@/scheduler/schema'
 import { ProviderType } from '@/types'
 import { ERROR_CODES } from '@constants/aws-infra'
-
-import InstanceStrategy from '../../library/instance'
-import { deleteContainer, updateContainer } from '../../lua/container'
-import { ContainerSchedulerSchema } from '../../schema'
 
 export class NewContainerStrategy {
     #data: z.infer<typeof ContainerSchedulerSchema>
