@@ -39,4 +39,16 @@ sudo podman create --restart always --name docker-proxy-container -v /var/run/po
 # Enable and start the service, making the container run on boot
 sudo systemctl enable docker-proxy.service
 sudo systemctl start docker-proxy.service
+
+sudo curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+sudo unzip awscliv2.zip
+sudo ./aws/install
+sudo rm -rf awscliv2.zip aws
+sudo mkdir -p /home/ubuntu/.aws
+sudo echo "[default]
+aws_access_key_id='${env.AWS_ACCESS_KEY_ID}'
+aws_secret_access_key='${env.AWS_ACCESS_KEY_SECRET}'
+region='${env.AWS_REGION}'" > /home/ubuntu/.aws/config
+sudo chmod 600 /home/ubuntu/.aws/config
+sudo aws ecr get-login-password --region region | docker login --username AWS --password-stdin ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com 
 `
