@@ -1,5 +1,6 @@
 import invariant from 'invariant'
 
+import models from '@/backend/database'
 import { getDockerClient } from '@/core/docker'
 import { Ec2InstanceType } from '@/types'
 import {
@@ -171,7 +172,12 @@ class InstanceStrategyAws {
 
         const result = await scheduleInstance(InstanceId, ImageId, type)
         invariant(result, 'Instance not scheduled')
-
+        await models.Instance.create({
+            instanceId: InstanceId,
+            amiId: ImageId,
+            instanceType: type,
+            status: 'pending'
+        })
         return InstanceId
     }
 
@@ -179,6 +185,12 @@ class InstanceStrategyAws {
         const instanceInfo = await ec2Aws.getInstanceStatusById(id)
         console.log('instanceInfo: ', id, instanceInfo)
         if (instanceInfo?.Status === 'ok') {
+            await models.Instance.findOneAndUpdate(
+                { instanceId: id },
+                {
+                    status: 'running'
+                }
+            )
             return true
         }
 
