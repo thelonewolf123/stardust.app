@@ -129,6 +129,16 @@ export class BuildImageStrategy {
         })
     }
 
+    #handleError(error: Error) {
+        console.error('Container provision error: ', error)
+
+        if (error.message === ERROR_CODES.INSTANCE_PROVISION_FAILED) {
+            console.log('Instance provision failed, retrying...')
+        }
+
+        throw error
+    }
+
     buildImage() {
         return this.#getInstanceForContainerBuild()
             .then(() => this.#instance.waitTillInstanceReady())
@@ -138,5 +148,6 @@ export class BuildImageStrategy {
             .then(() => this.#buildDockerImage())
             .then(() => this.#pushDockerImage())
             .then(() => this.#removeRepo())
+            .catch((err) => this.#handleError(err))
     }
 }

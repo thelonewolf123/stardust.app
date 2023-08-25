@@ -56,6 +56,7 @@ class InstanceStrategyAws {
 
     async exec(command: string) {
         invariant(this.publicIp, ERROR_CODES.INSTANCE_PUBLIC_IP_NOT_FOUND)
+        console.log(`Executing command: ${command} on ${this.publicIp}`)
         return ec2Aws.execCommand(command, this.publicIp)
     }
 
@@ -84,6 +85,11 @@ class InstanceStrategyAws {
             publicIp,
             status: 'running'
         })
+
+        await models.Instance.updateOne(
+            { instanceId: id },
+            { $set: { status: 'running', ipAddress: publicIp } }
+        )
 
         return info
     }
@@ -114,6 +120,10 @@ class InstanceStrategyAws {
             instanceId = this.instanceId
         }
         await ec2Aws.terminateInstance(instanceId)
+        await models.Instance.updateOne(
+            { instanceId },
+            { $set: { status: 'terminated' } }
+        )
     }
 
     async #isContainerScheduled(containerSlug: string) {
