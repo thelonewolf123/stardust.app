@@ -49,6 +49,9 @@ export class Container {
     @prop({ type: Env, required: false }, PropType.ARRAY)
     public env!: Env[]
 
+    @prop({ type: String, required: false }, PropType.ARRAY)
+    public command!: string[]
+
     @prop({ type: String, required: false })
     public containerId!: string
 

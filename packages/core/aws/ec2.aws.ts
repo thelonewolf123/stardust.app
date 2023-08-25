@@ -1,5 +1,6 @@
 import { Client as SSHClient } from 'ssh2'
 
+import { env } from '@/env'
 import {
     DescribeInstancesCommand,
     DescribeInstanceStatusCommand,
@@ -12,8 +13,7 @@ import {
 import {
     EC2_INSTANCE_TYPE,
     SSM_PARAMETER_KEYS
-} from '../../constants/aws-infra'
-import { env } from '../env'
+} from '../../../constants/aws-infra'
 import ssmAws from './ssm.aws'
 
 const client = new EC2Client({

@@ -1,8 +1,7 @@
 import gql from 'graphql-tag'
 import invariant from 'invariant'
-import { v4 } from 'uuid'
 
-import { ecr } from '@/core/ecr.aws'
+import { ecr } from '@/core/aws/ecr.aws'
 import { getRegularUser } from '@/core/utils'
 import { Resolvers } from '@/types/graphql-server'
 
@@ -11,7 +10,7 @@ export const mutation: Resolvers['Mutation'] = {
         const user = getRegularUser(ctx)
         const version = 0
         const projectSlug = user.username + '/' + input.name
-        const containerSlug = `${projectSlug}/${version}`
+        const containerSlug = `${projectSlug}:${version}`
 
         const ecrResponse = await ecr.createEcrRepo({ name: projectSlug })
         const repositoryUri = ecrResponse.repository?.repositoryUri

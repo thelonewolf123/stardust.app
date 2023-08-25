@@ -4,15 +4,17 @@ import path from 'path'
 import { v4 } from 'uuid'
 import { z } from 'zod'
 
+import models from '@/backend/database'
 import { makeQueryablePromise, sleep } from '@/core/utils'
 import InstanceStrategy from '@/scheduler/library/instance'
-import { getContainer } from '@/scheduler/lua/container'
+import { deleteContainer, getContainer } from '@/scheduler/lua/container'
 import { ContainerBuildSchema } from '@/schema'
-import { ProviderType } from '@/types'
+import { Context, ProviderType } from '@/types'
 import { ERROR_CODES } from '@constants/aws-infra'
 
 export class BuildImageStrategy {
     #data: z.infer<typeof ContainerBuildSchema>
+    #queue: Context['queue']['createContainer']
     #instance: InstanceStrategy
     #docker: Dockerode | null = null
     #githubRepoPath: string
@@ -21,9 +23,11 @@ export class BuildImageStrategy {
 
     constructor(
         data: z.infer<typeof ContainerBuildSchema>,
+        queue: Context['queue']['createContainer'],
         provider: ProviderType
     ) {
         this.#data = data
+        this.#queue = queue
         this.#instance = new InstanceStrategy(provider)
         this.#githubRepoPath = path.join('/home/ubuntu/', v4())
         this.dockerContext = path.join(
@@ -129,8 +133,32 @@ export class BuildImageStrategy {
         })
     }
 
-    #handleError(error: Error) {
+    async #scheduleNewContainer() {
+        const container = await models.Container.findOne({
+            containerSlug: this.#data.containerSlug
+        }).lean()
+        const env: Record<string, string> = {}
+        const metaData: Record<string, string> = {}
+
+        container?.env?.map(({ name, value }) => {
+            env[name] = value
+        })
+        container?.metaData?.map(({ name, value }) => {
+            metaData[name] = value
+        })
+
+        return this.#queue.publish({
+            containerSlug: this.#data.containerSlug,
+            ports: container?.port ? [container?.port] : [],
+            command: container?.command || [],
+            env: env,
+            image: this.#data.ecrRepo
+        })
+    }
+
+    async #handleError(error: Error) {
         console.error('Container provision error: ', error)
+        await deleteContainer(this.#data.containerSlug)
 
         if (error.message === ERROR_CODES.INSTANCE_PROVISION_FAILED) {
             console.log('Instance provision failed, retrying...')
@@ -148,6 +176,7 @@ export class BuildImageStrategy {
             .then(() => this.#buildDockerImage())
             .then(() => this.#pushDockerImage())
             .then(() => this.#removeRepo())
+            .then(() => this.#scheduleNewContainer())
             .catch((err) => this.#handleError(err))
     }
 }

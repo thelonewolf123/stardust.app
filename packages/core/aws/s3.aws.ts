@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs'
 import { writeFile } from 'fs/promises'
 
+import { env } from '@/env'
 import {
     DeleteObjectCommand,
     GetObjectCommand,
@@ -8,8 +9,6 @@ import {
     PutObjectCommand,
     S3
 } from '@aws-sdk/client-s3'
-
-import { env } from '../env'
 
 export const s3Client = new S3({
     credentials: {

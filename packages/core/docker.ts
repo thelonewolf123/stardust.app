@@ -1,7 +1,7 @@
 import Docker from 'dockerode'
 
 import { SSM_PARAMETER_KEYS } from '@constants/aws-infra'
-import ssmAws from '@core/ssm.aws'
+import ssmAws from '@core/aws/ssm.aws'
 
 export async function getDockerClient(ipAddress: string) {
     const auth = await ssmAws.getParameter(

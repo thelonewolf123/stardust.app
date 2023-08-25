@@ -1,13 +1,12 @@
 import invariant from 'invariant'
 
+import { env } from '@/env'
 // Import the required AWS SDK modules
 import {
     GetParameterCommand,
     PutParameterCommand,
     SSMClient
 } from '@aws-sdk/client-ssm'
-
-import { env } from '../env'
 
 // Function to set a parameter in the SSM Parameter Store
 async function setParameter(name: string, value: string, type = 'String') {

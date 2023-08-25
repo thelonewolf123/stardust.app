@@ -1,6 +1,7 @@
 import invariant from 'invariant'
 
 import models from '@/backend/database'
+import ec2Aws from '@/core/aws/ec2.aws'
 import { getDockerClient } from '@/core/docker'
 import { Ec2InstanceType } from '@/types'
 import {
@@ -9,7 +10,6 @@ import {
     MAX_CONTAINER_SCHEDULE_ATTEMPTS,
     MAX_INSTANCE_STATUS_ATTEMPTS
 } from '@constants/aws-infra'
-import ec2Aws from '@core/ec2.aws'
 import { sleep } from '@core/utils'
 
 import {

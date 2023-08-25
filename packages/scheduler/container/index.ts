@@ -71,7 +71,7 @@ export const setupDestroyContainerConsumer = async () => {
 }
 
 export const setupBuildContainerConsumer = async () => {
-    const { onMessage, channel, cleanup } = await queueManager(
+    const { onMessage, channel, publish, cleanup } = await queueManager(
         {
             exchange: BUILD_CONTAINER.EXCHANGE_NAME,
             queue: BUILD_CONTAINER.QUEUE_NAME,
@@ -81,13 +81,22 @@ export const setupBuildContainerConsumer = async () => {
     )
     process.on('SIGINT', () => cleanup())
 
+    const createContainerQueue = {
+        channel: channel.sender,
+        publish
+    }
+
     onMessage(async (message) => {
         if (!message) return
         const { content } = message
         const data = ContainerBuildSchema.parse(JSON.parse(content.toString()))
         console.log(data)
 
-        const strategy = new BuildImageStrategy(data, CLOUD_PROVIDER)
+        const strategy = new BuildImageStrategy(
+            data,
+            createContainerQueue,
+            CLOUD_PROVIDER
+        )
         strategy
             .buildImage()
             .then(() => {
