@@ -33,9 +33,8 @@ export type Container = {
 
 export type ContainerInput = {
   command?: InputMaybe<Array<Scalars['String']>>;
-  description: Scalars['String'];
+  ecrRepo: Scalars['String'];
   env?: InputMaybe<Array<EnvInput>>;
-  image: Scalars['String'];
   metaData?: InputMaybe<Array<MetaDataInput>>;
   port?: InputMaybe<Scalars['Int']>;
 };

@@ -5,7 +5,7 @@ import { z } from 'zod'
 import InstanceStrategy from '@/scheduler/library/instance'
 import { deleteContainer } from '@/scheduler/lua/container'
 import { updateInstance } from '@/scheduler/lua/instance'
-import { ContainerDestroySchema } from '@/scheduler/schema'
+import { ContainerDestroySchema } from '@/schema'
 import { ProviderType } from '@/types'
 import { ERROR_CODES } from '@constants/aws-infra'
 

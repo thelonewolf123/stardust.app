@@ -12,8 +12,7 @@ export const typeDefs = gql`
     }
 
     input ContainerInput {
-        description: String!
-        image: String!
+        ecrRepo: String!
         command: [String!]
         port: Int
         env: [EnvInput!]

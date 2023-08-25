@@ -64,7 +64,7 @@ export class Container {
     @prop({ type: Number, required: true })
     public version!: number
 
-    @prop({ ref: () => UserModel, required: false })
+    @prop({ ref: () => UserModel, required: true })
     public createdBy!: Ref<typeof UserModel>
 }
 

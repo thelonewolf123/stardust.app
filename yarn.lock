@@ -6202,7 +6202,7 @@ graphql-config@^4.5.0:
     string-env-interpolation "1.0.1"
     tslib "^2.4.0"
 
-graphql-request@^6.0.0:
+graphql-request@^6.0.0, graphql-request@^6.1.0:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/graphql-request/-/graphql-request-6.1.0.tgz#f4eb2107967af3c7a5907eb3131c671eac89be4f"
   integrity sha512-p+XPfS4q7aIpKVcgmnZKhMNqhltk20hfXtkaIkTfjjmiKMJ5xrt5c743cL03y/K7y1rg3WrIC49xGiEQ4mxdNw==
@@ -7822,6 +7822,13 @@ terser@^5.16.8:
     acorn "^8.8.2"
     commander "^2.20.0"
     source-map-support "~0.5.20"
+
+throng@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/throng/-/throng-5.0.0.tgz#f9550c0221e579073f68a00be33a593d094e4d29"
+  integrity sha512-nrq7+qQhn/DL8yW/wiwImTepfi6ynOCAe7moSwgoYN1F32yQMdBkuFII40oAkb3cDfaL6q5BIoFTDCHdMWQ8Pw==
+  dependencies:
+    lodash "^4.17.20"
 
 through@^2.3.6, through@^2.3.8:
   version "2.3.8"

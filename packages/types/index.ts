@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongoose'
+import { Schema } from 'mongoose'
 import { z } from 'zod'
 
 import models from '@/backend/database'
@@ -7,7 +7,7 @@ import {
     ContainerBuildSchema,
     ContainerDestroySchema,
     ContainerSchedulerSchema
-} from '@/scheduler/schema'
+} from '@/schema'
 import { User } from '@models/user'
 
 export type WorkerQueueMessage =
@@ -45,7 +45,11 @@ export type PhysicalHostType = {
 
 export type Context = {
     // user: null | any
-    user: null | (User & { _id: ObjectId })
+    user:
+        | null
+        | (User & {
+              _id: Schema.Types.ObjectId
+          })
     queue: {
         createContainer: Awaited<
             ReturnType<

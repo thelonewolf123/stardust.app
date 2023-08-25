@@ -7,7 +7,7 @@ import { z } from 'zod'
 import { makeQueryablePromise, sleep } from '@/core/utils'
 import InstanceStrategy from '@/scheduler/library/instance'
 import { getContainer } from '@/scheduler/lua/container'
-import { ContainerBuildSchema } from '@/scheduler/schema'
+import { ContainerBuildSchema } from '@/schema'
 import { ProviderType } from '@/types'
 import { ERROR_CODES } from '@constants/aws-infra'
 

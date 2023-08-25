@@ -16,7 +16,7 @@ export const mutation: Resolvers['Mutation'] = {
 
         ctx.queue.createContainer.publish({
             containerSlug,
-            image: input.image,
+            image: input.ecrRepo,
             command: input.command ?? [],
             env,
             ports: input.port ? [input.port] : []

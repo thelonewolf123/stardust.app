@@ -41,7 +41,8 @@ export const mutation: Resolvers['Mutation'] = {
             port: input.port,
             status: 'pending',
             image: `${repositoryUri}:${version}`,
-            version
+            version,
+            createdBy: user
         })
         await container.save()
 

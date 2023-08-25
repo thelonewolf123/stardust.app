@@ -10,13 +10,13 @@ import {
     ContainerBuildSchema,
     ContainerDestroySchema,
     ContainerSchedulerSchema
-} from '../schema'
+} from '../../schema'
 import { BuildImageStrategy } from './controllers/build-image'
 import { DestroyContainerStrategy } from './controllers/destroy-container'
 import { NewContainerStrategy } from './controllers/new-container'
 
 export const setupNewContainerConsumer = async () => {
-    const { onMessage, channel, cleanup, publish } = await queueManager({
+    const { onMessage, channel, cleanup } = await queueManager({
         exchange: NEW_CONTAINER.EXCHANGE_NAME,
         queue: NEW_CONTAINER.QUEUE_NAME,
         routingKey: NEW_CONTAINER.ROUTING_KEY

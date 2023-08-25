@@ -2,9 +2,10 @@ import Dockerode from 'dockerode'
 import invariant from 'invariant'
 import { z } from 'zod'
 
+import models from '@/backend/database'
 import InstanceStrategy from '@/scheduler/library/instance'
 import { deleteContainer, updateContainer } from '@/scheduler/lua/container'
-import { ContainerSchedulerSchema } from '@/scheduler/schema'
+import { ContainerSchedulerSchema } from '@/schema'
 import { ProviderType } from '@/types'
 import { ERROR_CODES } from '@constants/aws-infra'
 
@@ -83,6 +84,11 @@ export class NewContainerStrategy {
             containerId: info.Id,
             status: 'running'
         })
+
+        await models.Container.updateOne(
+            { containerSlug: this.#data.containerSlug },
+            { $set: { containerId: info.Id, status: 'running' } }
+        )
     }
 
     async #handleError(error: Error) {
