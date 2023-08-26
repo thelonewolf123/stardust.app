@@ -43,6 +43,6 @@ aws_access_key_id=${env.AWS_ACCESS_KEY_ID}
 aws_secret_access_key=${env.AWS_ACCESS_KEY_SECRET}
 region=${env.AWS_REGION}" > /root/.aws/config
 sudo chmod 600 /home/ubuntu/.aws/config
-sudo apt install awscli -y
+sudo snap install aws-cli --classic
 sudo aws ecr get-login-password --region region | podman login --username AWS --password-stdin ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com 
 `

@@ -18,8 +18,6 @@ export class BuildImageStrategy {
     #instance: InstanceStrategy
     #docker: Dockerode | null = null
     #githubRepoPath: string
-    #dockerBuildConfig
-    dockerContext: string
 
     constructor(
         data: z.infer<typeof ContainerBuildSchema>,
@@ -30,68 +28,18 @@ export class BuildImageStrategy {
         this.#queue = queue
         this.#instance = new InstanceStrategy(provider)
         this.#githubRepoPath = path.join('/home/ubuntu/', v4())
-        this.dockerContext = path.join(
-            this.#githubRepoPath,
-            this.#data.dockerContext || '.'
-        )
-
-        this.#dockerBuildConfig = {
-            file: {
-                context: this.dockerContext,
-                src: []
-                // src: [this.#data.dockerPath || 'Dockerfile']
-            },
-            args: {
-                buildargs: this.#data.buildArgs || {},
-                t: this.#data.ecrRepo
-            }
-        }
     }
 
     async #buildDockerImage() {
+        invariant(this.#instance, 'Instance not found')
         invariant(this.#docker, 'Docker client not found')
-        const buildStream: any = await this.#docker.buildImage(
-            this.#dockerBuildConfig.file,
-            this.#dockerBuildConfig.args
-        )
-
-        const containerBuildPromise = makeQueryablePromise(
-            new Promise<void>((resolve, reject) => {
-                invariant(this.#docker, 'Docker client not found')
-                this.#docker.modem.followProgress(buildStream, (err, res) => {
-                    if (err) {
-                        reject(err)
-                    } else {
-                        resolve()
-                    }
-                })
-            })
-        )
-
-        while (true) {
-            // periodically check if promise is completed!
-            if (containerBuildPromise.isFulfilled) {
-                // The promise is completed
-                console.log('Image build completed!')
-                break
-            }
-
-            const containerData = await getContainer({
-                containerSlug: this.#data.containerSlug,
-                projectSlug: this.#data.projectSlug
-            })
-
-            if (!containerData) {
-                throw new Error(ERROR_CODES.CONTAINER_BUILD_FAILED)
-            }
-
-            if (containerData.containerSlug !== this.#data.containerSlug) {
-                buildStream.destroy() // destroy build stream
-                throw new Error(ERROR_CODES.CONTAINER_BUILD_HAS_CANCELED)
-            }
-
-            await sleep(1000)
-        }
+        // TODO: this code is vulnerable to shell injection, fix it @thelonewolf123
+        this.#instance.exec(`#!/bin/bash
+cd ${this.#githubRepoPath} && docker build -t ${this.#data.ecrRepo}  \
+${Object.entries(this.#data.buildArgs ?? {}).map(([key, value]) => {
+    return `--build-arg ${key}=${value} \\`
+})} .
+`)
 
         console.log('Image built successfully.')
     }
