@@ -48,7 +48,3 @@ export async function getArchLinuxAmiId(region: string) {
             return ami.ami
         })
 }
-
-export const getFileContent = (path: string) => {
-    return readFileSync(path).toString()
-}
