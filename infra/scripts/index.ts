@@ -8,16 +8,18 @@ const proxyJs = getFileContent('./docker/proxy.js')
 export const ec2UserData = `#!/bin/bash
 sudo apt update
 sudo apt install git curl nodejs podman -y
-mkdir -p /home/ubuntu/docker-proxy
-cd /home/ubuntu/docker-proxy
 
-# Populate the Dockerfile, package.json and proxy.js
-echo '${dockerfile}' > Dockerfile
-echo '${packageJson}' > package.json
-echo "${proxyJs}" > proxy.js
+# clone the repo
+sudo git clone https://oauth:${env.GITHUB_TOKEN}@github.com/thelonewolf123/soul-forge /home/ubuntu/app
+cd /home/ubuntu/app
+sudo git fetch ${env.BRANCH}
+sudo git checkout ${env.BRANCH}
+sudo git pull
+cd infra/docker
 
 # Build the docker proxy
 sudo podman build -t docker.io/thelonewolf123/docker-proxy .
+# sudo rm -rf /home/ubuntu/app
 
 # Create a systemd service for the proxy
 echo '[Unit]
@@ -34,21 +36,18 @@ ExecStop=/usr/bin/podman stop -t 2 docker-proxy-container
 WantedBy=default.target' | sudo tee /etc/systemd/system/docker-proxy.service
 
 # Create the proxy container without running it
-sudo podman create --restart always --name docker-proxy-container -v /var/run/podman/podman.sock:/var/run/docker.sock -p 2375:2375 -e BEARER_TOKEN='${env.REMOTE_DOCKER_PASSWORD}' docker.io/thelonewolf123/docker-proxy 2> /home/ubuntu/docker-proxy/create.log 
+sudo podman create --restart always --name docker-proxy-container -v /var/run/podman/podman.sock:/var/run/docker.sock -p 2375:2375 -e BEARER_TOKEN='${env.REMOTE_DOCKER_PASSWORD}' docker.io/thelonewolf123/docker-proxy 2> /home/ubuntu/docker-proxy-create.log 
 
 # Enable and start the service, making the container run on boot
 sudo systemctl enable docker-proxy.service
 sudo systemctl start docker-proxy.service
 
-sudo curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-sudo unzip awscliv2.zip
-sudo ./aws/install
-sudo rm -rf awscliv2.zip aws
-sudo mkdir -p /home/ubuntu/.aws
+sudo snap install aws-cli --classic
+sudo mkdir -p /root/.aws
 sudo echo "[default]
-aws_access_key_id='${env.AWS_ACCESS_KEY_ID}'
-aws_secret_access_key='${env.AWS_ACCESS_KEY_SECRET}'
-region='${env.AWS_REGION}'" > /home/ubuntu/.aws/config
+aws_access_key_id=${env.AWS_ACCESS_KEY_ID}
+aws_secret_access_key=${env.AWS_ACCESS_KEY_SECRET}
+region=${env.AWS_REGION}" > /root/.aws/config
 sudo chmod 600 /home/ubuntu/.aws/config
-sudo aws ecr get-login-password --region region | docker login --username AWS --password-stdin ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com 
+sudo aws ecr get-login-password --region region | podman login --username AWS --password-stdin ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com 
 `

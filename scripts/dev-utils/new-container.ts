@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 import { NEW_CONTAINER } from '../../constants/queue'
 import { queueManager } from '../../packages/core/queue'
-import { ContainerSchedulerSchema } from '../../packages/scheduler/schema/index'
+import { ContainerSchedulerSchema } from '../../packages/schema/index'
 
 async function start() {
     const exchange = NEW_CONTAINER.EXCHANGE_NAME
