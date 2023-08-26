@@ -2,7 +2,7 @@ import { env } from '../../packages/env'
 
 export const ec2UserData = `#!/bin/bash
 sudo apt update
-sudo apt install git curl nodejs podman awscli -y
+sudo apt install git curl nodejs podman -y
 
 # clone the repo
 sudo git clone https://oauth:${env.GITHUB_TOKEN}@github.com/thelonewolf123/soul-forge /home/ubuntu/app
@@ -43,5 +43,6 @@ aws_access_key_id=${env.AWS_ACCESS_KEY_ID}
 aws_secret_access_key=${env.AWS_ACCESS_KEY_SECRET}
 region=${env.AWS_REGION}" > /root/.aws/config
 sudo chmod 600 /home/ubuntu/.aws/config
+sudo apt install awscli -y
 sudo aws ecr get-login-password --region region | podman login --username AWS --password-stdin ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com 
 `

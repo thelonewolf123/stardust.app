@@ -1,9 +1,8 @@
-// ip => 54.145.172.129
 import { getDockerClient } from '../../packages/core/docker'
 
 async function main() {
-    console.log(process.argv[2] || '54.198.171.249')
-    const docker = await getDockerClient(process.argv[2] || '54.198.171.249')
+    console.log(process.argv[2])
+    const docker = await getDockerClient(process.argv[2])
     await docker.buildImage(
         {
             context: '/root/app',
