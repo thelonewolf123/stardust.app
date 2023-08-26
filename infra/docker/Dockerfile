@@ -1,4 +1,4 @@
-FROM alpine
+FROM docker.io/alpine
 
 RUN apk update
 RUN apk add --no-cache nodejs npm
