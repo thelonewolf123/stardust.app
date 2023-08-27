@@ -26,7 +26,7 @@ export class Container {
     @prop({ type: String, required: true })
     public containerSlug!: string
 
-    @prop({ type: number, required: false, default: 0 })
+    @prop({ type: Number, required: false, default: 0 })
     public containerBuildAttempts?: number
 
     @prop({ type: String, required: true })

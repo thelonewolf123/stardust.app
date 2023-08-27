@@ -1,7 +1,7 @@
 import Dockerode from 'dockerode'
 
 import { getDockerClient } from '@/core/docker'
-import { ProviderType } from '@/types'
+import { InstanceExecArgs, ProviderType } from '@/types'
 import { Instance } from '@aws-sdk/client-ec2'
 
 import InstanceStrategyAws from './instance.aws'
@@ -49,11 +49,9 @@ class InstanceStrategy {
         return this.strategy.getDockerClient()
     }
 
-    exec(params: {
-        command: string
-        args: string[]
-        cwd?: string
-    }): Promise<readonly [() => void, Promise<string>]> {
+    exec(
+        params: Omit<InstanceExecArgs, 'ipAddress'>
+    ): Promise<readonly [() => void, Promise<string>]> {
         return this.strategy.exec(params)
     }
 }

@@ -75,3 +75,12 @@ export type QueryablePromise<T> = Promise<T> & {
 }
 
 export type ProviderType = 'aws' | 'gcp' | 'azure'
+
+export type InstanceExecArgs = {
+    command: string
+    args: string[]
+    cwd?: string
+    ipAddress?: string
+    sudo?: boolean
+    env?: Record<string, string>
+}

@@ -36,7 +36,7 @@ export class BuildImageStrategy {
         // TODO: this code is vulnerable to shell injection, fix it @thelonewolf123
 
         const [cancelBuild, buildProgress] = await this.#instance.exec({
-            command: 'docker',
+            command: 'podman',
             args: [
                 'build',
                 '-t',
@@ -48,15 +48,18 @@ export class BuildImageStrategy {
                 ),
                 '.'
             ],
-            cwd: this.#githubRepoPath
+            cwd: this.#githubRepoPath,
+            sudo: true
         })
 
         const promiseQuery = makeQueryablePromise(buildProgress)
 
         while (true) {
             const containerInfo = await getContainer({
-                projectSlug: this.#data.containerSlug
+                projectSlug: this.#data.projectSlug
             })
+
+            console.log('Container info: ', containerInfo)
 
             if (containerInfo?.containerSlug !== this.#data.containerSlug) {
                 cancelBuild()
@@ -82,7 +85,8 @@ export class BuildImageStrategy {
                 this.#data.githubRepoBranch,
                 this.#data.githubRepoUrl,
                 this.#githubRepoPath
-            ]
+            ],
+            sudo: true
         })
         await sleep(45_000)
     }
@@ -96,19 +100,12 @@ export class BuildImageStrategy {
 
     async #pushDockerImage() {
         invariant(this.#docker, 'Docker client not found')
-        const image = await this.#docker.getImage(this.#data.ecrRepo)
-        const stream = await image.push()
-
-        await new Promise((resolve, reject) => {
-            invariant(this.#docker, 'Docker client not found')
-            this.#docker.modem.followProgress(stream, (err, res) => {
-                if (err) {
-                    reject(err)
-                } else {
-                    resolve(true)
-                }
-            })
+        const [, pushProgress] = await this.#instance.exec({
+            command: 'podman',
+            args: ['push', this.#data.ecrRepo],
+            sudo: true
         })
+        await pushProgress
     }
 
     #getInstanceForContainerBuild() {

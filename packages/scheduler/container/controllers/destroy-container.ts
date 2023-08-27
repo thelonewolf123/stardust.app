@@ -2,6 +2,7 @@ import Dockerode from 'dockerode'
 import invariant from 'invariant'
 import { z } from 'zod'
 
+import models from '@/backend/database'
 import InstanceStrategy from '@/scheduler/library/instance'
 import { deleteContainer } from '@/scheduler/lua/container'
 import { updateInstance } from '@/scheduler/lua/instance'
@@ -41,7 +42,17 @@ export class DestroyContainerStrategy {
             if (!instance || !instance.InstanceId) return // instance already deleted
             await Promise.all([
                 deleteContainer(this.#data.containerId), // delete container
-                updateInstance(instance.InstanceId, { status: 'failed' }) // update instance status
+                updateInstance(instance.InstanceId, { status: 'failed' }), // update instance status
+                models.Instance.updateOne(
+                    {
+                        instanceId: instance.InstanceId
+                    },
+                    {
+                        $set: {
+                            status: 'failed'
+                        }
+                    }
+                ).lean()
             ])
 
             return

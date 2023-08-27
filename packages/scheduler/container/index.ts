@@ -6,7 +6,7 @@ import {
     DESTROY_CONTAINER,
     NEW_CONTAINER
 } from '@constants/queue'
-import { queueManager } from '@core/queue'
+import { createQueue, getClient, queueManager } from '@core/queue'
 
 import {
     ContainerBuildSchema,
@@ -83,10 +83,12 @@ export const setupBuildContainerConsumer = async () => {
     )
     process.on('SIGINT', () => cleanup())
 
-    const createContainerQueue = {
-        channel: channel.sender,
-        publish
-    }
+    const client = await getClient()
+    const createContainerQueue = await createQueue(client, {
+        exchange: NEW_CONTAINER.EXCHANGE_NAME,
+        queue: NEW_CONTAINER.QUEUE_NAME,
+        routingKey: NEW_CONTAINER.ROUTING_KEY
+    })
 
     onMessage(async (message) => {
         if (!message) return

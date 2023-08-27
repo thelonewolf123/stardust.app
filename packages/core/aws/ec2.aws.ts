@@ -1,6 +1,7 @@
 import { Client as SSHClient } from 'ssh2'
 
 import { env } from '@/env'
+import { InstanceExecArgs } from '@/types'
 import {
     DescribeInstancesCommand,
     DescribeInstanceStatusCommand,
@@ -101,22 +102,29 @@ async function terminateInstance(instanceId: string) {
     return info.TerminatingInstances?.[0]
 }
 
-async function execCommand(params: {
-    command: string
-    args: string[]
-    cwd?: string
-    ipAddress: string
-}) {
+async function execCommand(params: InstanceExecArgs) {
     const key = SSM_PARAMETER_KEYS.ec2PrivateKey
     const privateKey = await ssmAws.getParameter(key, true)
     let fullCommand = `${params.command} ${params.args.join(' ')}`
     const ssh = new SSHClient()
+
+    if (params.env) {
+        fullCommand = `export ${Object.entries(params.env)
+            .map(([key, value]) => `${key}=${value}`)
+            .join(' ')} && ${fullCommand}`
+    }
+
+    if (params.sudo) {
+        fullCommand = `sudo ${fullCommand}`
+    }
 
     if (params.cwd) {
         fullCommand = `cd ${params.cwd} && ${fullCommand}`
     } else {
         fullCommand = `cd /home/${EC2_INSTANCE_USERNAMES} && ${fullCommand}`
     }
+
+    console.log('Full command: ', fullCommand)
 
     ssh.connect({
         host: params.ipAddress,
@@ -130,22 +138,29 @@ async function execCommand(params: {
     const resultPromise = new Promise<string>((resolve, reject) => {
         let output = ''
 
-        ssh.exec(fullCommand, (err, stream) => {
-            if (err) {
-                reject(err)
-                ssh.end()
-                return
-            }
-
-            stream
-                .on('data', (data: Buffer) => {
-                    output += data.toString()
-                })
-                .on('end', () => {
-                    resolve(output)
+        ssh.exec(
+            fullCommand,
+            {
+                env: params.env,
+                pty: true
+            },
+            (err, stream) => {
+                if (err) {
+                    reject(err)
                     ssh.end()
-                })
-        })
+                    return
+                }
+
+                stream
+                    .on('data', (data: Buffer) => {
+                        output += data.toString()
+                    })
+                    .on('end', () => {
+                        resolve(output)
+                        ssh.end()
+                    })
+            }
+        )
 
         ssh.on('error', (err) => {
             reject(err)

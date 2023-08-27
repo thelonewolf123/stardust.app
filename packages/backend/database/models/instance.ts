@@ -10,9 +10,9 @@ class Instance {
     @prop({
         type: String,
         required: true,
-        enum: ['pending', 'running', 'stopped', 'terminated']
+        enum: ['pending', 'running', 'stopped', 'terminated', 'failed']
     })
-    public status!: 'pending' | 'running' | 'stopped' | 'terminated'
+    public status!: 'pending' | 'running' | 'stopped' | 'terminated' | 'failed'
 
     @prop({ type: Boolean, required: false, default: false })
     public isTerminatedByHealthCheck!: boolean

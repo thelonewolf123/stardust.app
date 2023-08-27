@@ -3,7 +3,7 @@ import invariant from 'invariant'
 import models from '@/backend/database'
 import ec2Aws from '@/core/aws/ec2.aws'
 import { getDockerClient } from '@/core/docker'
-import { Ec2InstanceType } from '@/types'
+import { Ec2InstanceType, InstanceExecArgs } from '@/types'
 import {
     ERROR_CODES,
     LOCK,
@@ -54,7 +54,7 @@ class InstanceStrategyAws {
         return this.instanceId
     }
 
-    async exec(params: { command: string; args: string[]; cwd?: string }) {
+    async exec(params: Omit<InstanceExecArgs, 'ipAddress'>) {
         invariant(this.publicIp, ERROR_CODES.INSTANCE_PUBLIC_IP_NOT_FOUND)
         console.log(`Executing command: ${params.command} on ${this.publicIp}`)
         return ec2Aws.execCommand({ ...params, ipAddress: this.publicIp })
