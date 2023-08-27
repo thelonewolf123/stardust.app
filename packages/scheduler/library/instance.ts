@@ -49,8 +49,12 @@ class InstanceStrategy {
         return this.strategy.getDockerClient()
     }
 
-    exec(command: string): Promise<string> {
-        return this.strategy.exec(command)
+    exec(params: {
+        command: string
+        args: string[]
+        cwd?: string
+    }): Promise<readonly [() => void, Promise<string>]> {
+        return this.strategy.exec(params)
     }
 }
 

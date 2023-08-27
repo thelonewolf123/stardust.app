@@ -34,27 +34,64 @@ export class BuildImageStrategy {
         invariant(this.#instance, 'Instance not found')
         invariant(this.#docker, 'Docker client not found')
         // TODO: this code is vulnerable to shell injection, fix it @thelonewolf123
-        this.#instance.exec(`#!/bin/bash
-cd ${this.#githubRepoPath} && docker build -t ${this.#data.ecrRepo}  \
-${Object.entries(this.#data.buildArgs ?? {}).map(([key, value]) => {
-    return `--build-arg ${key}=${value} \\`
-})} .
-`)
+
+        const [cancelBuild, buildProgress] = await this.#instance.exec({
+            command: 'docker',
+            args: [
+                'build',
+                '-t',
+                this.#data.ecrRepo,
+                ...Object.entries(this.#data.buildArgs ?? {}).map(
+                    ([key, value]) => {
+                        return `--build-arg ${key}=${value}`
+                    }
+                ),
+                '.'
+            ],
+            cwd: this.#githubRepoPath
+        })
+
+        const promiseQuery = makeQueryablePromise(buildProgress)
+
+        while (true) {
+            const containerInfo = await getContainer({
+                projectSlug: this.#data.containerSlug
+            })
+
+            if (containerInfo?.containerSlug !== this.#data.containerSlug) {
+                cancelBuild()
+                throw new Error('Container build failed')
+            }
+
+            if (promiseQuery.isFulfilled) break
+
+            await sleep(1000)
+        }
+
+        if (promiseQuery.isRejected) throw new Error('Container build failed')
 
         console.log('Image built successfully.')
     }
 
     async #cloneRepo() {
-        await this.#instance.exec(
-            `git clone -b ${this.#data.githubRepoBranch} ${
-                this.#data.githubRepoUrl
-            } ${this.#githubRepoPath}`
-        )
+        await this.#instance.exec({
+            command: 'git',
+            args: [
+                'clone',
+                '-b',
+                this.#data.githubRepoBranch,
+                this.#data.githubRepoUrl,
+                this.#githubRepoPath
+            ]
+        })
         await sleep(45_000)
     }
 
     async #removeRepo() {
-        await this.#instance.exec(`rm -rf ${this.#githubRepoPath}`)
+        await this.#instance.exec({
+            command: 'rm',
+            args: ['-rf', this.#githubRepoPath]
+        })
     }
 
     async #pushDockerImage() {

@@ -1,7 +1,13 @@
 import ec2Aws from '../../packages/core/aws/ec2.aws'
 
 async function main() {
-    ec2Aws.execCommand('ls', '54.87.147.123').then(console.log)
+    ec2Aws
+        .execCommand({
+            command: 'ls',
+            args: [],
+            ipAddress: ''
+        })
+        .then(console.log)
 }
 
 main()

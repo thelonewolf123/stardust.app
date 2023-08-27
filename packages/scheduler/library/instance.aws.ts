@@ -54,10 +54,10 @@ class InstanceStrategyAws {
         return this.instanceId
     }
 
-    async exec(command: string) {
+    async exec(params: { command: string; args: string[]; cwd?: string }) {
         invariant(this.publicIp, ERROR_CODES.INSTANCE_PUBLIC_IP_NOT_FOUND)
-        console.log(`Executing command: ${command} on ${this.publicIp}`)
-        return ec2Aws.execCommand(command, this.publicIp)
+        console.log(`Executing command: ${params.command} on ${this.publicIp}`)
+        return ec2Aws.execCommand({ ...params, ipAddress: this.publicIp })
     }
 
     async waitTillInstanceReady(id?: string) {

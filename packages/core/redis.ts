@@ -16,11 +16,11 @@ redis.on('error', (err) => {
 
 const connectionPromise = redis.connect() // returns a Promise
 
-async function runLuaScript(luaScript: string, args: string[]) {
+async function runLuaScript(luaScript: string, args: (string | undefined)[]) {
     try {
         // Execute the script with the container slug argument using EVAL
         const result = await redis.eval(luaScript, {
-            arguments: args
+            arguments: args.map((arg) => arg || '')
         })
         console.log('Result:', result)
         return result as null | string // type casting is not safe,

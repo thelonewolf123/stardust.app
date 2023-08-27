@@ -12,6 +12,7 @@ import {
 
 import {
     EC2_INSTANCE_TYPE,
+    EC2_INSTANCE_USERNAMES,
     SSM_PARAMETER_KEYS
 } from '../../../constants/aws-infra'
 import ssmAws from './ssm.aws'
@@ -100,47 +101,65 @@ async function terminateInstance(instanceId: string) {
     return info.TerminatingInstances?.[0]
 }
 
-async function execCommand(command: string, ipAddress: string) {
-    const privateKey = await ssmAws.getParameter(
-        SSM_PARAMETER_KEYS.ec2PrivateKey,
-        true
-    )
+async function execCommand(params: {
+    command: string
+    args: string[]
+    cwd?: string
+    ipAddress: string
+}) {
+    const key = SSM_PARAMETER_KEYS.ec2PrivateKey
+    const privateKey = await ssmAws.getParameter(key, true)
+    let fullCommand = `${params.command} ${params.args.join(' ')}`
+    const ssh = new SSHClient()
 
-    return new Promise<string>((resolve, reject) => {
-        const ssh = new SSHClient()
+    if (params.cwd) {
+        fullCommand = `cd ${params.cwd} && ${fullCommand}`
+    } else {
+        fullCommand = `cd /home/${EC2_INSTANCE_USERNAMES} && ${fullCommand}`
+    }
 
-        ssh.on('ready', () => {
-            ssh.exec(command, (err, stream) => {
-                if (err) {
-                    reject(err)
+    ssh.connect({
+        host: params.ipAddress,
+        port: 22,
+        username: EC2_INSTANCE_USERNAMES, // Modify this if your instance uses a different username
+        privateKey: privateKey
+    })
+
+    await new Promise<void>((resolve) => ssh.on('ready', resolve))
+
+    const resultPromise = new Promise<string>((resolve, reject) => {
+        let output = ''
+
+        ssh.exec(fullCommand, (err, stream) => {
+            if (err) {
+                reject(err)
+                ssh.end()
+                return
+            }
+
+            stream
+                .on('data', (data: Buffer) => {
+                    output += data.toString()
+                })
+                .on('end', () => {
+                    resolve(output)
                     ssh.end()
-                    return
-                }
-
-                let output = ''
-                stream
-                    .on('data', (data: Buffer) => {
-                        output += data.toString()
-                    })
-                    .on('end', () => {
-                        resolve(output)
-                        ssh.end()
-                    })
-            })
+                })
         })
 
         ssh.on('error', (err) => {
             reject(err)
         })
-
-        ssh.connect({
-            host: ipAddress,
-            port: 22,
-            username: 'ubuntu', // Modify this if your instance uses a different username
-            privateKey: privateKey
-        })
     })
+
+    return [
+        () => {
+            ssh.end()
+        },
+        resultPromise
+    ] as const
 }
+
 export default {
     execCommand,
     requestEc2SpotInstance,

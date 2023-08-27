@@ -37,3 +37,5 @@ export const ERROR_CODES = {
     CONTAINER_BUILD_FAILED: 'Container build failed',
     CONTAINER_BUILD_HAS_CANCELED: 'Container build has canceled'
 } as const
+
+export const EC2_INSTANCE_USERNAMES = 'ubuntu'

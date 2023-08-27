@@ -46,10 +46,17 @@ function getInstanceIdByContainerId(containerId: string) {
     return redis.runLuaScript(getInstanceScript, [containerId])
 }
 
-async function getContainer(params: {
-    containerSlug: string
-    projectSlug: string
-}): Promise<PhysicalHostType['containers'][number] | null> {
+async function getContainer(
+    params:
+        | {
+              containerSlug: string
+              projectSlug?: string
+          }
+        | {
+              containerSlug?: string
+              projectSlug: string
+          }
+): Promise<PhysicalHostType['containers'][number] | null> {
     const { containerSlug, projectSlug } = params
     const result = await redis.runLuaScript(getContainerScript, [
         containerSlug,
