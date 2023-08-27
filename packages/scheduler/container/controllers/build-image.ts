@@ -33,21 +33,16 @@ export class BuildImageStrategy {
     async #buildDockerImage() {
         invariant(this.#instance, 'Instance not found')
         invariant(this.#docker, 'Docker client not found')
-        // TODO: this code is vulnerable to shell injection, fix it @thelonewolf123
+
+        const buildArgs = Object.entries(this.#data.buildArgs ?? {})
+            .map(([key, value]) => {
+                return ['--build-arg', `${key}=${value}`]
+            })
+            .flat()
 
         const [cancelBuild, buildProgress] = await this.#instance.exec({
             command: 'podman',
-            args: [
-                'build',
-                '-t',
-                this.#data.ecrRepo,
-                ...Object.entries(this.#data.buildArgs ?? {}).map(
-                    ([key, value]) => {
-                        return `--build-arg ${key}=${value}`
-                    }
-                ),
-                '.'
-            ],
+            args: ['build', '-t', this.#data.ecrRepo, ...buildArgs, '.'],
             cwd: this.#githubRepoPath,
             sudo: true
         })

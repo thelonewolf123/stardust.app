@@ -108,12 +108,6 @@ async function execCommand(params: InstanceExecArgs) {
     let fullCommand = `${params.command} ${params.args.join(' ')}`
     const ssh = new SSHClient()
 
-    if (params.env) {
-        fullCommand = `export ${Object.entries(params.env)
-            .map(([key, value]) => `${key}=${value}`)
-            .join(' ')} && ${fullCommand}`
-    }
-
     if (params.sudo) {
         fullCommand = `sudo ${fullCommand}`
     }
@@ -138,6 +132,7 @@ async function execCommand(params: InstanceExecArgs) {
     const resultPromise = new Promise<string>((resolve, reject) => {
         let output = ''
 
+        // TODO: this code is vulnerable to shell injection, fix it @thelonewolf123
         ssh.exec(
             fullCommand,
             {

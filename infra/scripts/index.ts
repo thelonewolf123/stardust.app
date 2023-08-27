@@ -1,4 +1,4 @@
-import { env } from '../../packages/env'
+import { env } from '../../packages/env';
 
 export const ec2UserData = `#!/bin/bash
 sudo apt update
@@ -14,7 +14,7 @@ cd infra/docker
 
 # Build the docker proxy
 sudo podman build -t docker.io/thelonewolf123/docker-proxy .
-# sudo rm -rf /home/ubuntu/app
+sudo rm -rf /home/ubuntu/app
 
 # Create a systemd service for the proxy
 echo '[Unit]
