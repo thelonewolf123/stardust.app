@@ -39,3 +39,4 @@ export const ERROR_CODES = {
 } as const
 
 export const EC2_INSTANCE_USERNAMES = 'ubuntu'
+export const MAX_CONTAINER_BUILD_QUEUE_ATTEMPTS = 5

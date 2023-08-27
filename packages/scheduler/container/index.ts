@@ -1,3 +1,5 @@
+import models from '@/backend/database'
+import { MAX_CONTAINER_BUILD_QUEUE_ATTEMPTS } from '@constants/aws-infra'
 import { CLOUD_PROVIDER } from '@constants/provider'
 import {
     BUILD_CONTAINER,
@@ -92,11 +94,24 @@ export const setupBuildContainerConsumer = async () => {
         const data = ContainerBuildSchema.parse(JSON.parse(content.toString()))
         console.log(data)
 
+        const container = await models.Container.findOne({
+            containerSlug: data.containerSlug
+        }).lean()
+        const attempts = container?.containerBuildAttempts || 0
+
+        if (MAX_CONTAINER_BUILD_QUEUE_ATTEMPTS <= attempts) {
+            console.log(
+                `Max container build attempts reached for ${data.containerSlug}`
+            )
+            return channel.receiver.ack(message)
+        }
+
         const strategy = new BuildImageStrategy(
             data,
             createContainerQueue,
             CLOUD_PROVIDER
         )
+
         strategy
             .buildImage()
             .then(() => {
