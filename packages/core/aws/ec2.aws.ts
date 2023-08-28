@@ -13,7 +13,7 @@ import {
 
 import {
     EC2_INSTANCE_TYPE,
-    EC2_INSTANCE_USERNAMES,
+    EC2_INSTANCE_USERNAME,
     SSM_PARAMETER_KEYS
 } from '../../../constants/aws-infra'
 import ssmAws from './ssm.aws'
@@ -115,7 +115,7 @@ async function execCommand(params: InstanceExecArgs) {
     if (params.cwd) {
         fullCommand = `cd ${params.cwd} && ${fullCommand}`
     } else {
-        fullCommand = `cd /home/${EC2_INSTANCE_USERNAMES} && ${fullCommand}`
+        fullCommand = `cd /home/${EC2_INSTANCE_USERNAME} && ${fullCommand}`
     }
 
     console.log('Full command: ', fullCommand)
@@ -123,7 +123,7 @@ async function execCommand(params: InstanceExecArgs) {
     ssh.connect({
         host: params.ipAddress,
         port: 22,
-        username: EC2_INSTANCE_USERNAMES, // Modify this if your instance uses a different username
+        username: EC2_INSTANCE_USERNAME, // Modify this if your instance uses a different username
         privateKey: privateKey
     })
 

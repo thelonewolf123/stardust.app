@@ -12,8 +12,8 @@ import {
 
 export const s3Client = new S3({
     credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
-        secretAccessKey: process.env.AWS_ACCESS_KEY_SECRET || ''
+        accessKeyId: env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: env.AWS_ACCESS_KEY_SECRET
     },
     region: env.AWS_REGION
 })
