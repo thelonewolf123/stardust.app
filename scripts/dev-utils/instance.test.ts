@@ -21,6 +21,7 @@ async function main() {
             sudo: true
         })
         .then(([close, promise]) => {
+            setTimeout(close, 1500)
             return promise
         })
         .then((data) => {
