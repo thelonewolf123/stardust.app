@@ -12,7 +12,7 @@ sudo git checkout ${env.BRANCH}
 sudo git pull
 
 # Build the fusiongrid
-sudo podman build -t docker.io/thelonewolf123/fusiongrid .
+sudo podman build -f docker/Dockerfile -t docker.io/thelonewolf123/fusiongrid .
 sudo rm -rf /home/ubuntu/app
 
 # Create a systemd service for the proxy
