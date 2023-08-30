@@ -30,6 +30,16 @@ export class DestroyContainerStrategy {
         )
         await container.stop()
         await container.remove()
+        await models.Container.updateOne(
+            {
+                containerId: this.#data.containerId
+            },
+            {
+                $set: {
+                    status: 'terminated'
+                }
+            }
+        ).lean()
     }
 
     async #handleError(error: Error) {
@@ -39,7 +49,20 @@ export class DestroyContainerStrategy {
             const instance = await this.#instance.getContainerInstance(
                 this.#data.containerId
             )
+
+            await models.Container.updateOne(
+                {
+                    containerId: this.#data.containerId
+                },
+                {
+                    $set: {
+                        status: 'terminated'
+                    }
+                }
+            ).lean()
+
             if (!instance || !instance.InstanceId) return // instance already deleted
+
             await Promise.all([
                 deleteContainer(this.#data.containerId), // delete container
                 updateInstance(instance.InstanceId, { status: 'failed' }), // update instance status

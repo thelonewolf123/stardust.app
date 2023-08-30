@@ -40,9 +40,22 @@ export class BuildImageStrategy {
             })
             .flat()
 
+        const dockerPathArgs = []
+
+        if (this.#data.dockerPath) {
+            dockerPathArgs.push('-f', this.#data.dockerPath)
+        }
+
         const [cancelBuild, buildProgress] = await this.#instance.exec({
             command: 'podman',
-            args: ['build', '-t', this.#data.ecrRepo, ...buildArgs, '.'],
+            args: [
+                'build',
+                '-t',
+                this.#data.ecrRepo,
+                ...dockerPathArgs,
+                ...buildArgs,
+                '.'
+            ],
             cwd: this.#githubRepoPath,
             sudo: true
         })
@@ -67,6 +80,16 @@ export class BuildImageStrategy {
         }
 
         if (promiseQuery.isRejected) throw new Error('Container build failed')
+
+        const logs = await buildProgress
+        await models.Container.updateOne(
+            { containerSlug: this.#data.containerSlug },
+            {
+                $set: {
+                    containerBuildLogs: logs.split('\n')
+                }
+            }
+        )
 
         console.log('Image built successfully.')
     }

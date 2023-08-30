@@ -74,6 +74,9 @@ export class Container {
 
     @prop({ ref: () => UserModel, required: true })
     public createdBy!: Ref<typeof UserModel>
+
+    @prop({ type: String, required: false }, PropType.ARRAY)
+    public containerBuildLogs!: string[]
 }
 
 export const ContainerModel = getModelForClass(Container)
