@@ -13,7 +13,7 @@ Fusion-grid is a powerful container provision engine built with Node.js, TypeScr
 
 ### Architecture
 
-![Architecture](https://raw.githubusercontent.com/thelonewolf123/soul-forge/main/docs/images/architecture.png)
+![Architecture](images/architecture.png)
 
 ### Prerequisites
 
