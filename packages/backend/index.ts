@@ -64,7 +64,7 @@ server.addPlugin({
 })
 
 startStandaloneServer(server, {
-    listen: { port: 4000, path: '/graphql' },
+    listen: { port: parseInt(process.env.PORT || '4000'), path: '/graphql' },
     context: async ({ req, res }) => {
         const token = req.headers['x-access-token']
         const [createContainer, destroyContainer, buildContainer] =

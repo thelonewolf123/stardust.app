@@ -1,0 +1,35 @@
+version: '3.1'
+name: 'fusiongrid'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      - PORT=80
+    command: ["node", "dist/backend.bundle.js"]
+    deploy:
+      mode: replicated
+      replicas: 1
+    env_file:
+      - .env
+  cron:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: ["node", "dist/cron.bundle.js"]
+    env_file:
+      - .env
+  scheduler:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: ["node", "dist/scheduler.bundle.js"]
+    deploy:
+      mode: replicated
+      replicas: 4
+    env_file:
+      - .env
+   
