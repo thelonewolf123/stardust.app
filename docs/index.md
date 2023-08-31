@@ -11,10 +11,6 @@ Fusion-grid is a powerful container provision engine built with Node.js, TypeScr
 
 ## Getting started
 
-### Architecture
-
-![Architecture](images/architecture.png)
-
 ### Prerequisites
 
 -   Node.js
@@ -49,3 +45,7 @@ yarn infra:up
 
 yarn infra:down
 ```
+
+### Architecture
+
+![Architecture](images/architecture.png)
