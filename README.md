@@ -27,13 +27,13 @@ Fusion-grid is a powerful container provision engine built with Node.js, TypeScr
 git clone https://github.com/thelonewolf123/fusion-grid.git
 ```
 
-2. Install NPM packages for pulumi
+1. Install NPM packages for pulumi
 
 ```sh
 cd infra && yarn install
 ```
 
-4. Deploy on aws
+1. Deploy on aws
 
 ```sh
 yarn infra:up
@@ -42,7 +42,6 @@ yarn infra:up
 ### Tear down
 
 ```sh
-
 yarn infra:down
 ```
 
