@@ -2,6 +2,8 @@ import axios from 'axios'
 import { execSync } from 'child_process'
 import { existsSync, readFileSync } from 'fs'
 
+import { serverEnvSchema } from '../../packages/env'
+
 export function generateSshKey() {
     const isKeyExist =
         existsSync('./infra-private-key.pem') &&
@@ -47,4 +49,16 @@ export async function getArchLinuxAmiId(region: string) {
 
             return ami.ami
         })
+}
+
+export const getEnvMap = () => {
+    const envMap: Record<string, string> = {}
+    const env = process.env
+    const keys = Object.keys(serverEnvSchema)
+
+    for (const key in keys) {
+        envMap[key] = env[key] || ''
+    }
+
+    return envMap
 }

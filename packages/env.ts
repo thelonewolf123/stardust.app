@@ -14,26 +14,28 @@ if (process.env.NODE_ENV === 'development') {
     })
 }
 
+export const serverEnvSchema = {
+    AWS_ACCESS_KEY_ID: z.string().min(1),
+    AWS_ACCESS_KEY_SECRET: z.string().min(1),
+    AWS_ACCOUNT_ID: z.string().min(1),
+    AWS_REGION: z.string().min(1),
+    BACKEND_BASE_URL: z.string().url(),
+    BRANCH: z.string().min(1),
+    CHECKPOINT_PATH: z.string().min(1),
+    DATABASE_NAME: z.string().min(1),
+    DEPLOYMENT_ENV: z.enum(['local', 'aws']),
+    GITHUB_TOKEN: z.string().min(1),
+    JWT_SECRET: z.string().min(1),
+    MONGODB_URI: z.string().url(),
+    NODE_ENV: z.enum(['development', 'production']),
+    RABBITMQ_URL: z.string().url(),
+    REDIS_HOST: z.string().min(1),
+    REMOTE_DOCKER_PASSWORD: z.string().min(1),
+    SPOT_INSTANCE_ID: z.string().min(1)
+}
+
 export const env = createEnv({
-    server: {
-        AWS_ACCESS_KEY_ID: z.string().min(1),
-        AWS_ACCESS_KEY_SECRET: z.string().min(1),
-        AWS_ACCOUNT_ID: z.string().min(1),
-        AWS_REGION: z.string().min(1),
-        BACKEND_BASE_URL: z.string().url(),
-        BRANCH: z.string().min(1),
-        CHECKPOINT_PATH: z.string().min(1),
-        DATABASE_NAME: z.string().min(1),
-        DEPLOYMENT_ENV: z.enum(['local', 'aws']),
-        GITHUB_TOKEN: z.string().min(1),
-        JWT_SECRET: z.string().min(1),
-        MONGODB_URI: z.string().url(),
-        NODE_ENV: z.enum(['development', 'production']),
-        RABBITMQ_URL: z.string().url(),
-        REDIS_HOST: z.string().min(1),
-        REMOTE_DOCKER_PASSWORD: z.string().min(1),
-        SPOT_INSTANCE_ID: z.string().min(1)
-    },
+    server: serverEnvSchema,
     client: {},
     runtimeEnv: {
         AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
