@@ -4,7 +4,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: docker/Dockerfile
+      dockerfile: infra/docker/Dockerfile.app
       args:
         - NODE_ENV=production
         - GITHUB_TOKEN=${GITHUB_TOKEN}
@@ -36,7 +36,7 @@ services:
   cron:
     build:
       context: .
-      dockerfile: docker/Dockerfile
+      dockerfile: infra/docker/Dockerfile.app
       args:
         - NODE_ENV=production
         - GITHUB_TOKEN=${GITHUB_TOKEN}
@@ -61,7 +61,7 @@ services:
   scheduler:
     build:
       context: .
-      dockerfile: docker/Dockerfile
+      dockerfile: infra/docker/Dockerfile.app
       args:
         - NODE_ENV=production
         - GITHUB_TOKEN=${GITHUB_TOKEN}

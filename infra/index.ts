@@ -1,4 +1,5 @@
 import { SSM_PARAMETER_KEYS } from '../constants/aws-infra'
+import { webListener } from './resource/alb'
 import { createAmiFromInstance } from './resource/ami'
 import { instance } from './resource/instance'
 import { dockerHostPassword } from './resource/keystore-docker'
@@ -37,3 +38,6 @@ export const containerBucketId = containerBucket.id
 export const securityGroupSSMId = securityGroupSSM.id
 export const dockerHostPasswordId = dockerHostPassword.id
 export const dockerSnapshotBucketId = dockerSnapshotBucket.id
+
+// Export the url for the service.
+export const url = webListener.endpoint.hostname

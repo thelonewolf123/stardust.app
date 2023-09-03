@@ -41,6 +41,6 @@ RUN git clone -b $BRANCH https://oauth:$GITHUB_TOKEN@github.com/thelonewolf123/s
 RUN yarn install --frozen-lockfile
 RUN yarn build
 
-ENV NODE_ENV=production
+ENV NODE_ENV=development
 
 CMD [ "node", "dist/backend.bundle.js" ]
