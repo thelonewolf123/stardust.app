@@ -56,9 +56,12 @@ export const getEnvMap = () => {
     const env = process.env
     const keys = Object.keys(serverEnvSchema)
 
-    for (const key in keys) {
-        envMap[key] = env[key] || ''
-    }
+    keys.forEach((key) => {
+        if (typeof env[key] === 'undefined') {
+            throw new Error(`Missing env variable: ${key}`)
+        }
+        envMap[key] = env[key] as string
+    })
 
     return envMap
 }

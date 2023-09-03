@@ -9,5 +9,5 @@ export const appImage = new awsx.ecr.Image('app-img', {
     path: './docker',
     dockerfile: './docker/Dockerfile.app',
     args: getEnvMap(),
-    extraOptions: ['--platform', 'linux/amd64,linux/arm64']
+    extraOptions: ['--platform', 'linux/amd64']
 })
