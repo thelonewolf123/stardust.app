@@ -1,8 +1,9 @@
 import * as awsx from '@pulumi/awsx'
 
+import { REPLICAS } from '../../constants/aws-infra'
 import { webListener } from './alb'
 import { cluster } from './ecs'
-import { appImage } from './image-docker'
+import { appImage } from './image'
 
 // Create a Fargate service task that can scale out.
 export const appService = new awsx.classic.ecs.FargateService('app-svc', {
@@ -16,7 +17,7 @@ export const appService = new awsx.classic.ecs.FargateService('app-svc', {
             portMappings: [webListener]
         }
     },
-    desiredCount: 2
+    desiredCount: REPLICAS.APP
 })
 
 export const schedulerService = new awsx.classic.ecs.FargateService(
@@ -31,7 +32,7 @@ export const schedulerService = new awsx.classic.ecs.FargateService(
                 memory: 512 /*MB*/
             }
         },
-        desiredCount: 5
+        desiredCount: REPLICAS.SCHEDULER
     }
 )
 
@@ -45,5 +46,5 @@ export const cronService = new awsx.classic.ecs.FargateService('cron-svc', {
             memory: 512 /*MB*/
         }
     },
-    desiredCount: 1
+    desiredCount: REPLICAS.CRON // 1 is the default
 })

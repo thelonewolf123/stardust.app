@@ -40,3 +40,8 @@ export const ERROR_CODES = {
 
 export const EC2_INSTANCE_USERNAME = 'ubuntu'
 export const MAX_CONTAINER_BUILD_QUEUE_ATTEMPTS = 5
+export const REPLICAS = {
+    APP: 2,
+    CRON: 1, // ! NOTE: don't change this
+    SCHEDULER: 4
+}

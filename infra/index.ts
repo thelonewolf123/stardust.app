@@ -3,10 +3,9 @@ import { webListener } from './resource/alb'
 import { createAmiFromInstance } from './resource/ami'
 import { appService, cronService, schedulerService } from './resource/fargate'
 import { instance } from './resource/instance'
-import { dockerHostPassword } from './resource/keystore-docker'
-import { keyPair } from './resource/keystore-ec2'
+import { dockerHostPassword, keyPair } from './resource/keystore'
 import { containerBucket } from './resource/s3'
-import { securityGroup } from './resource/security-group'
+import { securityGroup } from './resource/securityGroup'
 import {
     storeBaseAmiId,
     storeBucketId,
