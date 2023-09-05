@@ -44,4 +44,4 @@ export const REPLICAS = {
     APP: 2,
     CRON: 1, // ! NOTE: don't change this
     SCHEDULER: 4
-}
+} as const

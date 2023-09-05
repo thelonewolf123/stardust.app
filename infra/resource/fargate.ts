@@ -1,6 +1,7 @@
 import * as awsx from '@pulumi/awsx'
 
 import { REPLICAS } from '../../constants/aws-infra'
+import { getEnvArray } from '../utils'
 import { webListener } from './alb'
 import { cluster } from './ecs'
 import { appImage } from './image'
@@ -14,6 +15,7 @@ export const appService = new awsx.classic.ecs.FargateService('app-svc', {
             command: ['node', 'dist/backend.bundle.js'],
             cpu: 256 /*25% of 1024*/,
             memory: 512 /*MB*/,
+            environment: getEnvArray(),
             portMappings: [webListener]
         }
     },
@@ -29,7 +31,8 @@ export const schedulerService = new awsx.classic.ecs.FargateService(
                 image: appImage.imageUri,
                 command: ['node', 'dist/scheduler.bundle.js'],
                 cpu: 256 /*25% of 1024*/,
-                memory: 512 /*MB*/
+                memory: 512 /*MB*/,
+                environment: getEnvArray()
             }
         },
         desiredCount: REPLICAS.SCHEDULER
@@ -43,7 +46,8 @@ export const cronService = new awsx.classic.ecs.FargateService('cron-svc', {
             image: appImage.imageUri,
             command: ['node', 'dist/cron.bundle.js'],
             cpu: 256 /*25% of 1024*/,
-            memory: 512 /*MB*/
+            memory: 512 /*MB*/,
+            environment: getEnvArray()
         }
     },
     desiredCount: REPLICAS.CRON // 1 is the default

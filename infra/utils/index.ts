@@ -65,3 +65,12 @@ export const getEnvMap = () => {
 
     return envMap
 }
+
+export const getEnvArray = () => {
+    const envMap = getEnvMap()
+    const envArray = Object.entries(envMap).map(([key, value]) => ({
+        name: key,
+        value
+    }))
+    return envArray
+}
