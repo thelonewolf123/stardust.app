@@ -74,3 +74,8 @@ export const getEnvArray = () => {
     }))
     return envArray
 }
+
+export const getCommitHash = () => {
+    const commitHash = execSync('git rev-parse HEAD').toString().trim()
+    return commitHash
+}

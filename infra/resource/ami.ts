@@ -58,6 +58,7 @@ export const archAmi = pulumi.output(
             })
         })
 )
+
 export function createAmiFromInstance(instance: aws.ec2.Instance) {
     const ami = new aws.ec2.AmiFromInstance(awsInfra.EC2_AMI_NAME, {
         sourceInstanceId: instance.id.apply((id) => id),
