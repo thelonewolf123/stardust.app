@@ -34,6 +34,7 @@ function updateInstance(
 
 async function cleanupInstance(): Promise<string[]> {
     const deletedInstance = await redis.runLuaScript(instanceCleanup, [])
+    console.log('deletedInstance', deletedInstance)
     const result = deletedInstance ? JSON.parse(deletedInstance) : []
     return result
 }

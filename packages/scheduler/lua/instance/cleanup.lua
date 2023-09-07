@@ -32,12 +32,14 @@ local function scheduleInstancesDeletion(instance)
 end
 
 -- Iterate through the 'physicalHost' data and remove instances scheduled for deletion past 2 minutes
+local idx = 1
 local deletedInstances = {}
 for i, instance in ipairs(physicalHost) do
     scheduleInstancesDeletion(instance) -- Add schedule delete timestamp to instances with no containers or failed status
     if isScheduledForDeletionPastTwoMinutes(instance) then
-        table.insert(deletedInstances, instance.instanceId)
+        table.insert(deletedInstances, idx, instance.instanceId)
         table.remove(physicalHost, i)
+        idx = idx + 1
     end
 end
 

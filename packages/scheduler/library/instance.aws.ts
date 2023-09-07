@@ -60,34 +60,34 @@ class InstanceStrategyAws {
         return ec2Aws.execCommand({ ...params, ipAddress: this.publicIp })
     }
 
-    async waitTillInstanceReady(id?: string) {
+    async waitTillInstanceReady(instanceId?: string) {
         this.instanceAttempts = 0
         let isInstanceReady = false
 
-        if (!id) {
+        if (!instanceId) {
             invariant(this.instanceId, ERROR_CODES.INSTANCE_NOT_FOUND)
-            id = this.instanceId
+            instanceId = this.instanceId
         }
 
         while (!isInstanceReady) {
-            isInstanceReady = await this.#isInstanceReady(id)
+            isInstanceReady = await this.#isInstanceReady(instanceId)
             await sleep(1000)
         }
 
-        const info = await ec2Aws.getInstanceInfoById(id)
+        const info = await ec2Aws.getInstanceInfoById(instanceId)
         const publicIp = info?.PublicIpAddress
 
         invariant(publicIp, ERROR_CODES.INSTANCE_PUBLIC_IP_NOT_FOUND)
 
         this.publicIp = publicIp
 
-        await updateInstance(id, {
+        await updateInstance(instanceId, {
             publicIp,
             status: 'running'
         })
 
         await models.Instance.updateOne(
-            { instanceId: id },
+            { instanceId: instanceId },
             { $set: { status: 'running', ipAddress: publicIp } }
         )
 
