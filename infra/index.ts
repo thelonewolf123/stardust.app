@@ -1,5 +1,5 @@
 import { SSM_PARAMETER_KEYS } from '../constants/aws-infra'
-import { webListener } from './resource/alb'
+// import { webListener } from './resource/alb'
 import { createAmiFromInstance } from './resource/ami'
 // import { appService, cronService, schedulerService } from './resource/fargate';
 import { instance } from './resource/instance'
@@ -40,7 +40,7 @@ export const dockerHostPasswordId = dockerHostPassword.id
 export const dockerSnapshotBucketId = dockerSnapshotBucket.id
 
 // Export the url for the service.
-export const url = webListener.endpoint.hostname
+// export const url = webListener.endpoint.hostname
 
 // Export the service.
 // export const app = appService.urn

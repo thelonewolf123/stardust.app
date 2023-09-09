@@ -6,10 +6,10 @@
     },
     "scripts": {
         "infra:up": "pulumi up --stack dev -y",
+        "infra:logs": "pulumi logs --stack dev -f",
         "infra:down": "pulumi destroy --stack dev -y",
-        "infra:preview": "pulumi preview --stack dev",
         "infra:cleanup": "pulumi stack rm dev -y",
-        "infra:logs": "pulumi logs --stack dev -f"
+        "infra:preview": "pulumi preview --stack dev"
     },
     "dependencies": {
         "@pulumi/aws": "^5.0.0",
