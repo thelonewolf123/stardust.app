@@ -4,11 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev:server": "ts-node packages/backend/index.ts",
-    "infra:up": "cd ./infra && pulumi up --stack dev -y",
-    "infra:down": "cd ./infra && pulumi destroy --stack dev -y",
+    "gc": "graphql-codegen --config codegen-server.yml",
     "build": "node scripts/build.js",
-    "gc": "graphql-codegen --config codegen-server.yml"
+    "dev:server": "ts-node packages/backend/index.ts",
+    "infra:up": "yarn infra:up --prefix ./infra",
+    "infra:down": "yarn infra:down --prefix ./infra",
+    "infra:logs": "yarn infra:logs --prefix ./infra",
+    "infra:cleanup": "yarn infra:cleanup --prefix ./infra",
+    "infra:preview": "yarn infra:preview --prefix ./infra"
   },
   "keywords": [],
   "author": "",

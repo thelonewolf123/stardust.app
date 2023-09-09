@@ -4,6 +4,13 @@
     "devDependencies": {
         "@types/node": "^16"
     },
+    "scripts": {
+        "infra:up": "pulumi up --stack dev -y",
+        "infra:down": "pulumi destroy --stack dev -y",
+        "infra:preview": "pulumi preview --stack dev",
+        "infra:cleanup": "pulumi stack rm dev -y",
+        "infra:logs": "pulumi logs --stack dev -f"
+    },
     "dependencies": {
         "@pulumi/aws": "^5.0.0",
         "@pulumi/awsx": "^1.0.5",

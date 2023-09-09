@@ -1,7 +1,7 @@
 import { SSM_PARAMETER_KEYS } from '../constants/aws-infra'
 import { webListener } from './resource/alb'
 import { createAmiFromInstance } from './resource/ami'
-import { appService, cronService, schedulerService } from './resource/fargate'
+// import { appService, cronService, schedulerService } from './resource/fargate';
 import { instance } from './resource/instance'
 import { dockerHostPassword, keyPair } from './resource/keystore'
 import { containerBucket } from './resource/s3'
@@ -43,6 +43,6 @@ export const dockerSnapshotBucketId = dockerSnapshotBucket.id
 export const url = webListener.endpoint.hostname
 
 // Export the service.
-export const app = appService.urn
-export const cron = cronService.urn
-export const scheduler = schedulerService.urn
+// export const app = appService.urn
+// export const cron = cronService.urn
+// export const scheduler = schedulerService.urn
