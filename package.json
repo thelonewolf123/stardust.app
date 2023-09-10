@@ -7,11 +7,11 @@
     "gc": "graphql-codegen --config codegen-server.yml",
     "build": "node scripts/build.js",
     "dev:server": "ts-node packages/backend/index.ts",
-    "infra:up": "npm run --prefix ./infra up ",
-    "infra:down": "npm run --prefix ./infra down ",
-    "infra:logs": "npm run --prefix ./infra logs ",
-    "infra:cleanup": "npm run --prefix ./infra cleanup ",
-    "infra:preview": "npm run --prefix ./infra preview "
+    "infra:up": "npm run --prefix ./infra up",
+    "infra:down": "npm run --prefix ./infra down",
+    "infra:logs": "npm run --prefix ./infra logs",
+    "infra:cleanup": "npm run --prefix ./infra cleanup",
+    "infra:preview": "npm run --prefix ./infra preview"
   },
   "keywords": [],
   "author": "",
