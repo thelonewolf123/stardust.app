@@ -5,11 +5,11 @@
         "@types/node": "^16"
     },
     "scripts": {
-        "infra:up": "pulumi up --stack dev -y",
-        "infra:logs": "pulumi logs --stack dev -f",
-        "infra:down": "pulumi destroy --stack dev -y",
-        "infra:cleanup": "pulumi stack rm dev -y",
-        "infra:preview": "pulumi preview --stack dev"
+        "up": "pulumi up --stack dev -y",
+        "logs": "pulumi logs --stack dev -f",
+        "down": "pulumi destroy --stack dev -y",
+        "cleanup": "pulumi stack rm dev -y",
+        "preview": "pulumi preview --stack dev"
     },
     "dependencies": {
         "@pulumi/aws": "^5.0.0",
