@@ -1,10 +1,18 @@
 import axios from 'axios'
 import { execSync } from 'child_process'
 import { existsSync, readFileSync } from 'fs'
+import { env } from 'process'
 
 import { serverEnvSchema } from '../../packages/env'
 
 export function generateSshKey() {
+    if (env.EC2_PRIVATE_KEY && env.EC2_PUBLIC_KEY) {
+        return {
+            privateKey: env.EC2_PRIVATE_KEY,
+            publicKey: env.EC2_PUBLIC_KEY
+        }
+    }
+
     const isKeyExist =
         existsSync('./infra-private-key.pem') &&
         existsSync('./infra-public-key.pub')
