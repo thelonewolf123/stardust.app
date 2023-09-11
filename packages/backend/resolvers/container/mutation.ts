@@ -1,4 +1,5 @@
 import gql from 'graphql-tag'
+import invariant from 'invariant'
 import { v4 } from 'uuid'
 
 import { getRegularUser } from '@/core/utils'
@@ -23,12 +24,26 @@ export const mutation: Resolvers['Mutation'] = {
         })
 
         return true
+    },
+    async deleteContainer(_, { containerId }, ctx) {
+        getRegularUser(ctx)
+        const container = await ctx.db.Container.findOne({
+            containerId,
+            createdBy: ctx.user?._id
+        }).lean()
+
+        invariant(container, 'Container not found')
+
+        ctx.queue.destroyContainer.publish({
+            containerId
+        })
+        return true
     }
 }
 
 export const mutationType = gql`
     type Mutation {
         createContainer(input: ContainerInput!): Boolean!
-        deleteContainer(slug: String!): Boolean!
+        deleteContainer(containerId: String!): Boolean!
     }
 `
