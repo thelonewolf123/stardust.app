@@ -7,7 +7,9 @@ export function getApolloClient() {
         query: async (
             /** @type {{ query: any,  variables: any}} */ { query, variables }
         ) => {
-            const data = await request(baseUrl, query, variables)
+            const data = await request(baseUrl, query, variables, {
+                'x-access-token': process.env.ACCESS_TOKEN
+            })
             return { data }
         },
         mutate: async (
@@ -16,7 +18,9 @@ export function getApolloClient() {
                 variables
             }
         ) => {
-            const data = await request(baseUrl, mutation, variables)
+            const data = await request(baseUrl, mutation, variables, {
+                'x-access-token': process.env.ACCESS_TOKEN
+            })
             return { data }
         }
     }
