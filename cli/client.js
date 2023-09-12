@@ -1,3 +1,5 @@
+// @ts-check
+
 import { request } from 'graphql-request'
 
 export function getApolloClient() {
@@ -8,7 +10,7 @@ export function getApolloClient() {
             /** @type {{ query: any,  variables: any}} */ { query, variables }
         ) => {
             const data = await request(baseUrl, query, variables, {
-                'x-access-token': process.env.ACCESS_TOKEN
+                'x-access-token': process.env.ACCESS_TOKEN || ''
             })
             return { data }
         },
@@ -19,7 +21,7 @@ export function getApolloClient() {
             }
         ) => {
             const data = await request(baseUrl, mutation, variables, {
-                'x-access-token': process.env.ACCESS_TOKEN
+                'x-access-token': process.env.ACCESS_TOKEN || ''
             })
             return { data }
         }

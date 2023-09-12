@@ -1,9 +1,13 @@
 #!/usr/bin/env node
+// @ts-check
 
 import gql from 'graphql-tag'
+import colors from 'colors'
 
 import { getApolloClient } from './client.js'
-import { createNewContainer, getNewContainerInput } from './container/index.js'
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
+import { getLoginInput } from './prompt/index.js'
 
 async function login(
     /** @type {{username: String, password: String}} */ { username, password }
@@ -26,18 +30,6 @@ async function login(
     process.env.ACCESS_TOKEN = token
 }
 
-async function main() {
-    await login({
-        username: 'thelonewolf123',
-        password: 'Harish@2000'
-    })
-
-    const container = await getNewContainerInput()
-    console.log('container', container)
-
-    await createNewContainer(container)
-}
-
 // "name": "learning-golangx",
 // "description": "learning-golang - deployment",
 // "dockerContext": ".",
@@ -46,4 +38,25 @@ async function main() {
 // "port": 8000,
 // "githubUrl": "https://github.com/thelonewolf123/learning-golang"
 
-main()
+yargs(hideBin(process.argv))
+    .command('login', 'Login to the platform', {}, async () => {
+        const input = await getLoginInput()
+        console.log('Logging in...')
+
+        login(input)
+            .then(() => console.log('Logged in successfully'.green.bold))
+            .catch((err) => {
+                if (err.response)
+                    console.error(
+                        'Login failed'.red.bold,
+                        `${err.response.errors[0].message}`.yellow
+                    )
+                else
+                    console.error(
+                        'Login failed'.red.bold,
+                        `${err.message}`.yellow
+                    )
+            })
+    })
+    .demandCommand(1)
+    .parse()
