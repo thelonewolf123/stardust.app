@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
 
 import { getApolloClient } from './client'
-import { createNewContainer } from './container'
+import { createNewContainer, getNewContainerInput } from './container'
 
 async function login({
     username,
@@ -33,15 +33,19 @@ async function main() {
         username: 'thelonewolf123',
         password: 'Harish@2000'
     })
-    await createNewContainer({
-        name: 'learning-golangx',
-        description: 'learning-golang - deployment',
-        dockerContext: '.',
-        dockerPath: './Dockerfile',
-        githubBranch: 'main',
-        port: 8000,
-        githubUrl: 'https://github.com/thelonewolf123/learning-golang'
-    })
+
+    const container = await getNewContainerInput()
+    console.log('container', container)
+
+    await createNewContainer(container)
 }
+
+// "name": "learning-golangx",
+// "description": "learning-golang - deployment",
+// "dockerContext": ".",
+// "dockerPath": "./Dockerfile",
+// "githubBranch": "main",
+// "port": 8000,
+// "githubUrl": "https://github.com/thelonewolf123/learning-golang"
 
 main()

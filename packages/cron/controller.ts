@@ -1,8 +1,10 @@
-import invariant from 'invariant'
-
 import { getDockerClient } from '@/core/docker'
 import InstanceStrategy from '@/scheduler/library/instance'
-import { cleanupInstance, getAllPhysicalHosts } from '@/scheduler/lua/instance'
+import {
+    cleanupInstance,
+    getAllPhysicalHosts,
+    updateInstance
+} from '@/scheduler/lua/instance'
 import { CLOUD_PROVIDER } from '@constants/provider'
 
 export const instanceHealthCheck = async () => {
@@ -25,6 +27,14 @@ export const instanceHealthCheck = async () => {
         .filter(Boolean)
         .map(({ instanceId }) => instanceId)
     console.log('health-check', deadInstances)
+
+    await Promise.all(
+        deadInstances.map((instanceId) => {
+            return updateInstance(instanceId, {
+                status: 'failed'
+            })
+        })
+    )
 }
 
 export const instanceCleanup = async () => {
