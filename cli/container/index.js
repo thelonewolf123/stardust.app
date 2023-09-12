@@ -1,19 +1,20 @@
 import gql from 'graphql-tag'
 import inquirer from 'inquirer'
 
-import { getApolloClient } from '../client'
-
-type NewContainerInput = {
-    name: string
-    description: string
-    dockerContext: string
-    dockerPath: string
-    githubBranch: string
-    port: number
-    githubUrl: string
-}
-
-export async function createNewContainer(params: NewContainerInput) {
+import { getApolloClient } from '../client.js'
+/**
+ * @typedef {Object} NewContainerInput
+ * @property {string} name
+ * @property {string} description
+ * @property {string} dockerContext
+ * @property {string} dockerPath
+ * @property {string} githubBranch
+ * @property {number} port
+ * @property {string} githubUrl
+ */
+export async function createNewContainer(
+    /** @type {NewContainerInput} */ params
+) {
     const client = getApolloClient()
 
     const { data } = await client.mutate({

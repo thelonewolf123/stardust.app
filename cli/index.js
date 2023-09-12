@@ -1,15 +1,11 @@
 import gql from 'graphql-tag'
 
-import { getApolloClient } from './client'
-import { createNewContainer, getNewContainerInput } from './container'
+import { getApolloClient } from './client.js'
+import { createNewContainer, getNewContainerInput } from './container/index.js'
 
-async function login({
-    username,
-    password
-}: {
-    username: string
-    password: string
-}) {
+async function login(
+    /** @type {{username: String, password: String}} */ { username, password }
+) {
     const client = getApolloClient()
 
     const { data } = await client.query({
