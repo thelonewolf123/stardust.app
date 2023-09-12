@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import gql from 'graphql-tag'
 
 import { getApolloClient } from './client.js'
