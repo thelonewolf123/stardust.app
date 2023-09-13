@@ -3,16 +3,12 @@
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import { loginCmdHandler } from './user/index.js'
-
-// "name": "learning-golangx",
-// "description": "learning-golang - deployment",
-// "dockerContext": ".",
-// "dockerPath": "./Dockerfile",
-// "githubBranch": "main",
-// "port": 8000,
-// "githubUrl": "https://github.com/thelonewolf123/learning-golang"
+import { deployContainerHandler } from './container/index.js'
 
 yargs(hideBin(process.argv))
-    .command('login', 'Login to the platform', {}, () => loginCmdHandler())
+    .command('login', 'Login to fusion-grid', {}, () => loginCmdHandler())
+    .command('deploy', 'Schedule a container deployment', {}, () =>
+        deployContainerHandler()
+    )
     .demandCommand(1)
     .parse()

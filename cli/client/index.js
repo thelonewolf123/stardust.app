@@ -1,4 +1,5 @@
 import { request } from 'graphql-request'
+import { config } from '../constants.js'
 
 export function getGqlClient() {
     const baseUrl =
@@ -8,7 +9,7 @@ export function getGqlClient() {
             /** @type {{ query: any,  variables: any}} */ { query, variables }
         ) => {
             const data = await request(baseUrl, query, variables, {
-                'x-access-token': process.env.ACCESS_TOKEN || ''
+                'x-access-token': config.accessToken
             })
             return { data }
         },
@@ -19,7 +20,7 @@ export function getGqlClient() {
             }
         ) => {
             const data = await request(baseUrl, mutation, variables, {
-                'x-access-token': process.env.ACCESS_TOKEN || ''
+                'x-access-token': config.accessToken
             })
             return { data }
         }

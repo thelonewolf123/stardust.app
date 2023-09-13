@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
+import colors from 'colors'
 import { getGqlClient } from '../client/index.js'
 import { getLoginInput } from '../prompt/index.js'
-import colors from 'colors'
 import { existsSync, writeFileSync } from 'fs'
 import { config_path } from '../constants.js'
 import { execSync } from 'child_process'
@@ -49,7 +49,7 @@ export const loginCmdHandler = async () => {
     console.log('Logging in...')
 
     login(input)
-        .then(() => console.log('Logged in successfully'.green.bold))
+        .then((token) => loginSuccess(token, input.username, input.password))
         .catch((err) => {
             if (err.response)
                 console.error(
