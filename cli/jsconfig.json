@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "sourceMap": true,
+        "declaration": true,
+        "moduleResolution": "node",
+        "outDir": "./dist",
+        "rootDir": ".",
+        "esModuleInterop": true,
+        "strict": true,
+        "target": "ESNext",
+        "forceConsistentCasingInFileNames": true,
+        "checkJs": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
+    },
+
+    "exclude": ["node_modules"],
+    "include": ["**/**.js"]
+}

@@ -1,8 +1,6 @@
-// @ts-check
-
 import { request } from 'graphql-request'
 
-export function getApolloClient() {
+export function getGqlClient() {
     const baseUrl =
         process.env.BACKEND_BASE_URL || 'http://localhost:4000/graphql'
     return {

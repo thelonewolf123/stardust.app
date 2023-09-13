@@ -1,7 +1,6 @@
-// @ts-check
 import gql from 'graphql-tag'
+import { getGqlClient } from '../client/index.js'
 
-import { getApolloClient } from '../client.js'
 /**
  * @typedef {Object} NewContainerInput
  * @property {string} name
@@ -15,7 +14,7 @@ import { getApolloClient } from '../client.js'
 export async function createNewContainer(
     /** @type {NewContainerInput} */ params
 ) {
-    const client = getApolloClient()
+    const client = getGqlClient()
 
     const { data } = await client.mutate({
         mutation: gql`
