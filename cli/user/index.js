@@ -2,6 +2,9 @@ import gql from 'graphql-tag'
 import { getGqlClient } from '../client/index.js'
 import { getLoginInput } from '../prompt/index.js'
 import colors from 'colors'
+import { existsSync, writeFileSync } from 'fs'
+import { config_path } from '../constants.js'
+import { execSync } from 'child_process'
 
 async function login(
     /** @type {{username: String, password: String}} */ { username, password }
@@ -21,7 +24,24 @@ async function login(
     })
 
     const token = data.login
-    process.env.ACCESS_TOKEN = token
+    return token
+}
+
+const loginSuccess = (
+    /** @type {String} */ token,
+    /** @type {String} */ username,
+    /** @type {String} */ password
+) => {
+    console.log('Logged in successfully'.green.bold)
+    console.log('Saving credentials...'.yellow)
+    const config = {
+        accessToken: token,
+        username,
+        password
+    }
+    if (!existsSync(config_path)) execSync('mkdir -p ~/.fusion')
+    writeFileSync(config_path, JSON.stringify(config, null, 4))
+    console.log('Credentials saved'.green.bold)
 }
 
 export const loginCmdHandler = async () => {
