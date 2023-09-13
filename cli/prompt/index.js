@@ -12,7 +12,7 @@ export async function getLoginInput() {
             type: 'password',
             name: 'password',
             message: 'Enter your password',
-            mask: '*'
+            hidden: true
         }
     ])
 

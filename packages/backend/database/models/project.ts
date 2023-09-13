@@ -37,10 +37,10 @@ export class Project {
     @prop({ ref: () => Container, required: false })
     public current!: Ref<typeof Container>
 
-    @prop({ type: Date, default: Date.now(), required: true })
+    @prop({ type: Date, default: Date.now(), required: false })
     public createdAt!: Date
 
-    @prop({ type: Date, default: Date.now(), required: true })
+    @prop({ type: Date, default: Date.now(), required: false })
     public updatedAt!: Date
 }
 

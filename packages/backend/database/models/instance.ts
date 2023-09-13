@@ -17,19 +17,19 @@ class Instance {
     @prop({ type: Boolean, required: false, default: false })
     public isTerminatedByHealthCheck!: boolean
 
-    @prop({ type: Date, required: true })
+    @prop({ type: Date, required: false, default: Date.now() })
     public createdAt!: Date
 
-    @prop({ type: Date, required: true })
+    @prop({ type: Date, required: false, default: Date.now() })
     public updatedAt!: Date
 
-    @prop({ type: Date, required: true })
+    @prop({ type: Date, required: false, default: Date.now() })
     public deletedAt!: Date
 
-    @prop({ type: String, required: true })
+    @prop({ type: String, required: false })
     public ipAddress!: string
 
-    @prop({ type: String, required: true })
+    @prop({ type: String, required: false, default: 'us-east-1' })
     public region!: string
 }
 

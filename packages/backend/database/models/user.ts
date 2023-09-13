@@ -14,7 +14,7 @@ export class User {
     @prop({ type: Number, default: 0, required: true })
     public count!: number
 
-    @prop({ type: Date, default: Date.now(), required: true })
+    @prop({ type: Date, default: Date.now(), required: false })
     public createdAt!: Date
 }
 

@@ -57,5 +57,6 @@ export const loginCmdHandler = async () => {
                     `${err.response.errors[0].message}`.yellow
                 )
             else console.error('Login failed'.red.bold, `${err.message}`.yellow)
+            process.exit(1)
         })
 }
