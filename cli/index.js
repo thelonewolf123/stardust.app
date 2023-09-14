@@ -10,5 +10,17 @@ yargs(hideBin(process.argv))
     .command('deploy', 'Schedule a container deployment', {}, () =>
         deployContainerHandler()
     )
+    .command('rm', 'Remove a container', {}, () => {
+        throw new Error('Not implemented')
+    })
+    .command('ls', 'List all containers', {}, () => {
+        throw new Error('Not implemented')
+    })
+    .command('logs', 'Get logs of a container', {}, () => {
+        throw new Error('Not implemented')
+    })
+    .command('inspect', 'Inspect a container', {}, () => {
+        throw new Error('Not implemented')
+    })
     .demandCommand(1)
     .parse()
