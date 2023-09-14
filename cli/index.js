@@ -7,13 +7,19 @@ import { deployContainerHandler } from './container/index.js'
 
 yargs(hideBin(process.argv))
     .command('login', 'Login to fusion-grid', {}, () => loginCmdHandler())
-    .command('deploy', 'Schedule a container deployment', {}, () =>
+    .command('create', 'Schedule a container deployment', {}, () =>
         deployContainerHandler()
     )
-    .command('rm', 'Remove a container', {}, () => {
+    .command('delete', 'Remove a deployment', {}, () => {
         throw new Error('Not implemented')
     })
-    .command('ls', 'List all containers', {}, () => {
+    .command('start', 'Start a container', {}, () => {
+        throw new Error('Not implemented')
+    })
+    .command('stop', 'Stop a container', {}, () => {
+        throw new Error('Not implemented')
+    })
+    .command('list', 'List all containers', {}, () => {
         throw new Error('Not implemented')
     })
     .command('logs', 'Get logs of a container', {}, () => {
