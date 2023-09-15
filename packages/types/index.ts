@@ -44,7 +44,6 @@ export type PhysicalHostType = {
 }
 
 export type Context = {
-    // user: null | any
     user:
         | null
         | (User & {

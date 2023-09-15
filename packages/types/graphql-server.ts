@@ -117,6 +117,7 @@ export type ProjectInput = {
 
 export type Query = {
   __typename?: 'Query';
+  getAllContainers: Array<Container>;
   getContainerInfo: Container;
   getProjectBySlug: Project;
   login: Scalars['String'];
@@ -306,6 +307,7 @@ export type ProjectResolvers<ContextType = Context, ParentType extends Resolvers
 };
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  getAllContainers?: Resolver<Array<ResolversTypes['Container']>, ParentType, ContextType>;
   getContainerInfo?: Resolver<ResolversTypes['Container'], ParentType, ContextType, RequireFields<QueryGetContainerInfoArgs, 'slug'>>;
   getProjectBySlug?: Resolver<ResolversTypes['Project'], ParentType, ContextType, RequireFields<QueryGetProjectBySlugArgs, 'slug'>>;
   login?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<QueryLoginArgs, 'password' | 'username'>>;

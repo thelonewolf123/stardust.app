@@ -10,11 +10,19 @@ export const query: Resolvers['Query'] = {
         }).lean()
         invariant(container, 'Container not found')
         return container
+    },
+    async getAllContainers(_, __, ctx) {
+        const user = ctx.user
+        const containers = await ctx.db.Container.find({
+            createdBy: user
+        }).lean()
+        return containers
     }
 }
 
 export const queryType = gql`
     type Query {
         getContainerInfo(slug: String!): Container!
+        getAllContainers: [Container!]!
     }
 `
