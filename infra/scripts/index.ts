@@ -37,6 +37,7 @@ sudo podman create --name docker-proxy-container -v /var/run/podman/podman.sock:
 sudo systemctl enable docker-proxy.service
 sudo systemctl start docker-proxy.service
 
+# Install aws-cli
 sudo mkdir -p /root/.aws
 sudo echo "[default]
 aws_access_key_id=${env.AWS_ACCESS_KEY_ID}
@@ -44,5 +45,6 @@ aws_secret_access_key=${env.AWS_ACCESS_KEY_SECRET}
 region=${env.AWS_REGION}" > /root/.aws/config
 sudo chmod 600 /root/.aws/config
 sudo snap install aws-cli --classic
+
 sudo aws ecr get-login-password --region ${env.AWS_REGION} | podman login --username AWS --password-stdin ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com 
 `
