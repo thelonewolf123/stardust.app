@@ -10,10 +10,9 @@ cd /home/ubuntu/app
 sudo git fetch ${env.BRANCH}
 sudo git checkout ${env.BRANCH}
 sudo git pull
-cd docker.proxy
 
 # Build the docker proxy
-sudo podman build -f infra/docker/Dockerfile.proxy -t docker.io/thelonewolf123/docker-proxy .
+sudo podman build -f infra/docker/Dockerfile.proxy -t docker.io/thelonewolf123/docker-proxy docker.proxy/
 sudo rm -rf /home/ubuntu/app
 
 # Create a systemd service for the proxy

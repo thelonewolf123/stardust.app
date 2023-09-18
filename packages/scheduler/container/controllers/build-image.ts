@@ -60,36 +60,38 @@ export class BuildImageStrategy {
             sudo: true
         })
 
-        const promiseQuery = makeQueryablePromise(buildProgress)
+        await buildProgress
 
-        while (true) {
-            const containerInfo = await getContainer({
-                projectSlug: this.#data.projectSlug
-            })
+        // const promiseQuery = makeQueryablePromise(buildProgress)
 
-            console.log('Container info: ', containerInfo)
+        // while (true) {
+        //     const containerInfo = await getContainer({
+        //         projectSlug: this.#data.projectSlug
+        //     })
 
-            if (containerInfo?.containerSlug !== this.#data.containerSlug) {
-                cancelBuild()
-                throw new Error('Container build failed')
-            }
+        //     console.log('Container info: ', containerInfo)
 
-            if (promiseQuery.isFulfilled) break
+        //     if (containerInfo?.containerSlug !== this.#data.containerSlug) {
+        //         cancelBuild()
+        //         throw new Error('Container build failed')
+        //     }
 
-            await sleep(1000)
-        }
+        //     if (promiseQuery.isFulfilled) break
 
-        if (promiseQuery.isRejected) throw new Error('Container build failed')
+        //     await sleep(1000)
+        // }
 
-        const logs = await buildProgress
-        await models.Container.updateOne(
-            { containerSlug: this.#data.containerSlug },
-            {
-                $set: {
-                    containerBuildLogs: logs.split('\n')
-                }
-            }
-        )
+        // if (promiseQuery.isRejected) throw new Error('Container build failed')
+
+        // const logs = await buildProgress
+        // await models.Container.updateOne(
+        //     { containerSlug: this.#data.containerSlug },
+        //     {
+        //         $set: {
+        //             containerBuildLogs: logs.split('\n')
+        //         }
+        //     }
+        // )
 
         console.log('Image built successfully.')
     }
