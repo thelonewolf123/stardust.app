@@ -47,7 +47,7 @@ export class BuildImageStrategy {
         }
 
         const [cancelBuild, buildProgress] = await this.#instance.exec({
-            command: 'podman',
+            command: 'docker',
             args: [
                 'build',
                 '-t',
@@ -60,38 +60,38 @@ export class BuildImageStrategy {
             sudo: true
         })
 
-        await buildProgress
+        // await buildProgress
 
-        // const promiseQuery = makeQueryablePromise(buildProgress)
+        const promiseQuery = makeQueryablePromise(buildProgress)
 
-        // while (true) {
-        //     const containerInfo = await getContainer({
-        //         projectSlug: this.#data.projectSlug
-        //     })
+        while (true) {
+            const containerInfo = await getContainer({
+                projectSlug: this.#data.projectSlug
+            })
 
-        //     console.log('Container info: ', containerInfo)
+            console.log('Container info: ', containerInfo)
 
-        //     if (containerInfo?.containerSlug !== this.#data.containerSlug) {
-        //         cancelBuild()
-        //         throw new Error('Container build failed')
-        //     }
+            if (containerInfo?.containerSlug !== this.#data.containerSlug) {
+                cancelBuild()
+                throw new Error('Container build failed')
+            }
 
-        //     if (promiseQuery.isFulfilled) break
+            if (promiseQuery.isFulfilled) break
 
-        //     await sleep(1000)
-        // }
+            await sleep(1000)
+        }
 
-        // if (promiseQuery.isRejected) throw new Error('Container build failed')
+        if (promiseQuery.isRejected) throw new Error('Container build failed')
 
-        // const logs = await buildProgress
-        // await models.Container.updateOne(
-        //     { containerSlug: this.#data.containerSlug },
-        //     {
-        //         $set: {
-        //             containerBuildLogs: logs.split('\n')
-        //         }
-        //     }
-        // )
+        const logs = await buildProgress
+        await models.Container.updateOne(
+            { containerSlug: this.#data.containerSlug },
+            {
+                $set: {
+                    containerBuildLogs: logs.split('\n')
+                }
+            }
+        )
 
         console.log('Image built successfully.')
     }
@@ -121,7 +121,7 @@ export class BuildImageStrategy {
     async #pushDockerImage() {
         invariant(this.#docker, 'Docker client not found')
         const [, pushProgress] = await this.#instance.exec({
-            command: 'podman',
+            command: 'docker',
             args: ['push', this.#data.ecrRepo],
             sudo: true
         })
