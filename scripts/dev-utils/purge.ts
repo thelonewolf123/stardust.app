@@ -23,6 +23,11 @@ queue.map(async (queue) => {
 
     onMessage((message) => {
         if (!message) return
+        console.log(
+            'QUEUE MESSAGE => ',
+            queue.EXCHANGE_NAME,
+            message.content.toString()
+        )
         channel.receiver.ack(message)
     })
 })
