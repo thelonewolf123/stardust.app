@@ -1,4 +1,5 @@
 import { createClient, RedisClientOptions } from 'redis'
+import Redlock from 'redlock'
 
 import { env } from '@/env'
 
@@ -12,6 +13,13 @@ const redis = createClient(config)
 // Optional: Add error handling for the Redis client
 redis.on('error', (err) => {
     console.error('Redis Client Error:', err)
+})
+
+const redlock = new Redlock([redis], {
+    driftFactor: 0.01, // time in ms
+    retryCount: 10,
+    retryDelay: 200, // time in ms
+    retryJitter: 200 // time in ms
 })
 
 const connectionPromise = redis.connect() // returns a Promise
@@ -30,4 +38,10 @@ async function runLuaScript(luaScript: string, args: (string | undefined)[]) {
     return null
 }
 
-export default { client: redis, runLuaScript, connect: () => connectionPromise }
+export default {
+    client: redis,
+    runLuaScript,
+    connect: () => connectionPromise
+}
+
+export { redlock }

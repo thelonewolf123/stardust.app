@@ -3,7 +3,7 @@ import invariant from 'invariant'
 import models from '@/backend/database'
 import ec2Aws from '@/core/aws/ec2.aws'
 import { getDockerClient } from '@/core/docker'
-import { Ec2InstanceType, InstanceExecArgs } from '@/types'
+import { Ec2InstanceType, InstanceExecArgs, PhysicalHostType } from '@/types'
 import {
     ERROR_CODES,
     LOCK,
@@ -180,7 +180,7 @@ class InstanceStrategyAws {
 
         invariant(InstanceId && ImageId, 'Instance not created')
 
-        const result = await scheduleInstance(InstanceId, ImageId, type)
+        const result = await scheduleInstance(InstanceId, type, ImageId)
         invariant(result, 'Instance not scheduled')
         await models.Instance.create({
             instanceId: InstanceId,
