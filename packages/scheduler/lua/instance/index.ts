@@ -1,6 +1,24 @@
 import { Ec2InstanceType, PhysicalHostType } from '@/types'
 import redis, { redlock } from '@core/redis'
 
+async function getAllPhysicalHosts(): Promise<PhysicalHostType[]> {
+    const hosts = await redis.client.get('physicalHost')
+    const result = hosts ? JSON.parse(hosts) : []
+    result.forEach((host: PhysicalHostType) => {
+        host.createdAt = new Date(host.createdAt)
+        host.updatedAt = new Date(host.updatedAt)
+        if (host.scheduledForDeletionAt) {
+            host.scheduledForDeletionAt = new Date(host.scheduledForDeletionAt)
+        }
+    })
+    return result
+}
+
+// Update the 'physicalHost' key in Redis with the modified data
+async function updateDataInRedis(data: PhysicalHostType[]) {
+    await redis.client.set('physicalHost', JSON.stringify(data))
+}
+
 async function updateInstance(
     instanceId: string,
     instanceData: Omit<Partial<PhysicalHostType>, 'containers'>
@@ -112,24 +130,6 @@ async function cleanupInstance(): Promise<string[]> {
         console.error('Error cleaning up instances:', error)
         throw error
     }
-}
-
-async function getAllPhysicalHosts(): Promise<PhysicalHostType[]> {
-    const hosts = await redis.client.get('physicalHost')
-    const result = hosts ? JSON.parse(hosts) : []
-    result.forEach((host: PhysicalHostType) => {
-        host.createdAt = new Date(host.createdAt)
-        host.updatedAt = new Date(host.updatedAt)
-        if (host.scheduledForDeletionAt) {
-            host.scheduledForDeletionAt = new Date(host.scheduledForDeletionAt)
-        }
-    })
-    return result
-}
-
-// Update the 'physicalHost' key in Redis with the modified data
-async function updateDataInRedis(data: PhysicalHostType[]) {
-    await redis.client.set('physicalHost', JSON.stringify(data))
 }
 
 // Main function to add a new instance
