@@ -35,11 +35,36 @@ export const query: Resolvers['Query'] = {
         console.log(project)
 
         return project
+    },
+    async getAllProjects(_, __, ctx) {
+        const user = getRegularUser(ctx)
+
+        const projects = (await ProjectModel.find(
+            { user: user._id },
+            {
+                history: 1,
+                name: 1,
+                slug: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                current: 1,
+                description: 1,
+                githubUrl: 1,
+                githubBranch: 1,
+                dockerPath: 1,
+                dockerContext: 1
+            }
+        )
+            .populate(['current', 'history'])
+            .lean()) as DocumentType<Project>[]
+
+        return projects
     }
 }
 
 export const queryType = gql`
     type Query {
         getProjectBySlug(slug: String!): Project!
+        getAllProjects: [Project!]!
     }
 `

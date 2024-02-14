@@ -61,11 +61,20 @@ export const mutation: Resolvers['Mutation'] = {
         await project.save()
 
         return projectSlug
+    },
+    deleteProject: async (_, { slug }, ctx) => {
+        const user = getRegularUser(ctx)
+        const project = await ctx.db.Project.findOne({ slug, user: user._id })
+        if (!project) throw new Error('Project not found')
+
+        await ctx.db.Project.deleteOne({ slug, user: user._id })
+        return true
     }
 }
 
 export const mutationType = gql`
     type Mutation {
         createProject(input: ProjectInput!): String!
+        deleteProject(slug: String!): Boolean!
     }
 `

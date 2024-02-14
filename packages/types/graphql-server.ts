@@ -63,6 +63,7 @@ export type Mutation = {
   createContainer: Scalars['Boolean'];
   createProject: Scalars['String'];
   deleteContainer: Scalars['Boolean'];
+  deleteProject: Scalars['Boolean'];
   signup: Scalars['String'];
 };
 
@@ -79,6 +80,11 @@ export type MutationCreateProjectArgs = {
 
 export type MutationDeleteContainerArgs = {
   containerId: Scalars['String'];
+};
+
+
+export type MutationDeleteProjectArgs = {
+  slug: Scalars['String'];
 };
 
 
@@ -118,6 +124,7 @@ export type ProjectInput = {
 export type Query = {
   __typename?: 'Query';
   getAllContainers: Array<Container>;
+  getAllProjects: Array<Project>;
   getContainerInfo: Container;
   getProjectBySlug: Project;
   login: Scalars['String'];
@@ -289,6 +296,7 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
   createContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationCreateContainerArgs, 'input'>>;
   createProject?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'input'>>;
   deleteContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteContainerArgs, 'containerId'>>;
+  deleteProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteProjectArgs, 'slug'>>;
   signup?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'email' | 'password' | 'username'>>;
 };
 
@@ -308,6 +316,7 @@ export type ProjectResolvers<ContextType = Context, ParentType extends Resolvers
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   getAllContainers?: Resolver<Array<ResolversTypes['Container']>, ParentType, ContextType>;
+  getAllProjects?: Resolver<Array<ResolversTypes['Project']>, ParentType, ContextType>;
   getContainerInfo?: Resolver<ResolversTypes['Container'], ParentType, ContextType, RequireFields<QueryGetContainerInfoArgs, 'slug'>>;
   getProjectBySlug?: Resolver<ResolversTypes['Project'], ParentType, ContextType, RequireFields<QueryGetProjectBySlugArgs, 'slug'>>;
   login?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<QueryLoginArgs, 'password' | 'username'>>;

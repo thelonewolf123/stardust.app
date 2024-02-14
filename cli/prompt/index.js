@@ -1,5 +1,7 @@
 // @ts-check
 import inquirer from 'inquirer'
+import { getGqlClient } from '../client/index.js'
+import gql from 'graphql-tag'
 
 export async function getLoginInput() {
     const input = await inquirer.prompt([
@@ -59,6 +61,40 @@ export async function getNewContainerInput() {
             type: 'input',
             name: 'githubUrl',
             message: 'Enter the github url'
+        }
+    ])
+
+    return input
+}
+
+export async function getDeleteContainerInput() {
+    const client = getGqlClient()
+
+    const { data } = await client.query({
+        query: gql`
+            query GetAllProjects {
+                getAllProjects {
+                    slug
+                    name
+                }
+            }
+        `,
+        variables: {}
+    })
+
+    console.log('Select the container to delete', data.getAllProjects)
+    /** @type {{slug: string, name: string}[]} */
+    const projectList = data.getAllProjects
+
+    const input = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'containerId',
+            message: 'Select the container to delete',
+            choices: projectList.map((project) => ({
+                name: project.name,
+                value: project.slug
+            }))
         }
     ])
 
