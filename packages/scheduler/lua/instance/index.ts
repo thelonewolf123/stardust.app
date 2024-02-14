@@ -30,27 +30,15 @@ async function updateInstance(
         // Get the current data from Redis
         let data = await getAllPhysicalHosts()
 
-        // Find the instance index using the provided instanceId
-        const instanceIndex = data.findIndex(
-            (instance) => instance.instanceId === instanceId
-        )
-
-        // Check if the instance was found
-        if (instanceIndex === -1) {
-            // Release the lock if the instance was not found
-            await lock.release()
-            return null // If it was not found, return null as we cannot update a non-existent instance
-        }
-
-        // Get the existing instance object
-        const instance = data[instanceIndex]
-
-        // Update the instance object with the provided data
-        instance.updatedAt = new Date()
-        for (const [key, value] of Object.entries(instanceData)) {
-            // @ts-ignore
-            instance[key] = value
-        }
+        let hasInstanceUpdated = false
+        data = data.map((instance) => {
+            if (instance.instanceId === instanceId) {
+                hasInstanceUpdated = true
+                instance.updatedAt = new Date()
+                return { ...instance, ...instanceData }
+            }
+            return instance
+        })
 
         // Update the 'physicalHost' key in Redis with the modified data
         await updateDataInRedis(data)
@@ -59,7 +47,7 @@ async function updateInstance(
         await lock.release()
 
         // Return the instanceId to confirm that the instance was updated successfully
-        return instanceId
+        return hasInstanceUpdated ? instanceId : null
     } catch (error) {
         console.error('Error updating instance:', error)
         throw error
