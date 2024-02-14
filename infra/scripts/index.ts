@@ -48,5 +48,3 @@ sudo snap install aws-cli --classic
 sudo aws ecr get-login-password --region ${env.AWS_REGION} | sudo docker login --username AWS --password-stdin ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com
 sudo aws ecr get-login-password --region ${env.AWS_REGION} | sudo podman login --username AWS --password-stdin ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com 
 `
-
-console.log(ec2UserData)

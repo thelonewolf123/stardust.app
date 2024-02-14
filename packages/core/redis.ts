@@ -1,3 +1,4 @@
+import Redis from 'ioredis'
 import { createClient, RedisClientOptions } from 'redis'
 import Redlock from 'redlock'
 
@@ -9,13 +10,14 @@ const config: RedisClientOptions = {
 }
 
 const redis = createClient(config)
+const redisRedlock = new Redis(config.url || 'localhost')
 
 // Optional: Add error handling for the Redis client
 redis.on('error', (err) => {
     console.error('Redis Client Error:', err)
 })
 
-const redlock = new Redlock([redis], {
+const redlock = new Redlock([redisRedlock], {
     driftFactor: 0.01, // time in ms
     retryCount: 10,
     retryDelay: 200, // time in ms

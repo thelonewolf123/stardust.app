@@ -9,7 +9,7 @@ import { securityGroup } from './securityGroup'
 export const instance = new aws.ec2.Instance(
     awsInfra.EC2_INSTANCE_NAME,
     {
-        ami: getAmi().apply((ami) => ami.id),
+        ami: getAmi('ubuntu').then((ami) => ami.id),
         instanceType: awsInfra.EC2_INSTANCE_TYPE,
         keyName: keyPair.id.apply((keyName) => keyName),
         vpcSecurityGroupIds: [securityGroup.id.apply((id) => id)],
