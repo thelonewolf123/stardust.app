@@ -75,7 +75,7 @@ async function cleanupInstance(): Promise<string[]> {
         const lock = await redlock.acquire(['physicalHostLock'], 10000)
 
         // Decode the JSON data into a JavaScript object
-        const physicalHost = await getAllPhysicalHosts()
+        let physicalHost = await getAllPhysicalHosts()
 
         // Function to check if an instance is scheduled for deletion and past 2 minutes
         const isScheduledForDeletionPastTwoMinutes = (
@@ -107,16 +107,15 @@ async function cleanupInstance(): Promise<string[]> {
 
         // Iterate through the 'physicalHost' data and remove instances scheduled for deletion past 2 minutes
         const deletedInstances: string[] = []
-        let idx = 0
-        for (let i = 0; i < physicalHost.length; i++) {
-            const instance = physicalHost[i]
+
+        physicalHost = physicalHost.filter((instance) => {
             scheduleInstancesDeletion(instance) // Add schedule delete timestamp to instances with no containers or failed status
             if (isScheduledForDeletionPastTwoMinutes(instance)) {
-                deletedInstances[idx] = instance.instanceId
-                physicalHost.splice(i, 1)
-                idx++
+                deletedInstances.push(instance.instanceId)
+                return false
             }
-        }
+            return true
+        })
 
         // Update the 'physicalHost' key in Redis with the updated data
         await updateDataInRedis(physicalHost)

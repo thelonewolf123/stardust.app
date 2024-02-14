@@ -65,9 +65,27 @@ export const mutation: Resolvers['Mutation'] = {
     deleteProject: async (_, { slug }, ctx) => {
         const user = getRegularUser(ctx)
         const project = await ctx.db.Project.findOne({ slug, user: user._id })
+            .populate(['history'])
+            .lean()
         if (!project) throw new Error('Project not found')
 
+        const current = await ctx.db.Container.findOne({
+            _id: project.current
+        }).lean()
+
+        await ctx.db.Container.deleteMany({
+            containerSlug: { $regex: `^${slug}:` }
+        })
+
         await ctx.db.Project.deleteOne({ slug, user: user._id })
+        await ecr.deleteEcrRepo({ name: slug })
+
+        if (current && current.containerId) {
+            ctx.queue.destroyContainer.publish({
+                containerId: current.containerId
+            })
+        }
+
         return true
     }
 }
