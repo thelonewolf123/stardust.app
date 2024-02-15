@@ -62,9 +62,10 @@ export type Mutation = {
   __typename?: 'Mutation';
   createContainer: Scalars['Boolean'];
   createProject: Scalars['String'];
-  deleteContainer: Scalars['Boolean'];
   deleteProject: Scalars['Boolean'];
   signup: Scalars['String'];
+  startContainer: Scalars['Boolean'];
+  stopContainer: Scalars['Boolean'];
 };
 
 
@@ -78,11 +79,6 @@ export type MutationCreateProjectArgs = {
 };
 
 
-export type MutationDeleteContainerArgs = {
-  containerId: Scalars['String'];
-};
-
-
 export type MutationDeleteProjectArgs = {
   slug: Scalars['String'];
 };
@@ -92,6 +88,16 @@ export type MutationSignupArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
   username: Scalars['String'];
+};
+
+
+export type MutationStartContainerArgs = {
+  projectSlug: Scalars['String'];
+};
+
+
+export type MutationStopContainerArgs = {
+  projectSlug: Scalars['String'];
 };
 
 export type Project = {
@@ -295,9 +301,10 @@ export type EnvResolvers<ContextType = Context, ParentType extends ResolversPare
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   createContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationCreateContainerArgs, 'input'>>;
   createProject?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'input'>>;
-  deleteContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteContainerArgs, 'containerId'>>;
   deleteProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteProjectArgs, 'slug'>>;
   signup?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'email' | 'password' | 'username'>>;
+  startContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationStartContainerArgs, 'projectSlug'>>;
+  stopContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationStopContainerArgs, 'projectSlug'>>;
 };
 
 export type ProjectResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Project'] = ResolversParentTypes['Project']> = {

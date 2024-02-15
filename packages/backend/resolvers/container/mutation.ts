@@ -25,17 +25,68 @@ export const mutation: Resolvers['Mutation'] = {
 
         return true
     },
-    async deleteContainer(_, { containerId }, ctx) {
+    async startContainer(_, { projectSlug }, ctx) {
+        const user = getRegularUser(ctx)
+        const project = await ctx.db.Project.findOne({
+            slug: projectSlug,
+            user: user._id
+        }).lean()
+
+        invariant(project, 'Container not found')
+
+        const container = await ctx.db.Container.findOne({
+            _id: project.current
+        }).lean()
+
+        invariant(container, 'Container not found')
+        invariant(
+            container.status === 'terminated',
+            'Container is already running'
+        )
+
+        await ctx.db.Container.updateOne(
+            {
+                _id: container._id
+            },
+            {
+                status: 'pending'
+            }
+        )
+
+        const env: Record<string, string> = {}
+        container.env.forEach((envron) => {
+            env[envron.name] = envron.value
+        })
+
+        ctx.queue.createContainer.publish({
+            containerSlug: container.containerSlug,
+            image: container.image,
+            command: container.command ?? [],
+            env,
+            ports: container.port ? [container.port] : []
+        })
+        return true
+    },
+    async stopContainer(_, { projectSlug }, ctx) {
         getRegularUser(ctx)
         const container = await ctx.db.Container.findOne({
-            containerId,
+            containerSlug: projectSlug,
             createdBy: ctx.user?._id
         }).lean()
 
         invariant(container, 'Container not found')
 
+        await ctx.db.Container.updateOne(
+            {
+                _id: container._id
+            },
+            {
+                status: 'terminated'
+            }
+        )
+
         ctx.queue.destroyContainer.publish({
-            containerId
+            containerId: container.containerId
         })
         return true
     }
@@ -44,6 +95,7 @@ export const mutation: Resolvers['Mutation'] = {
 export const mutationType = gql`
     type Mutation {
         createContainer(input: ContainerInput!): Boolean!
-        deleteContainer(containerId: String!): Boolean!
+        startContainer(projectSlug: String!): Boolean!
+        stopContainer(projectSlug: String!): Boolean!
     }
 `
