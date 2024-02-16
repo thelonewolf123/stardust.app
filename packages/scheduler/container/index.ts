@@ -1,5 +1,9 @@
 import models from '@/backend/database'
-import { MAX_CONTAINER_BUILD_QUEUE_ATTEMPTS } from '@constants/aws-infra'
+import {
+    MAX_CONTAINER_BUILD_QUEUE_ATTEMPTS,
+    MAX_CONTAINER_DEPLOY_QUEUE_ATTEMPTS,
+    MAX_CONTAINER_TERMINATE_QUEUE_ATTEMPTS
+} from '@constants/aws-infra'
 import { CLOUD_PROVIDER } from '@constants/provider'
 import {
     BUILD_CONTAINER,
@@ -25,12 +29,30 @@ export const setupNewContainerConsumer = async () => {
     })
     process.on('SIGINT', () => cleanup())
 
-    onMessage((message) => {
+    onMessage(async (message) => {
         if (!message) return
         const { content } = message
         const data = ContainerSchedulerSchema.parse(
             JSON.parse(content.toString())
         )
+
+        const container = await models.Container.findOne({
+            containerSlug: data.containerSlug
+        }).lean()
+        const attempts = container?.containerDeployAttempts || 0
+
+        if (MAX_CONTAINER_DEPLOY_QUEUE_ATTEMPTS <= attempts) {
+            console.log(
+                `Max container build attempts reached for ${data.containerSlug}`
+            )
+            return channel.receiver.ack(message)
+        } else {
+            await models.Container.updateOne(
+                { containerSlug: data.containerSlug },
+                { $inc: { containerDeployAttempts: 1 } }
+            )
+        }
+
         const strategy = new NewContainerStrategy(data, CLOUD_PROVIDER)
         strategy
             .createNewContainer()
@@ -59,6 +81,24 @@ export const setupDestroyContainerConsumer = async () => {
             JSON.parse(content.toString())
         )
         console.log(data)
+
+        const container = await models.Container.findOne({
+            containerId: data.containerId
+        }).lean()
+        const attempts = container?.containerTerminateAttempts || 0
+
+        if (MAX_CONTAINER_TERMINATE_QUEUE_ATTEMPTS <= attempts) {
+            console.log(
+                `Max container build attempts reached for ${data.containerId}`
+            )
+            return channel.receiver.ack(message)
+        } else {
+            await models.Container.updateOne(
+                { containerId: data.containerId },
+                { $inc: { containerTerminateAttempts: 1 } }
+            )
+        }
+
         const strategy = new DestroyContainerStrategy(data, CLOUD_PROVIDER)
         strategy
             .destroyContainer()
@@ -106,6 +146,11 @@ export const setupBuildContainerConsumer = async () => {
                 `Max container build attempts reached for ${data.containerSlug}`
             )
             return channel.receiver.ack(message)
+        } else {
+            await models.Container.updateOne(
+                { containerSlug: data.containerSlug },
+                { $inc: { containerBuildAttempts: 1 } }
+            )
         }
 
         const strategy = new BuildImageStrategy(

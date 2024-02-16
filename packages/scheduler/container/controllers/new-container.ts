@@ -94,6 +94,14 @@ export class NewContainerStrategy {
     async #handleError(error: Error) {
         console.error('Container provision error: ', error)
         await deleteContainer(this.#data.containerSlug)
+        await models.Container.updateOne(
+            {
+                containerSlug: this.#data.containerSlug
+            },
+            {
+                $set: { status: 'failed' }
+            }
+        )
 
         if (error.message === ERROR_CODES.INSTANCE_PROVISION_FAILED) {
             console.log('Instance provision failed, retrying...')

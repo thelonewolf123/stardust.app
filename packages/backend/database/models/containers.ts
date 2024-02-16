@@ -29,6 +29,12 @@ export class Container {
     @prop({ type: Number, required: false, default: 0 })
     public containerBuildAttempts?: number
 
+    @prop({ type: Number, required: false, default: 0 })
+    public containerDeployAttempts?: number
+
+    @prop({ type: Number, required: false, default: 0 })
+    public containerTerminateAttempts?: number
+
     @prop({ type: String, required: true })
     public image!: string
 
