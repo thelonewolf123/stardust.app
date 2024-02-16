@@ -9,7 +9,6 @@ import {
     ECRClient,
     GetAuthorizationTokenCommand
 } from '@aws-sdk/client-ecr' // ES Modules import
-import { DeleteActivationCommandInput } from '@aws-sdk/client-ssm'
 
 // const { ECRClient, CreateRepositoryCommand } = require("@aws-sdk/client-ecr"); // CommonJS import
 
