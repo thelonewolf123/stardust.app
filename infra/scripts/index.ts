@@ -2,8 +2,7 @@ import { env } from '../../packages/env'
 
 export const ec2UserData = `#!/bin/bash
 sudo apt update
-sudo apt install git curl nodejs podman -y
-sudo snap install docker
+sudo apt install git curl nodejs podman docker.io -y
 
 # clone the repo
 sudo git clone https://oauth:${env.GITHUB_TOKEN}@github.com/thelonewolf123/soul-forge /home/ubuntu/app
