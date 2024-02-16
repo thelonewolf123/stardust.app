@@ -2,6 +2,7 @@ import invariant from 'invariant'
 
 import models from '@/backend/database'
 import ec2Aws from '@/core/aws/ec2.aws'
+import { ecr } from '@/core/aws/ecr.aws'
 import { getDockerClient } from '@/core/docker'
 import { Ec2InstanceType, InstanceExecArgs, PhysicalHostType } from '@/types'
 import {
@@ -230,6 +231,10 @@ class InstanceStrategyAws {
             await this.#markInstanceAsFailed(id)
             throw new Error(ERROR_CODES.INSTANCE_PROVISION_FAILED)
         }
+    }
+
+    getAuthConfig() {
+        return ecr.getAuthorizationToken()
     }
 }
 

@@ -82,11 +82,15 @@ export async function getDeleteProjectInput() {
         variables: {}
     })
 
-    console.log('Select the project to delete', data.getAllProjects)
     /**
      * @type {{slug: string, name: string}[]} projectList
      */
     const projectList = data.getAllProjects
+
+    if (projectList.length === 0) {
+        console.log('No projects to delete'.yellow.bold)
+        process.exit(0)
+    }
 
     const input = await inquirer.prompt([
         {
@@ -118,11 +122,15 @@ export async function getContainerStartInput() {
         variables: {}
     })
 
-    console.log('Select the project to start', data.getNotRunningProjects)
     /**
      * @type {{slug: string, name: string}[]} projectList
      */
     const projectList = data.getNotRunningProjects
+
+    if (projectList.length === 0) {
+        console.log('No projects to start'.yellow.bold)
+        process.exit(0)
+    }
 
     const input = await inquirer.prompt([
         {

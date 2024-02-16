@@ -36,7 +36,11 @@ export class NewContainerStrategy {
         invariant(this.#docker, 'Docker client not initialized')
 
         if (!imageExists) {
-            const stream = await this.#docker.pull(this.#data.image)
+            const authconfig = await this.#instance.getAuthConfig()
+            console.log('Auth config: ', authconfig)
+            const stream = await this.#docker.pull(this.#data.image, {
+                authconfig
+            })
 
             await new Promise<void>((resolve, reject) => {
                 invariant(this.#docker, 'Docker client not initialized')

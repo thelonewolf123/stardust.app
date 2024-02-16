@@ -54,6 +54,13 @@ class InstanceStrategy {
     ): Promise<readonly [() => void, Promise<string>]> {
         return this.strategy.exec(params)
     }
+
+    getAuthConfig(): Promise<{
+        username: string
+        password: string
+    }> {
+        return this.strategy.getAuthConfig()
+    }
 }
 
 export default InstanceStrategy

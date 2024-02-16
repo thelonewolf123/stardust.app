@@ -15,6 +15,7 @@ export const mutation: Resolvers['Mutation'] = {
         const ecrResponse = await ecr.createEcrRepo({ name: projectSlug })
         const repositoryUri = ecrResponse.repository?.repositoryUri
         invariant(repositoryUri, 'Repository URI is not defined')
+        const repoWithHash = `${repositoryUri}:${version}`
 
         const buildArgs: Record<string, string> = {}
         input.buildArgs?.map(({ name, value }) => {
@@ -28,7 +29,7 @@ export const mutation: Resolvers['Mutation'] = {
             githubRepoBranch: input.githubBranch,
             dockerPath: input.dockerPath,
             dockerContext: input.dockerContext,
-            ecrRepo: repositoryUri,
+            ecrRepo: repoWithHash,
             buildArgs,
             version
         })
@@ -39,7 +40,7 @@ export const mutation: Resolvers['Mutation'] = {
             metaData: input.metaData,
             port: input.port,
             status: 'pending',
-            image: `${repositoryUri}:${version}`,
+            image: repoWithHash,
             version,
             createdBy: user
         })

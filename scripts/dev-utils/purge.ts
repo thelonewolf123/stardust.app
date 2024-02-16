@@ -42,10 +42,15 @@ mongoose.connect(env.MONGODB_URI).then(() => {
         mongoose.connection.db.collection('containers').drop(),
         mongoose.connection.db.collection('projects').drop(),
         mongoose.connection.db.collection('instances').drop()
-    ]).then(() => {
-        console.log('MongoDB purged')
-        mongoose.connection.close()
-    })
+    ])
+        .then(() => {
+            console.log('MongoDB purged')
+            mongoose.connection.close()
+        })
+        .catch(() => {
+            console.log('MongoDB purged')
+            mongoose.connection.close()
+        })
 })
 
 setTimeout(() => process.exit(), 100_000)

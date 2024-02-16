@@ -11,8 +11,8 @@ export async function deleteProject(projectSlug) {
 
     const { data } = await client.mutate({
         mutation: gql`
-            mutation Mutation($projectSlug: String!) {
-                deleteProject(projectSlug: $projectSlug)
+            mutation Mutation($slug: String!) {
+                deleteProject(slug: $slug)
             }
         `,
         variables: {
@@ -24,11 +24,11 @@ export async function deleteProject(projectSlug) {
 }
 
 export async function deleteProjectHandler() {
-    console.log('Deleting container...')
+    console.log('Deleting project...')
     const { projectSlug } = await getDeleteProjectInput()
     deleteProject(projectSlug)
         .then((data) => {
-            console.log('Container deleted successfully'.green.bold, data)
+            console.log('Project deleted successfully'.green.bold, data)
         })
         .catch((err) => {
             if (err.response)
