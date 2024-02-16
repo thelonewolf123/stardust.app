@@ -17,10 +17,13 @@ export const mutation: Resolvers['Mutation'] = {
         invariant(repositoryUri, 'Repository URI is not defined')
         const repoWithHash = `${repositoryUri}:${version}`
 
-        const buildArgs: Record<string, string> = {}
-        input.buildArgs?.map(({ name, value }) => {
-            buildArgs[name] = value
-        })
+        const buildArgs = (input.buildArgs || []).reduce(
+            (acc, { name, value }) => {
+                acc[name] = value
+                return acc
+            },
+            {} as Record<string, string>
+        )
 
         ctx.queue.buildContainer.publish({
             containerSlug,

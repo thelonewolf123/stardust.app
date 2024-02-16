@@ -37,7 +37,6 @@ export class NewContainerStrategy {
 
         if (!imageExists) {
             const authconfig = await this.#instance.getAuthConfig()
-            console.log('Auth config: ', authconfig)
             const stream = await this.#docker.pull(this.#data.image, {
                 authconfig
             })
