@@ -132,7 +132,9 @@ export type Query = {
   getAllContainers: Array<Container>;
   getAllProjects: Array<Project>;
   getContainerInfo: Container;
+  getNotRunningProjects: Array<Project>;
   getProjectBySlug: Project;
+  getRunningProjects: Array<Project>;
   login: Scalars['String'];
   logout: Scalars['Boolean'];
 };
@@ -325,7 +327,9 @@ export type QueryResolvers<ContextType = Context, ParentType extends ResolversPa
   getAllContainers?: Resolver<Array<ResolversTypes['Container']>, ParentType, ContextType>;
   getAllProjects?: Resolver<Array<ResolversTypes['Project']>, ParentType, ContextType>;
   getContainerInfo?: Resolver<ResolversTypes['Container'], ParentType, ContextType, RequireFields<QueryGetContainerInfoArgs, 'slug'>>;
+  getNotRunningProjects?: Resolver<Array<ResolversTypes['Project']>, ParentType, ContextType>;
   getProjectBySlug?: Resolver<ResolversTypes['Project'], ParentType, ContextType, RequireFields<QueryGetProjectBySlugArgs, 'slug'>>;
+  getRunningProjects?: Resolver<Array<ResolversTypes['Project']>, ParentType, ContextType>;
   login?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<QueryLoginArgs, 'password' | 'username'>>;
   logout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
 };

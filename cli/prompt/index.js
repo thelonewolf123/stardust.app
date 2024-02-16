@@ -67,7 +67,7 @@ export async function getNewContainerInput() {
     return input
 }
 
-export async function getDeleteContainerInput() {
+export async function getDeleteProjectInput() {
     const client = getGqlClient()
 
     const { data } = await client.query({
@@ -82,15 +82,89 @@ export async function getDeleteContainerInput() {
         variables: {}
     })
 
-    console.log('Select the container to delete', data.getAllProjects)
-    /** @type {{slug: string, name: string}[]} */
+    console.log('Select the project to delete', data.getAllProjects)
+    /**
+     * @type {{slug: string, name: string}[]} projectList
+     */
     const projectList = data.getAllProjects
 
     const input = await inquirer.prompt([
         {
             type: 'list',
-            name: 'containerId',
-            message: 'Select the container to delete',
+            name: 'projectSlug',
+            message: 'Select the project to delete',
+            choices: projectList.map((project) => ({
+                name: project.name,
+                value: project.slug
+            }))
+        }
+    ])
+
+    return input
+}
+
+export async function getContainerStartInput() {
+    const client = getGqlClient()
+
+    const { data } = await client.query({
+        query: gql`
+            query GetNotRunningProjects {
+                getNotRunningProjects {
+                    slug
+                    name
+                }
+            }
+        `,
+        variables: {}
+    })
+
+    console.log('Select the project to start', data.getNotRunningProjects)
+    /**
+     * @type {{slug: string, name: string}[]} projectList
+     */
+    const projectList = data.getNotRunningProjects
+
+    const input = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'projectSlug',
+            message: 'Select the project to start',
+            choices: projectList.map((project) => ({
+                name: project.name,
+                value: project.slug
+            }))
+        }
+    ])
+
+    return input
+}
+
+export async function getContainerStopInput() {
+    const client = getGqlClient()
+
+    const { data } = await client.query({
+        query: gql`
+            query GetRunningProjects {
+                getRunningProjects {
+                    slug
+                    name
+                }
+            }
+        `,
+        variables: {}
+    })
+
+    console.log('Select the project to stop', data.getRunningProjects)
+    /**
+     * @type {{slug: string, name: string}[]} projectList
+     */
+    const projectList = data.getRunningProjects
+
+    const input = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'projectSlug',
+            message: 'Select the project to start',
             choices: projectList.map((project) => ({
                 name: project.name,
                 value: project.slug
