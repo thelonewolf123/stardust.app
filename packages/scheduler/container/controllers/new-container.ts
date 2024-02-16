@@ -99,7 +99,7 @@ export class NewContainerStrategy {
                 containerSlug: this.#data.containerSlug
             },
             {
-                $set: { status: 'failed' }
+                $set: { status: 'pending' }
             }
         )
 

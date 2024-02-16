@@ -191,29 +191,45 @@ class InstanceStrategyAws {
         return InstanceId
     }
 
-    async #isInstanceReady(id: string) {
-        const instanceInfo = await ec2Aws.getInstanceStatusById(id)
-        console.log('instanceInfo: ', id, instanceInfo)
-        if (instanceInfo?.Status === 'ok') {
-            await models.Instance.findOneAndUpdate(
-                { instanceId: id },
-                {
-                    status: 'running'
-                }
-            )
-            return true
-        }
-
-        if (this.instanceAttempts > MAX_INSTANCE_STATUS_ATTEMPTS) {
-            await updateInstance(id, {
+    async #markInstanceAsFailed(instanceId: string) {
+        await updateInstance(instanceId, {
+            status: 'failed'
+        })
+        await models.Instance.updateOne(
+            { instanceId },
+            {
                 status: 'failed'
-            })
+            }
+        )
+    }
+
+    async #isInstanceReady(id: string) {
+        try {
+            const instanceInfo = await ec2Aws.getInstanceStatusById(id)
+            console.log('instanceInfo: ', id, instanceInfo)
+            if (instanceInfo?.Status === 'ok') {
+                await models.Instance.findOneAndUpdate(
+                    { instanceId: id },
+                    {
+                        status: 'running'
+                    }
+                )
+                return true
+            }
+
+            if (this.instanceAttempts > MAX_INSTANCE_STATUS_ATTEMPTS) {
+                await this.#markInstanceAsFailed(id)
+                throw new Error(ERROR_CODES.INSTANCE_PROVISION_FAILED)
+            }
+
+            this.instanceAttempts++
+
+            return false
+        } catch (error) {
+            console.error('Error in isInstanceReady:', error)
+            await this.#markInstanceAsFailed(id)
             throw new Error(ERROR_CODES.INSTANCE_PROVISION_FAILED)
         }
-
-        this.instanceAttempts++
-
-        return false
     }
 }
 

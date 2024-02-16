@@ -1,6 +1,6 @@
 import gql from 'graphql-tag'
-import { getGqlClient } from '../client'
-import { getContainerStartInput } from '../prompt'
+import { getGqlClient } from '../client/index.js'
+import { getContainerStartInput } from '../prompt/index.js'
 
 /**
  * @param {String} projectSlug

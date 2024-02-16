@@ -43,7 +43,11 @@ export const setupNewContainerConsumer = async () => {
 
         if (MAX_CONTAINER_DEPLOY_QUEUE_ATTEMPTS <= attempts) {
             console.log(
-                `Max container build attempts reached for ${data.containerSlug}`
+                `Max container deploy attempts reached for ${data.containerSlug}`
+            )
+            await models.Container.updateOne(
+                { containerSlug: data.containerSlug },
+                { $set: { status: 'failed' } }
             )
             return channel.receiver.ack(message)
         } else {
@@ -89,8 +93,14 @@ export const setupDestroyContainerConsumer = async () => {
 
         if (MAX_CONTAINER_TERMINATE_QUEUE_ATTEMPTS <= attempts) {
             console.log(
-                `Max container build attempts reached for ${data.containerId}`
+                `Max container terminate attempts reached for ${data.containerId}`
             )
+
+            await models.Container.updateOne(
+                { containerId: data.containerId },
+                { $set: { status: 'failed' } }
+            )
+
             return channel.receiver.ack(message)
         } else {
             await models.Container.updateOne(
@@ -145,6 +155,12 @@ export const setupBuildContainerConsumer = async () => {
             console.log(
                 `Max container build attempts reached for ${data.containerSlug}`
             )
+
+            await models.Container.updateOne(
+                { containerSlug: data.containerSlug },
+                { $set: { status: 'failed' } }
+            )
+
             return channel.receiver.ack(message)
         } else {
             await models.Container.updateOne(
