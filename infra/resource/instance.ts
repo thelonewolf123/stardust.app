@@ -15,8 +15,7 @@ export const instance = new aws.ec2.Instance(
         vpcSecurityGroupIds: [securityGroup.id.apply((id) => id)],
         tags: {
             Name: awsInfra.EC2_INSTANCE_NAME
-        },
-        userData: ec2UserData
+        }
     },
     {
         replaceOnChanges: ['*']

@@ -1,4 +1,5 @@
 import * as aws from '@pulumi/aws'
+import * as command from '@pulumi/command'
 
 import * as awsInfra from '../../constants/aws-infra'
 import { getArchLinuxAmiId } from '../utils'
@@ -46,11 +47,20 @@ export const archAmi = regionName
         })
     })
 
-export function createAmiFromInstance(instance: aws.ec2.Instance) {
-    const ami = new aws.ec2.AmiFromInstance(awsInfra.EC2_AMI_NAME, {
-        sourceInstanceId: instance.id.apply((id) => id),
-        name: awsInfra.EC2_AMI_NAME
-    })
+export function createAmiFromInstance(
+    instance: aws.ec2.Instance,
+    remoteCommand: command.remote.Command
+) {
+    const ami = new aws.ec2.AmiFromInstance(
+        awsInfra.EC2_AMI_NAME,
+        {
+            sourceInstanceId: instance.id.apply((id) => id),
+            name: awsInfra.EC2_AMI_NAME
+        },
+        {
+            dependsOn: [instance, remoteCommand]
+        }
+    )
     return ami
 }
 

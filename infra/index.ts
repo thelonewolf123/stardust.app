@@ -6,6 +6,7 @@ import { instance } from './resource/instance'
 import { dockerHostPassword, keyPair } from './resource/keystore'
 import { containerBucket } from './resource/s3'
 import { securityGroup } from './resource/securityGroup'
+import { remoteCommand } from './resource/ssh'
 import {
     storeBaseAmiId,
     storeBucketId,
@@ -14,7 +15,7 @@ import {
     storeSecurityGroup
 } from './resource/ssm'
 
-const ami = createAmiFromInstance(instance)
+const ami = createAmiFromInstance(instance, remoteCommand)
 const baseAmiSSM = storeBaseAmiId(ami)
 const keyPairSSM = storeKeyPairName(keyPair)
 const securityGroupSSM = storeSecurityGroup(securityGroup)
