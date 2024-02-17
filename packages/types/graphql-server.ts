@@ -63,6 +63,8 @@ export type Mutation = {
   createContainer: Scalars['Boolean'];
   createProject: Scalars['String'];
   deleteProject: Scalars['Boolean'];
+  getBuildLogs: Array<Scalars['String']>;
+  getLiveLogs: Array<Scalars['String']>;
   refreshProject: Scalars['Boolean'];
   roleBackProject: Scalars['Boolean'];
   signup: Scalars['String'];
@@ -83,6 +85,16 @@ export type MutationCreateProjectArgs = {
 
 export type MutationDeleteProjectArgs = {
   slug: Scalars['String'];
+};
+
+
+export type MutationGetBuildLogsArgs = {
+  containerSlug: Scalars['String'];
+};
+
+
+export type MutationGetLiveLogsArgs = {
+  projectSlug: Scalars['String'];
 };
 
 
@@ -332,6 +344,8 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
   createContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationCreateContainerArgs, 'input'>>;
   createProject?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'input'>>;
   deleteProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteProjectArgs, 'slug'>>;
+  getBuildLogs?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationGetBuildLogsArgs, 'containerSlug'>>;
+  getLiveLogs?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationGetLiveLogsArgs, 'projectSlug'>>;
   refreshProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRefreshProjectArgs, 'input'>>;
   roleBackProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRoleBackProjectArgs, 'slug' | 'version'>>;
   signup?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'email' | 'password' | 'username'>>;
