@@ -22,6 +22,14 @@ class Env {
     public value!: string
 }
 
+class BuildArgs {
+    @prop({ type: String, required: true })
+    public name!: string
+
+    @prop({ type: String, required: true })
+    public value!: string
+}
+
 export class Container {
     @prop({ type: String, required: true })
     public containerSlug!: string
@@ -59,6 +67,9 @@ export class Container {
 
     @prop({ type: Env, required: false }, PropType.ARRAY)
     public env!: Env[]
+
+    @prop({ type: BuildArgs, required: false }, PropType.ARRAY)
+    public buildArgs!: BuildArgs[]
 
     @prop({ type: String, required: false }, PropType.ARRAY)
     public command!: string[]

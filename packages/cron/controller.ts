@@ -116,8 +116,8 @@ export const instanceCleanup = async () => {
     console.log('deletedInstance', deletedInstance)
 
     await Promise.all(
-        deletedInstance.map(async (instanceId) => {
-            return instance.terminateInstance(instanceId)
+        deletedInstance.map((instanceId) => {
+            return instance.terminateInstance(instanceId).catch(handleErrors)
         })
     )
 }

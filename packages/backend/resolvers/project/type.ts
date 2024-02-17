@@ -19,6 +19,19 @@ export const typeDefs = gql`
         metaData: [metaDataInput!]
     }
 
+    input RefreshProjectInput {
+        name: String!
+        description: String!
+        githubUrl: String
+        githubBranch: String
+        dockerPath: String
+        dockerContext: String
+        buildArgs: [BuildArgsInput!]
+        port: Int
+        env: [EnvInput!]
+        metaData: [metaDataInput!]
+    }
+
     type Project {
         slug: String!
         name: String!

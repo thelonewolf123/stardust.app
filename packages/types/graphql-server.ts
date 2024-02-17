@@ -63,6 +63,8 @@ export type Mutation = {
   createContainer: Scalars['Boolean'];
   createProject: Scalars['String'];
   deleteProject: Scalars['Boolean'];
+  refreshProject: Scalars['Boolean'];
+  roleBackProject: Scalars['Boolean'];
   signup: Scalars['String'];
   startContainer: Scalars['Boolean'];
   stopContainer: Scalars['Boolean'];
@@ -81,6 +83,17 @@ export type MutationCreateProjectArgs = {
 
 export type MutationDeleteProjectArgs = {
   slug: Scalars['String'];
+};
+
+
+export type MutationRefreshProjectArgs = {
+  input: RefreshProjectInput;
+};
+
+
+export type MutationRoleBackProjectArgs = {
+  slug: Scalars['String'];
+  version: Scalars['Int'];
 };
 
 
@@ -153,6 +166,19 @@ export type QueryGetProjectBySlugArgs = {
 export type QueryLoginArgs = {
   password: Scalars['String'];
   username: Scalars['String'];
+};
+
+export type RefreshProjectInput = {
+  buildArgs?: InputMaybe<Array<BuildArgsInput>>;
+  description: Scalars['String'];
+  dockerContext?: InputMaybe<Scalars['String']>;
+  dockerPath?: InputMaybe<Scalars['String']>;
+  env?: InputMaybe<Array<EnvInput>>;
+  githubBranch?: InputMaybe<Scalars['String']>;
+  githubUrl?: InputMaybe<Scalars['String']>;
+  metaData?: InputMaybe<Array<MetaDataInput>>;
+  name: Scalars['String'];
+  port?: InputMaybe<Scalars['Int']>;
 };
 
 export type User = {
@@ -257,6 +283,7 @@ export type ResolversTypes = {
   Project: ResolverTypeWrapper<Project>;
   ProjectInput: ProjectInput;
   Query: ResolverTypeWrapper<{}>;
+  RefreshProjectInput: RefreshProjectInput;
   String: ResolverTypeWrapper<Scalars['String']>;
   User: ResolverTypeWrapper<User>;
   metaData: ResolverTypeWrapper<MetaData>;
@@ -277,6 +304,7 @@ export type ResolversParentTypes = {
   Project: Project;
   ProjectInput: ProjectInput;
   Query: {};
+  RefreshProjectInput: RefreshProjectInput;
   String: Scalars['String'];
   User: User;
   metaData: MetaData;
@@ -304,6 +332,8 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
   createContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationCreateContainerArgs, 'input'>>;
   createProject?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'input'>>;
   deleteProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteProjectArgs, 'slug'>>;
+  refreshProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRefreshProjectArgs, 'input'>>;
+  roleBackProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRoleBackProjectArgs, 'slug' | 'version'>>;
   signup?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'email' | 'password' | 'username'>>;
   startContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationStartContainerArgs, 'projectSlug'>>;
   stopContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationStopContainerArgs, 'projectSlug'>>;

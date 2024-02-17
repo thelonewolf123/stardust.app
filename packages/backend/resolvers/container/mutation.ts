@@ -40,7 +40,7 @@ export const mutation: Resolvers['Mutation'] = {
 
         invariant(container, 'Container not found')
         invariant(
-            container.status === 'terminated',
+            container.status !== 'running',
             'Container is already running'
         )
 
