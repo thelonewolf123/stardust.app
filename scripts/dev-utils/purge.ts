@@ -91,8 +91,8 @@ async function purgeMongo() {
             console.log('MongoDB purged')
             mongoose.connection.close()
         })
-        .catch(() => {
-            console.log('MongoDB purged')
+        .catch((err) => {
+            console.log('MongoDB purged', err.message)
             mongoose.connection.close()
         })
 }

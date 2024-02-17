@@ -25,13 +25,29 @@ const redlock = new Redlock([redisRedlock], {
 })
 
 const connectionPromise = redis.connect() // returns a Promise
+const commandMap = new Map<string, string>()
 
-async function runLuaScript(luaScript: string, args: (string | undefined)[]) {
+async function runLuaScript(
+    commandName: string,
+    luaScript: string,
+    args: (string | undefined)[]
+) {
     try {
         // Execute the script with the container slug argument using EVAL
-        const result = await redis.eval(luaScript, {
-            arguments: args.map((arg) => arg || '')
+        // const result = await redis.eval(luaScript, {
+        //     arguments: args.map((arg) => arg || '')
+        // })
+
+        let result = null
+        redisRedlock.defineCommand(commandName, {
+            lua: luaScript
         })
+        commandMap.set(commandName, luaScript)
+        // @ts-ignore
+        const command = redisRedlock[commandName] as undefined | Function
+        if (command) {
+            result = await command(...args)
+        }
         return result as null | string // type casting is not safe,
     } catch (err) {
         console.error('Redis Error:', err)

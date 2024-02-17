@@ -14,7 +14,7 @@ function scheduleContainer(containerSlug: string) {
         /MAX_CONTAINER_PER_INSTANCE/g,
         `${MAX_CONTAINER_PER_INSTANCE}`
     )
-    return redis.runLuaScript(script, [containerSlug])
+    return redis.runLuaScript('scheduleContainer', script, [containerSlug])
 }
 
 function scheduleContainerBuild(args: {
@@ -25,25 +25,32 @@ function scheduleContainerBuild(args: {
         /MAX_CONTAINER_PER_INSTANCE/g,
         `${MAX_CONTAINER_PER_INSTANCE}`
     )
-    return redis.runLuaScript(script, [args.containerSlug, args.projectSlug])
+    return redis.runLuaScript('scheduleContainerBuild', script, [
+        args.containerSlug,
+        args.projectSlug
+    ])
 }
 
 function deleteContainer(containerSlug: string) {
-    return redis.runLuaScript(deleteContainerScript, [containerSlug])
+    return redis.runLuaScript('deleteContainer', deleteContainerScript, [
+        containerSlug
+    ])
 }
 
 function updateContainer(
     containerSlug: string,
     containerData: Partial<PhysicalHostType['containers'][number]>
 ) {
-    return redis.runLuaScript(updateContainerScript, [
+    return redis.runLuaScript('updateContainer', updateContainerScript, [
         containerSlug,
         JSON.stringify(containerData)
     ])
 }
 
 function getInstanceIdByContainerId(containerId: string) {
-    return redis.runLuaScript(getInstanceScript, [containerId])
+    return redis.runLuaScript('getInstanceIdByContainerId', getInstanceScript, [
+        containerId
+    ])
 }
 
 async function getContainer(
@@ -58,10 +65,11 @@ async function getContainer(
           }
 ): Promise<PhysicalHostType['containers'][number] | null> {
     const { containerSlug, projectSlug } = params
-    const result = await redis.runLuaScript(getContainerScript, [
-        containerSlug,
-        projectSlug
-    ])
+    const result = await redis.runLuaScript(
+        'getContainer',
+        getContainerScript,
+        [containerSlug, projectSlug]
+    )
 
     if (result) {
         return JSON.parse(result)
