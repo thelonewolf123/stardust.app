@@ -71,7 +71,10 @@ async function purgeEcr() {
 
     await Promise.all(
         repos.map(async (repo) => {
-            return ecr.deleteEcrRepo(repo.ecrRepo).catch(() => {})
+            const repoName = repo.ecrRepo.split('/').slice(1).join('/') // remove the account id
+            return ecr.deleteEcrRepo({ name: repoName }).catch((e) => {
+                console.log('ECR repo not found', e.message, repoName)
+            })
         })
     )
 
