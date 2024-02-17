@@ -10,6 +10,16 @@ async function getAllPhysicalHosts(): Promise<PhysicalHostType[]> {
         if (host.scheduledForDeletionAt) {
             host.scheduledForDeletionAt = new Date(host.scheduledForDeletionAt)
         }
+        console.log(host.containers)
+        if (!Array.isArray(host.containers)) {
+            host.containers = []
+        }
+        if (host.containers) {
+            host.containers.forEach((container) => {
+                container.updatedAt = new Date(container.updatedAt)
+                container.scheduledAt = new Date(container.scheduledAt)
+            })
+        }
     })
     return result
 }

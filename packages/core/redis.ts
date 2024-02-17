@@ -32,7 +32,6 @@ async function runLuaScript(luaScript: string, args: (string | undefined)[]) {
         const result = await redis.eval(luaScript, {
             arguments: args.map((arg) => arg || '')
         })
-        console.log('Result:', result)
         return result as null | string // type casting is not safe,
     } catch (err) {
         console.error('Redis Error:', err)

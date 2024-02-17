@@ -14,6 +14,7 @@ import {
 import { sleep } from '@core/utils'
 
 import {
+    deleteContainer,
     getInstanceIdByContainerId,
     scheduleContainer,
     scheduleContainerBuild
@@ -235,6 +236,11 @@ class InstanceStrategyAws {
 
     getAuthConfig() {
         return ecr.getAuthorizationToken()
+    }
+
+    async freeContainerInstance(containerSlug: string) {
+        invariant(this.instanceId, ERROR_CODES.INSTANCE_NOT_FOUND)
+        await deleteContainer(containerSlug)
     }
 }
 

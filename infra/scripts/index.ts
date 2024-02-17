@@ -38,10 +38,10 @@ sudo systemctl start docker-proxy.service
 
 # Install aws-cli
 sudo mkdir -p /root/.aws
-sudo echo "[default]
+echo "[default]
 aws_access_key_id=${env.AWS_ACCESS_KEY_ID}
 aws_secret_access_key=${env.AWS_ACCESS_KEY_SECRET}
-region=${env.AWS_REGION}" > /root/.aws/config
+region=${env.AWS_REGION}"  | sudo tee /root/.aws/config
 sudo chmod 600 /root/.aws/config
 
 sudo docker login --username AWS --password $(sudo aws ecr get-login-password --region ${env.AWS_REGION}) ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com

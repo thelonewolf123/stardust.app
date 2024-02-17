@@ -1,7 +1,17 @@
 import { CronJob } from 'cron'
 
-import { instanceCleanup, instanceHealthCheck } from './controller'
+import * as mongodb from '@/backend/database/mongoose'
 
+import redis from '../core/redis'
+import {
+    containerCleanup,
+    instanceCleanup,
+    instanceHealthCheck
+} from './controller'
+
+function setup() {
+    return Promise.all([mongodb.connect(), redis.connect()])
+}
 export default function main() {
     const healthCron = new CronJob({
         onTick: instanceHealthCheck,
@@ -9,12 +19,21 @@ export default function main() {
     })
     healthCron.start()
 
-    const cleanupCron = new CronJob({
+    const instanceCleanupCron = new CronJob({
         onTick: instanceCleanup,
         cronTime: '*/1 * * * *'
     })
-    cleanupCron.start()
+    instanceCleanupCron.start()
+
+    const containerCleanupCron = new CronJob({
+        onTick: containerCleanup,
+        cronTime: '*/1 * * * *'
+    })
+    containerCleanupCron.start()
 }
 
-// start crons
-main()
+setup().then(() => {
+    // start crons
+    console.log('cron started')
+    main()
+})

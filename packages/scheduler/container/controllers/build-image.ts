@@ -128,6 +128,11 @@ export class BuildImageStrategy {
         await pushProgress
     }
 
+    async #freeContainer() {
+        invariant(this.#instance, 'Instance not found')
+        return this.#instance.freeContainerInstance(this.#data.containerSlug)
+    }
+
     #getInstanceForContainerBuild() {
         return this.#instance.getInstanceForContainerBuild({
             containerSlug: this.#data.containerSlug,
@@ -178,6 +183,7 @@ export class BuildImageStrategy {
             .then(() => this.#buildDockerImage())
             .then(() => this.#pushDockerImage())
             .then(() => this.#removeRepo())
+            .then(() => this.#freeContainer())
             .then(() => this.#scheduleNewContainer())
             .catch((err) => this.#handleError(err))
     }

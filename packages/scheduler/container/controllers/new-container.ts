@@ -32,6 +32,7 @@ export class NewContainerStrategy {
     }
 
     async #pullImageIfNeeded() {
+        console.log('Pulling image: ', this.#data.image)
         const imageExists = await this.#checkImageExistence()
         invariant(this.#docker, 'Docker client not initialized')
 
@@ -55,6 +56,7 @@ export class NewContainerStrategy {
     }
 
     async #startContainer() {
+        console.log('Starting container: ', this.#data.containerSlug)
         invariant(this.#docker, 'Docker client not initialized')
         const env = this.#data.env || {}
         const ports = this.#data.ports || []
@@ -81,6 +83,7 @@ export class NewContainerStrategy {
     }
 
     async #updateContainerStatus() {
+        console.log('Updating container status...', this.#data.containerSlug)
         invariant(this.#container, 'Container not initialized')
         const info = await this.#container.inspect()
         await updateContainer(this.#data.containerSlug, {

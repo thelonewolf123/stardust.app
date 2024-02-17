@@ -61,6 +61,10 @@ class InstanceStrategy {
     }> {
         return this.strategy.getAuthConfig()
     }
+
+    freeContainerInstance(containerId: string): Promise<void> {
+        return this.strategy.freeContainerInstance(containerId)
+    }
 }
 
 export default InstanceStrategy
