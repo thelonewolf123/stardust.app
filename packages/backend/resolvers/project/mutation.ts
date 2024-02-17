@@ -113,7 +113,7 @@ export const mutation: Resolvers['Mutation'] = {
             { slug, user: user._id },
             { $set: { current: container } }
         )
-        const currentContainer = getContainerObj(project.current)
+        const currentContainer = project.current
         invariant(currentContainer, 'Current container not found')
 
         const containerSlug = `${slug}:${history.length}`
@@ -169,9 +169,10 @@ export const mutation: Resolvers['Mutation'] = {
         const current = project.current
         invariant(current, 'Current container not found')
 
-        if (!(current instanceof ctx.db.Container)) {
-            invariant(false, 'Current container not found')
-        }
+        invariant(
+            current instanceof ctx.db.Container,
+            'Current container not found'
+        )
 
         const containerSlug = `${slug}:${history.length}`
         const repoWithHash = `${project.ecrRepo}:${history.length}`
