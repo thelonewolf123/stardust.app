@@ -1,10 +1,8 @@
-import { number } from 'zod'
+import { ContainerStatus } from '@/types/graphql-server';
+import { getModelForClass, prop, PropType, Ref } from '@typegoose/typegoose';
 
-import { ContainerStatus } from '@/types/graphql-server'
-import { getModelForClass, prop, PropType, Ref } from '@typegoose/typegoose'
-
-import { InstanceModel } from './instance'
-import { UserModel } from './user'
+import { InstanceModel } from './instance';
+import { UserModel } from './user';
 
 class MetaData {
     @prop({ type: String, required: true })

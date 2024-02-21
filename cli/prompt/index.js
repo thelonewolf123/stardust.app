@@ -166,3 +166,26 @@ export async function getContainerStopInput() {
 
     return input
 }
+
+export async function getInspectProjectInput() {
+    const projectList = await getAllProjects()
+
+    if (projectList.length === 0) {
+        console.log('No projects to inspect'.yellow.bold)
+        process.exit(0)
+    }
+
+    const input = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'projectSlug',
+            message: 'Select the project to inspect',
+            choices: projectList.map((project) => ({
+                name: project.name,
+                value: project.slug
+            }))
+        }
+    ])
+
+    return input
+}

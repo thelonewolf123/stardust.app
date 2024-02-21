@@ -8,6 +8,7 @@ import { deleteProjectHandler } from './container/delete.js'
 import { startContainerHandler } from './container/start.js'
 import { stopContainerHandler } from './container/stop.js'
 import { listProjectsHandler } from './container/list.js'
+import { inspectContainerHandler } from './container/inspect.js'
 
 yargs(hideBin(process.argv))
     .command('login', 'Login to fusion-grid', {}, () => loginCmdHandler())
@@ -21,8 +22,8 @@ yargs(hideBin(process.argv))
     .command('logs', 'Get logs of a container', {}, () => {
         throw new Error('Not implemented')
     })
-    .command('inspect', 'Inspect a container', {}, () => {
-        throw new Error('Not implemented')
-    })
+    .command('inspect', 'Inspect a container', {}, () =>
+        inspectContainerHandler()
+    )
     .demandCommand(1)
     .parse()

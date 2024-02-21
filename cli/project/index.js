@@ -94,3 +94,52 @@ export async function getAllRunningProjects() {
 
     return data.getAllRunningProjects
 }
+
+/**
+ *
+ * @param {string} slug
+ * @returns {Promise<Project>}
+ */
+export async function getProjectBySlug(slug) {
+    const client = getGqlClient()
+
+    const { data } = await client.query({
+        query: gql`
+            query GetProjectBySlug($slug: String!) {
+                getProjectBySlug(slug: $slug) {
+                    createdAt
+                    current {
+                        command
+                        containerSlug
+                        env {
+                            name
+                            value
+                        }
+                        image
+                        metaData {
+                            name
+                            value
+                        }
+                        port
+                        status
+                    }
+                    description
+                    dockerContext
+                    dockerPath
+                    githubBranch
+                    githubUrl
+                    history {
+                        containerSlug
+                    }
+                    slug
+                    name
+                }
+            }
+        `,
+        variables: {
+            slug
+        }
+    })
+
+    return data.getProjectBySlug
+}
