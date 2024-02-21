@@ -2,6 +2,7 @@
 import inquirer from 'inquirer'
 import { getGqlClient } from '../client/index.js'
 import gql from 'graphql-tag'
+import { getAllProjects } from '../project/index.js'
 
 export async function getLoginInput() {
     const input = await inquirer.prompt([
@@ -68,24 +69,7 @@ export async function getNewContainerInput() {
 }
 
 export async function getDeleteProjectInput() {
-    const client = getGqlClient()
-
-    const { data } = await client.query({
-        query: gql`
-            query GetAllProjects {
-                getAllProjects {
-                    slug
-                    name
-                }
-            }
-        `,
-        variables: {}
-    })
-
-    /**
-     * @type {{slug: string, name: string}[]} projectList
-     */
-    const projectList = data.getAllProjects
+    const projectList = await getAllProjects()
 
     if (projectList.length === 0) {
         console.log('No projects to delete'.yellow.bold)
