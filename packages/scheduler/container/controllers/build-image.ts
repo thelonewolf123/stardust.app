@@ -1,16 +1,16 @@
-import Dockerode from 'dockerode'
-import invariant from 'invariant'
-import path from 'path'
-import { v4 } from 'uuid'
-import { z } from 'zod'
+import Dockerode from 'dockerode';
+import invariant from 'invariant';
+import path from 'path';
+import { v4 } from 'uuid';
+import { z } from 'zod';
 
-import models from '@/backend/database'
-import { makeQueryablePromise, sleep } from '@/core/utils'
-import InstanceStrategy from '@/scheduler/library/instance'
-import { deleteContainer, getContainer } from '@/scheduler/lua/container'
-import { ContainerBuildSchema } from '@/schema'
-import { Context, ProviderType } from '@/types'
-import { ERROR_CODES } from '@constants/aws-infra'
+import models from '@/backend/database';
+import { makeQueryablePromise, sleep } from '@/core/utils';
+import InstanceStrategy from '@/scheduler/library/instance';
+import { deleteContainer, getContainer } from '@/scheduler/lua/container';
+import { ContainerBuildSchema } from '@/schema';
+import { Context, ProviderType } from '@/types';
+import { ERROR_CODES } from '@constants/aws-infra';
 
 export class BuildImageStrategy {
     #data: z.infer<typeof ContainerBuildSchema>
@@ -69,7 +69,11 @@ export class BuildImageStrategy {
                 projectSlug: this.#data.projectSlug
             })
 
-            console.log('Container info: ', containerInfo)
+            console.log(
+                'Container info: ',
+                containerInfo,
+                new Date().toISOString()
+            )
 
             if (containerInfo?.containerSlug !== this.#data.containerSlug) {
                 cancelBuild()

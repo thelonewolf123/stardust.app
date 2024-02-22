@@ -1,13 +1,9 @@
-import models from '@/backend/database'
-import { getDockerClient } from '@/core/docker'
-import InstanceStrategy from '@/scheduler/library/instance'
-import { deleteContainer, updateContainer } from '@/scheduler/lua/container'
-import {
-    cleanupInstance,
-    getAllPhysicalHosts,
-    updateInstance
-} from '@/scheduler/lua/instance'
-import { CLOUD_PROVIDER } from '@constants/provider'
+import models from '@/backend/database';
+import { getDockerClient } from '@/core/docker';
+import InstanceStrategy from '@/scheduler/library/instance';
+import { deleteContainer, updateContainer } from '@/scheduler/lua/container';
+import { cleanupInstance, getAllPhysicalHosts, updateInstance } from '@/scheduler/lua/instance';
+import { CLOUD_PROVIDER } from '@constants/provider';
 
 const handleErrors = (err: Error) => {
     console.error(err)

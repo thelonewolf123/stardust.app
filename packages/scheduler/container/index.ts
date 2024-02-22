@@ -1,25 +1,18 @@
-import models from '@/backend/database'
+import models from '@/backend/database';
 import {
-    MAX_CONTAINER_BUILD_QUEUE_ATTEMPTS,
-    MAX_CONTAINER_DEPLOY_QUEUE_ATTEMPTS,
+    MAX_CONTAINER_BUILD_QUEUE_ATTEMPTS, MAX_CONTAINER_DEPLOY_QUEUE_ATTEMPTS,
     MAX_CONTAINER_TERMINATE_QUEUE_ATTEMPTS
-} from '@constants/aws-infra'
-import { CLOUD_PROVIDER } from '@constants/provider'
-import {
-    BUILD_CONTAINER,
-    DESTROY_CONTAINER,
-    NEW_CONTAINER
-} from '@constants/queue'
-import { createQueue, getClient, queueManager } from '@core/queue'
+} from '@constants/aws-infra';
+import { CLOUD_PROVIDER } from '@constants/provider';
+import { BUILD_CONTAINER, DESTROY_CONTAINER, NEW_CONTAINER } from '@constants/queue';
+import { createQueue, getClient, queueManager } from '@core/queue';
 
 import {
-    ContainerBuildSchema,
-    ContainerDestroySchema,
-    ContainerSchedulerSchema
-} from '../../schema'
-import { BuildImageStrategy } from './controllers/build-image'
-import { DestroyContainerStrategy } from './controllers/destroy-container'
-import { NewContainerStrategy } from './controllers/new-container'
+    ContainerBuildSchema, ContainerDestroySchema, ContainerSchedulerSchema
+} from '../../schema';
+import { BuildImageStrategy } from './controllers/build-image';
+import { DestroyContainerStrategy } from './controllers/destroy-container';
+import { NewContainerStrategy } from './controllers/new-container';
 
 export const setupNewContainerConsumer = async () => {
     const { onMessage, channel, cleanup } = await queueManager({
@@ -35,6 +28,7 @@ export const setupNewContainerConsumer = async () => {
         const data = ContainerSchedulerSchema.parse(
             JSON.parse(content.toString())
         )
+        console.log(data)
 
         const container = await models.Container.findOne({
             containerSlug: data.containerSlug
