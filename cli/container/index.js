@@ -54,11 +54,3 @@ export async function deployContainerHandler() {
                 )
         })
 }
-
-// "name": "learning-golangx",
-// "description": "learning-golang - deployment",
-// "dockerContext": ".",
-// "dockerPath": "./Dockerfile",
-// "githubBranch": "main",
-// "port": 8000,
-// "githubUrl": "https://github.com/thelonewolf123/learning-golang"
