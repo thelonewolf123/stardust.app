@@ -1,10 +1,12 @@
+import cors from 'cors'
+import express from 'express'
 import jwt from 'jsonwebtoken'
 
 import { createQueue, getClient } from '@/core/queue'
 import { env } from '@/env'
 import { Context } from '@/types'
 import { ApolloServer } from '@apollo/server'
-import { startStandaloneServer } from '@apollo/server/standalone'
+import { expressMiddleware } from '@apollo/server/express4'
 import {
     BUILD_CONTAINER,
     DESTROY_CONTAINER,
@@ -17,6 +19,8 @@ import { connect } from './database/mongoose'
 import accountSchema from './resolvers/account'
 import containerSchema from './resolvers/container'
 import projectSchema from './resolvers/project'
+
+const app = express()
 
 const server = new ApolloServer({
     typeDefs: mergeTypeDefs([
@@ -63,59 +67,78 @@ server.addPlugin({
     }
 })
 
-startStandaloneServer(server, {
-    listen: { port: parseInt(process.env.PORT || '4000'), path: '/graphql' },
-    context: async ({ req, res }) => {
-        const token = req.headers['x-access-token']
-        const [createContainer, destroyContainer, buildContainer] =
-            await queuePromise
+// Start the server
+const main = async () => {
+    await server.start()
+    app.use(
+        '/graphql',
+        cors<cors.CorsRequest>(),
+        express.json(),
+        expressMiddleware(server, {
+            context: async ({ req, res }) => {
+                const token = req.headers['x-access-token']
+                const [createContainer, destroyContainer, buildContainer] =
+                    await queuePromise
 
-        const ctx: Context = {
-            queue: {
-                createContainer,
-                destroyContainer,
-                buildContainer
-            },
-            db: models,
-            user: null
-        }
+                const ctx: Context = {
+                    queue: {
+                        createContainer,
+                        destroyContainer,
+                        buildContainer
+                    },
+                    db: models,
+                    user: null
+                }
 
-        if (!token) return ctx
+                if (!token) return ctx
 
-        try {
-            const { username, count } = await new Promise<{
-                username: string
-                count: number
-            }>((resolve, reject) => {
-                jwt.verify(`${token}`, env.JWT_SECRET, (err, decoded) => {
-                    if (err) {
-                        return reject(err)
-                    }
+                try {
+                    const { username, count } = await new Promise<{
+                        username: string
+                        count: number
+                    }>((resolve, reject) => {
+                        jwt.verify(
+                            `${token}`,
+                            env.JWT_SECRET,
+                            (err, decoded) => {
+                                if (err) {
+                                    return reject(err)
+                                }
 
-                    if (typeof decoded === 'string')
-                        return reject('Decoded token is string')
+                                if (typeof decoded === 'string')
+                                    return reject('Decoded token is string')
 
-                    if (!decoded || !decoded.exp)
-                        return reject('No decoded token')
+                                if (!decoded || !decoded.exp)
+                                    return reject('No decoded token')
 
-                    if (decoded.exp < Date.now() / 1000)
-                        return reject('Token expired')
+                                if (decoded.exp < Date.now() / 1000)
+                                    return reject('Token expired')
 
-                    resolve(decoded as any)
-                })
-            })
+                                resolve(decoded as any)
+                            }
+                        )
+                    })
 
-            const user = await models.User.findOne({ username }).lean()
+                    const user = await models.User.findOne({ username }).lean()
 
-            ctx.user = user && user.count === count ? (user as any) : null
+                    ctx.user =
+                        user && user.count === count ? (user as any) : null
 
-            return ctx
-        } catch (err) {
-            console.log(err)
-        }
+                    return ctx
+                } catch (err) {
+                    console.log(err)
+                }
 
-        return ctx
-    }
-}).then(({ url }) => {
-    console.log(`🚀 Server listening at: ${url}`)
-})
+                return ctx
+            }
+        })
+    )
+
+    const port = parseInt(process.env.PORT || '4000')
+
+    app.listen(port, () => {
+        console.log(`🚀 Server listening at: ${port}`)
+    })
+}
+
+main()
