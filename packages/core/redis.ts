@@ -3,10 +3,7 @@ import Redlock from 'redlock'
 
 import { env } from '@/env'
 
-const redis = new Redis(env.REDIS_HOST || 'localhost')
-const connectionPromise = redis.connect()
-
-// Optional: Add error handling for the Redis client
+const redis = new Redis()
 
 const redlock = new Redlock([redis], {
     driftFactor: 0.01, // time in ms
@@ -18,40 +15,39 @@ const redlock = new Redlock([redis], {
 const commandMap = new Map<string, true>()
 
 async function runLuaScript(
-    commandName: string,
-    luaScript: string,
+    cmd: string,
+    lua: string,
     args: (string | undefined)[]
 ) {
     try {
-        // Execute the script with the container slug argument using EVAL
-        // const result = await redis.eval(luaScript, {
-        //     arguments: args.map((arg) => arg || '')
-        // })
-
-        let result = null
-        if (!commandMap.has(commandName)) {
-            redis.defineCommand(commandName, {
-                lua: luaScript
+        if (!commandMap.has(cmd)) {
+            redis.defineCommand(cmd, {
+                lua: lua,
+                numberOfKeys: 0
             })
-            commandMap.set(commandName, true)
+            commandMap.set(cmd, true)
         }
 
         // @ts-ignore
-        const command = redis[commandName] as undefined | Function
-        if (command) {
-            result = await command(...args)
+        if (typeof redis[cmd] === 'function') {
+            // @ts-ignore
+            return await redis[cmd](...args)
         }
-        return result as null | string // type casting is not safe,
     } catch (err) {
         console.error('Redis Error:', err)
     }
+
     return null
 }
 
 export default {
     client: redis,
     runLuaScript,
-    connect: () => connectionPromise
+    connect: () =>
+        new Promise((resolve, reject) => {
+            redis.on('ready', resolve)
+            redis.on('error', reject)
+        })
 }
 
 export { redlock }
