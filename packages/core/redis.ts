@@ -1,31 +1,21 @@
 import Redis from 'ioredis'
-import { createClient, RedisClientOptions } from 'redis'
 import Redlock from 'redlock'
 
 import { env } from '@/env'
 
-const config: RedisClientOptions = {
-    url: env.REDIS_HOST || 'localhost'
-    // Add more configuration options here if needed.
-}
-
-const redis = createClient(config)
-const redisRedlock = new Redis(config.url || 'localhost')
+const redis = new Redis(env.REDIS_HOST || 'localhost')
+const connectionPromise = redis.connect()
 
 // Optional: Add error handling for the Redis client
-redis.on('error', (err) => {
-    console.error('Redis Client Error:', err)
-})
 
-const redlock = new Redlock([redisRedlock], {
+const redlock = new Redlock([redis], {
     driftFactor: 0.01, // time in ms
     retryCount: 10,
     retryDelay: 200, // time in ms
     retryJitter: 200 // time in ms
 })
 
-const connectionPromise = redis.connect() // returns a Promise
-const commandMap = new Map<string, string>()
+const commandMap = new Map<string, true>()
 
 async function runLuaScript(
     commandName: string,
@@ -39,12 +29,15 @@ async function runLuaScript(
         // })
 
         let result = null
-        redisRedlock.defineCommand(commandName, {
-            lua: luaScript
-        })
-        commandMap.set(commandName, luaScript)
+        if (!commandMap.has(commandName)) {
+            redis.defineCommand(commandName, {
+                lua: luaScript
+            })
+            commandMap.set(commandName, true)
+        }
+
         // @ts-ignore
-        const command = redisRedlock[commandName] as undefined | Function
+        const command = redis[commandName] as undefined | Function
         if (command) {
             result = await command(...args)
         }
