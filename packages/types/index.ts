@@ -84,3 +84,9 @@ export type InstanceExecArgs = {
     env?: Record<string, string>
     onProgress?: (progress: string) => void
 }
+
+export type PublisherType =
+    | 'BUILD_LOGS'
+    | 'CONTAINER_LOGS'
+    | 'CONTAINER_DEPLOYMENT_LOGS'
+    | 'GIT_CLONE_LOGS'

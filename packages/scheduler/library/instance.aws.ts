@@ -4,7 +4,7 @@ import models from '@/backend/database'
 import ec2Aws from '@/core/aws/ec2.aws'
 import { ecr } from '@/core/aws/ecr.aws'
 import { getDockerClient } from '@/core/docker'
-import { Ec2InstanceType, InstanceExecArgs, PhysicalHostType } from '@/types'
+import { Ec2InstanceType, InstanceExecArgs } from '@/types'
 import {
     ERROR_CODES,
     LOCK,

@@ -5,12 +5,13 @@ import { v4 } from 'uuid'
 import { z } from 'zod'
 
 import models from '@/backend/database'
-import { makeQueryablePromise, sleep } from '@/core/utils'
+import { getPublisherName, makeQueryablePromise, sleep } from '@/core/utils'
 import InstanceStrategy from '@/scheduler/library/instance'
 import { deleteContainer, getContainer } from '@/scheduler/lua/container'
 import { ContainerBuildSchema } from '@/schema'
 import { Context, ProviderType } from '@/types'
 import { ERROR_CODES } from '@constants/aws-infra'
+import { getPublisher } from '@core/redis'
 
 export class BuildImageStrategy {
     #data: z.infer<typeof ContainerBuildSchema>
@@ -33,6 +34,11 @@ export class BuildImageStrategy {
     async #buildDockerImage() {
         invariant(this.#instance, 'Instance not found')
         invariant(this.#docker, 'Docker client not found')
+
+        const buildLogPublisher = getPublisher(
+            'BUILD_LOGS',
+            this.#data.containerSlug
+        )
 
         const buildArgs = Object.entries(this.#data.buildArgs ?? {})
             .map(([key, value]) => {
@@ -60,6 +66,7 @@ export class BuildImageStrategy {
             sudo: true,
             onProgress: (progress) => {
                 console.log('Build progress: ', progress)
+                buildLogPublisher.publish(progress)
             }
         })
 

@@ -12,13 +12,16 @@ import {
     DESTROY_CONTAINER,
     NEW_CONTAINER
 } from '@constants/queue'
+import redis from '@core/redis'
 import { mergeResolvers, mergeTypeDefs } from '@graphql-tools/merge'
 
 import models from './database'
 import { connect } from './database/mongoose'
+import { startLogsPublisher } from './publisher'
 import accountSchema from './resolvers/account'
 import containerSchema from './resolvers/container'
 import projectSchema from './resolvers/project'
+import { handleContainerBuildLogs } from './routes/logger'
 
 const app = express()
 
@@ -45,7 +48,8 @@ server.addPlugin({
     async serverWillStart() {
         console.log('Server starting up!')
         await connect()
-
+        await redis.connect()
+        startLogsPublisher()
         const client = await getClient()
         queuePromise = await Promise.all([
             createQueue(client, {
@@ -133,6 +137,8 @@ const main = async () => {
             }
         })
     )
+
+    app.get('/build/:id/logs', handleContainerBuildLogs)
 
     const port = parseInt(process.env.PORT || '4000')
 

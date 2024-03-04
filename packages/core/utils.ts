@@ -1,6 +1,6 @@
 import invariant from 'invariant'
 
-import { Context, QueryablePromise } from '@/types'
+import { Context, PublisherType, QueryablePromise } from '@/types'
 
 export async function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
@@ -34,4 +34,31 @@ export function makeQueryablePromise<T>(
     )
 
     return queryablePromise
+}
+
+export const getPublisherName = (type: PublisherType, id: string) => {
+    const publishers = {
+        BUILD_LOGS: `logger:build:${id}`,
+        GIT_CLONE_LOGS: `logger:clone${id}`,
+        CONTAINER_DEPLOYMENT_LOGS: `logger:container-deployment:${id}`,
+        CONTAINER_LOGS: `logger:container-logs:${id}`
+    }
+
+    return publishers[type]
+}
+
+export const getPublisherType = (ch: string): PublisherType => {
+    if (ch.includes('clone')) {
+        return 'GIT_CLONE_LOGS'
+    }
+    if (ch.includes('build')) {
+        return 'BUILD_LOGS'
+    }
+    if (ch.includes('container-deployment')) {
+        return 'CONTAINER_DEPLOYMENT_LOGS'
+    }
+    if (ch.includes('container-logs')) {
+        return 'CONTAINER_LOGS'
+    }
+    throw new Error('Unknown publisher type')
 }

@@ -2,6 +2,9 @@ import Redis from 'ioredis'
 import Redlock from 'redlock'
 
 import { env } from '@/env'
+import { PublisherType } from '@/types'
+
+import { getPublisherName } from './utils'
 
 const redis = new Redis(env.REDIS_HOST)
 
@@ -40,18 +43,15 @@ async function runLuaScript(
     return null
 }
 
-const getPublisher = (ch: string) => {
-    return (msg: string) => redis.publish(ch, msg)
+const getPublisher = (type: PublisherType, id: string) => {
+    const channel = getPublisherName(type, id)
+    return { publish: (msg: string) => redis.publish(channel, msg) }
 }
 
 export default {
     client: redis,
     runLuaScript,
-    connect: () =>
-        new Promise((resolve, reject) => {
-            redis.on('ready', resolve)
-            redis.on('error', reject)
-        })
+    connect: () => Promise.resolve(true)
 }
 
 export { redlock, getPublisher }

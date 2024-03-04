@@ -1,6 +1,6 @@
 import { getPublisher } from '../../packages/core/redis'
 
-const publisher = getPublisher('logger:info')
+const publisher = getPublisher('BUILD_LOGS', 'test')
 for (let i = 0; i < 100; i++) {
-    publisher(`Message ${i}`)
+    publisher.publish(`Message ${i}`)
 }
