@@ -189,3 +189,19 @@ export async function getInspectProjectInput() {
 
     return input
 }
+
+export async function getContainerLogsInput() {
+    const projectList = await getAllProjects()
+
+    if (projectList.length === 0) {
+        console.log('No projects to view logs'.yellow.bold)
+        process.exit(0)
+    }
+    return inquirer.prompt([
+        {
+            type: 'input',
+            name: 'containerSlug',
+            message: 'Enter the container slug'
+        }
+    ])
+}
