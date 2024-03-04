@@ -1,6 +1,7 @@
 import gql from 'graphql-tag'
-import { getGqlClient } from '../client/index.js'
+import { BASE_URL, getGqlClient } from '../client/index.js'
 import { getNewContainerInput } from '../prompt/index.js'
+import EventSource from 'eventsource'
 
 /**
  * @typedef {Object} NewContainerInput
@@ -29,6 +30,17 @@ export async function createNewContainer(
     })
 
     return data.createProject
+}
+/**
+ *
+ * @param {String} slug
+ */
+export async function getContainerBuildLogs(slug) {
+    const source = new EventSource(`${BASE_URL}/build/${slug}/logs`)
+    console.log('Building container...')
+    source.addEventListener('message', (event) => {
+        console.log(event.data)
+    })
 }
 
 export async function deployContainerHandler() {

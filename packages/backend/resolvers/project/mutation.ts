@@ -65,7 +65,7 @@ export const mutation: Resolvers['Mutation'] = {
         })
         await project.save()
 
-        return projectSlug
+        return containerSlug
     },
     deleteProject: async (_, { slug }, ctx) => {
         const user = getRegularUser(ctx)
