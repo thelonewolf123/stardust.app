@@ -12,10 +12,17 @@ async function main() {
     //     stream: true
     // })
 
-    const build = await docker.createImage({
-        remote: 'https://github.com/thelonewolf123/learning-golang/blob/main/Dockerfile',
-        host: 'https://github.com'
-    })
+    const build = await docker.buildImage(
+        {
+            context: '/home/ubuntu/learning-golang',
+            src: []
+        },
+        {
+            t: 'golang-testxs',
+            buildargs: {},
+            dockerfile: '/home/ubuntu/learning-golang/Dockerfile'
+        }
+    )
 
     await new Promise((resolve, reject) =>
         docker.modem.followProgress(build, resolve, (event) =>
