@@ -39,8 +39,6 @@ export function makeQueryablePromise<T>(
 export const getPublisherName = (type: PublisherType, id: string) => {
     const publishers = {
         BUILD_LOGS: `logger:build:${id}`,
-        GIT_CLONE_LOGS: `logger:clone${id}`,
-        CONTAINER_DEPLOYMENT_LOGS: `logger:container-deployment:${id}`,
         CONTAINER_LOGS: `logger:container-logs:${id}`
     }
 
@@ -48,14 +46,8 @@ export const getPublisherName = (type: PublisherType, id: string) => {
 }
 
 export const getPublisherType = (ch: string): PublisherType => {
-    if (ch.includes('clone')) {
-        return 'GIT_CLONE_LOGS'
-    }
     if (ch.includes('build')) {
         return 'BUILD_LOGS'
-    }
-    if (ch.includes('container-deployment')) {
-        return 'CONTAINER_DEPLOYMENT_LOGS'
     }
     if (ch.includes('container-logs')) {
         return 'CONTAINER_LOGS'

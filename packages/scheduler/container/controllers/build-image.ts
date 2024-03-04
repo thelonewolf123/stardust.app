@@ -5,7 +5,7 @@ import { v4 } from 'uuid'
 import { z } from 'zod'
 
 import models from '@/backend/database'
-import { getPublisherName, makeQueryablePromise, sleep } from '@/core/utils'
+import { makeQueryablePromise, sleep } from '@/core/utils'
 import InstanceStrategy from '@/scheduler/library/instance'
 import { deleteContainer, getContainer } from '@/scheduler/lua/container'
 import { ContainerBuildSchema } from '@/schema'
@@ -19,6 +19,7 @@ export class BuildImageStrategy {
     #instance: InstanceStrategy
     #docker: Dockerode | null = null
     #githubRepoPath: string
+    #publisher: ReturnType<typeof getPublisher>
 
     constructor(
         data: z.infer<typeof ContainerBuildSchema>,
@@ -29,16 +30,13 @@ export class BuildImageStrategy {
         this.#queue = queue
         this.#instance = new InstanceStrategy(provider)
         this.#githubRepoPath = path.join('/home/ubuntu/', v4())
+        this.#publisher = getPublisher('BUILD_LOGS', this.#data.containerSlug)
     }
 
     async #buildDockerImage() {
         invariant(this.#instance, 'Instance not found')
         invariant(this.#docker, 'Docker client not found')
-
-        const buildLogPublisher = getPublisher(
-            'BUILD_LOGS',
-            this.#data.containerSlug
-        )
+        this.#publisher.publish('Building docker image...')
 
         const buildArgs = Object.entries(this.#data.buildArgs ?? {})
             .map(([key, value]) => {
@@ -66,7 +64,7 @@ export class BuildImageStrategy {
             sudo: true,
             onProgress: (progress) => {
                 console.log('Build progress: ', progress)
-                buildLogPublisher.publish(progress)
+                this.#publisher.publish(progress)
             }
         })
 
@@ -106,10 +104,12 @@ export class BuildImageStrategy {
         )
 
         console.log('Image built successfully.')
+        this.#publisher.publish('Image built successfully.')
     }
 
     async #cloneRepo() {
-        await this.#instance.exec({
+        this.#publisher.publish('Cloning repository...')
+        const [_, progress] = await this.#instance.exec({
             command: 'git',
             args: [
                 'clone',
@@ -120,6 +120,8 @@ export class BuildImageStrategy {
             ],
             sudo: true
         })
+        await progress
+        this.#publisher.publish('Repository cloned successfully.')
     }
 
     async #removeRepo() {
@@ -131,12 +133,14 @@ export class BuildImageStrategy {
 
     async #pushDockerImage() {
         invariant(this.#docker, 'Docker client not found')
+        this.#publisher.publish('Pushing image to ECR...')
         const [, pushProgress] = await this.#instance.exec({
             command: 'docker',
             args: ['push', this.#data.ecrRepo],
             sudo: true
         })
         await pushProgress
+        this.#publisher.publish('Image pushed to ECR successfully.')
     }
 
     async #freeContainer() {
@@ -144,14 +148,17 @@ export class BuildImageStrategy {
         return this.#instance.freeContainerInstance(this.#data.containerSlug)
     }
 
-    #getInstanceForContainerBuild() {
-        return this.#instance.getInstanceForContainerBuild({
+    async #getInstanceForContainerBuild() {
+        this.#publisher.publish('Provisioning instance for container build...')
+        await this.#instance.getInstanceForContainerBuild({
             containerSlug: this.#data.containerSlug,
             projectSlug: this.#data.projectSlug
         })
+        this.#publisher.publish('Instance provisioned successfully.')
     }
 
     async #scheduleNewContainer() {
+        this.#publisher.publish('Scheduling new container...')
         const container = await models.Container.findOne({
             containerSlug: this.#data.containerSlug
         }).lean()
@@ -165,13 +172,14 @@ export class BuildImageStrategy {
             metaData[name] = value
         })
 
-        return this.#queue.publish({
+        await this.#queue.publish({
             containerSlug: this.#data.containerSlug,
             ports: container?.port ? [container?.port] : [],
             command: container?.command || [],
             env: env,
             image: this.#data.ecrRepo
         })
+        this.#publisher.publish('New container scheduled successfully.')
     }
 
     async #handleError(error: Error) {

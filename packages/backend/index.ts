@@ -21,7 +21,7 @@ import { startLogsPublisher } from './publisher'
 import accountSchema from './resolvers/account'
 import containerSchema from './resolvers/container'
 import projectSchema from './resolvers/project'
-import { handleContainerBuildLogs } from './routes/logger'
+import { getLogHandler } from './routes/logs'
 
 const app = express()
 
@@ -138,7 +138,8 @@ const main = async () => {
         })
     )
 
-    app.get('/build/:id/logs', handleContainerBuildLogs)
+    app.get('/build/:id/logs', getLogHandler('build'))
+    app.get('/container/:id/logs', getLogHandler('container'))
 
     const port = parseInt(process.env.PORT || '4000')
 

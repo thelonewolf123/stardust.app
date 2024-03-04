@@ -3,6 +3,7 @@ import invariant from 'invariant'
 import { z } from 'zod'
 
 import models from '@/backend/database'
+import { getPublisher } from '@/core/redis'
 import InstanceStrategy from '@/scheduler/library/instance'
 import { deleteContainer, updateContainer } from '@/scheduler/lua/container'
 import { ContainerSchedulerSchema } from '@/schema'
@@ -14,6 +15,7 @@ export class NewContainerStrategy {
     #instance: InstanceStrategy
     #docker: Dockerode | null = null
     #container: Dockerode.Container | null = null
+    #publisher: ReturnType<typeof getPublisher>
 
     constructor(
         data: z.infer<typeof ContainerSchedulerSchema>,
@@ -21,6 +23,7 @@ export class NewContainerStrategy {
     ) {
         this.#data = data
         this.#instance = new InstanceStrategy(provider)
+        this.#publisher = getPublisher('BUILD_LOGS', this.#data.containerSlug)
     }
 
     async #checkImageExistence() {
@@ -37,6 +40,7 @@ export class NewContainerStrategy {
         invariant(this.#docker, 'Docker client not initialized')
 
         if (!imageExists) {
+            this.#publisher.publish('Pulling image...')
             const authconfig = await this.#instance.getAuthConfig()
             const stream = await this.#docker.pull(this.#data.image, {
                 authconfig
@@ -52,12 +56,15 @@ export class NewContainerStrategy {
                     }
                 })
             })
+            this.#publisher.publish('Image pulled successfully')
         }
     }
 
     async #startContainer() {
         console.log('Starting container: ', this.#data.containerSlug)
         invariant(this.#docker, 'Docker client not initialized')
+        this.#publisher.publish('Starting container...')
+
         const env = this.#data.env || {}
         const ports = this.#data.ports || []
 
@@ -80,6 +87,7 @@ export class NewContainerStrategy {
         })
 
         await this.#container.start()
+        this.#publisher.publish('Container started successfully')
     }
 
     async #updateContainerStatus() {

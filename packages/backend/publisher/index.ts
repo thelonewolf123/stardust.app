@@ -21,12 +21,6 @@ function handleMessage(pattern: string, channel: string, message: string) {
         case 'CONTAINER_LOGS':
             handleContainerLogMessage(message, id)
             break
-        case 'CONTAINER_DEPLOYMENT_LOGS':
-            handleContainerDeploymentLogMessage(message, id)
-            break
-        case 'GIT_CLONE_LOGS':
-            handleCloneLogMessage(message, id)
-            break
         default:
             console.log('Unknown type', type)
     }
@@ -40,16 +34,6 @@ function handleBuildLogMessage(message: string, id: string) {
 function handleContainerLogMessage(message: string, id: string) {
     console.log('Container log message', message)
     LOGS_EMITTER.emit('container', { message, id })
-}
-
-function handleContainerDeploymentLogMessage(message: string, id: string) {
-    console.log('Container deployment log message', message)
-    LOGS_EMITTER.emit('deployment', { message, id })
-}
-
-function handleCloneLogMessage(message: string, id: string) {
-    console.log('Clone log message', message)
-    LOGS_EMITTER.emit('clone', { message, id })
 }
 
 export async function startLogsPublisher() {
