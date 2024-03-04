@@ -149,6 +149,7 @@ async function execCommand(params: InstanceExecArgs) {
                 stream
                     .on('data', (data: Buffer) => {
                         output += data.toString()
+                        params.onProgress?.(data.toString())
                     })
                     .on('end', () => {
                         resolve(output)

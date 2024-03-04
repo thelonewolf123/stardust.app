@@ -1,12 +1,6 @@
-import redis from '../../packages/core/redis'
+import { getPublisher } from '../../packages/core/redis'
 
-redis
-    .runLuaScript(
-        'getPhysicalHosts',
-        'return redis.call("GET", "physicalHost")',
-        []
-    )
-    .then((result) => {
-        console.log(result)
-        process.exit(0)
-    })
+const publisher = getPublisher('logger:info')
+for (let i = 0; i < 100; i++) {
+    publisher(`Message ${i}`)
+}

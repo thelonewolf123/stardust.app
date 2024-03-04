@@ -30,79 +30,15 @@ export class BuildImageStrategy {
         this.#githubRepoPath = path.join('/home/ubuntu/', v4())
     }
 
-    // async #buildDockerImage() {
-    //     invariant(this.#instance, 'Instance not found')
-    //     invariant(this.#docker, 'Docker client not found')
-
-    //     const buildArgs = Object.entries(this.#data.buildArgs ?? {})
-    //         .map(([key, value]) => {
-    //             return ['--build-arg', `${key}=${value}`]
-    //         })
-    //         .flat()
-
-    //     const dockerPathArgs = []
-
-    //     if (this.#data.dockerPath) {
-    //         dockerPathArgs.push('-f', this.#data.dockerPath)
-    //     }
-
-    //     const [cancelBuild, buildProgress] = await this.#instance.exec({
-    //         command: 'docker',
-    //         args: [
-    //             'build',
-    //             '-t',
-    //             this.#data.ecrRepo,
-    //             ...dockerPathArgs,
-    //             ...buildArgs,
-    //             '.'
-    //         ],
-    //         cwd: this.#githubRepoPath,
-    //         sudo: true
-    //     })
-
-    //     // await buildProgress
-
-    //     const promiseQuery = makeQueryablePromise(buildProgress)
-
-    //     while (true) {
-    //         const containerInfo = await getContainer({
-    //             projectSlug: this.#data.projectSlug
-    //         })
-
-    //         console.log(
-    //             'Container info: ',
-    //             containerInfo,
-    //             new Date().toISOString()
-    //         )
-
-    //         if (containerInfo?.containerSlug !== this.#data.containerSlug) {
-    //             cancelBuild()
-    //             throw new Error('Container build failed')
-    //         }
-
-    //         if (promiseQuery.isFulfilled) break
-
-    //         await sleep(1000)
-    //     }
-
-    //     if (promiseQuery.isRejected) throw new Error('Container build failed')
-
-    //     const logs = await buildProgress
-    //     await models.Container.updateOne(
-    //         { containerSlug: this.#data.containerSlug },
-    //         {
-    //             $set: {
-    //                 containerBuildLogs: logs.split('\n')
-    //             }
-    //         }
-    //     )
-
-    //     console.log('Image built successfully.')
-    // }
-
     async #buildDockerImage() {
         invariant(this.#instance, 'Instance not found')
         invariant(this.#docker, 'Docker client not found')
+
+        const buildArgs = Object.entries(this.#data.buildArgs ?? {})
+            .map(([key, value]) => {
+                return ['--build-arg', `${key}=${value}`]
+            })
+            .flat()
 
         const dockerPathArgs = []
 
@@ -110,34 +46,59 @@ export class BuildImageStrategy {
             dockerPathArgs.push('-f', this.#data.dockerPath)
         }
 
-        const stream = await this.#docker.buildImage(
+        const [cancelBuild, buildProgress] = await this.#instance.exec({
+            command: 'docker',
+            args: [
+                'build',
+                '-t',
+                this.#data.ecrRepo,
+                ...dockerPathArgs,
+                ...buildArgs,
+                '.'
+            ],
+            cwd: this.#githubRepoPath,
+            sudo: true,
+            onProgress: (progress) => {
+                console.log('Build progress: ', progress)
+            }
+        })
+
+        const promiseQuery = makeQueryablePromise(buildProgress)
+
+        while (true) {
+            const containerInfo = await getContainer({
+                projectSlug: this.#data.projectSlug
+            })
+
+            console.log(
+                'Container info: ',
+                containerInfo,
+                new Date().toISOString()
+            )
+
+            if (containerInfo?.containerSlug !== this.#data.containerSlug) {
+                cancelBuild()
+                throw new Error('Container build failed')
+            }
+
+            if (promiseQuery.isFulfilled) break
+
+            await sleep(1000)
+        }
+
+        if (promiseQuery.isRejected) throw new Error('Container build failed')
+
+        const logs = await buildProgress
+        await models.Container.updateOne(
+            { containerSlug: this.#data.containerSlug },
             {
-                context: this.#githubRepoPath,
-                src: [this.#githubRepoPath]
-            },
-            {
-                t: this.#data.ecrRepo,
-                buildargs: this.#data.buildArgs ?? {},
-                dockerfile: this.#data.dockerPath
+                $set: {
+                    containerBuildLogs: logs.split('\n')
+                }
             }
         )
 
-        return new Promise((resolve, reject) => {
-            invariant(this.#docker, 'Docker client not found')
-            this.#docker.modem.followProgress(
-                stream,
-                (err, res) => {
-                    if (err) {
-                        reject(err)
-                    } else {
-                        resolve(res)
-                    }
-                },
-                (result) => {
-                    console.log('Log -> ', result)
-                }
-            )
-        })
+        console.log('Image built successfully.')
     }
 
     async #cloneRepo() {
@@ -152,7 +113,6 @@ export class BuildImageStrategy {
             ],
             sudo: true
         })
-        await sleep(45_000)
     }
 
     async #removeRepo() {

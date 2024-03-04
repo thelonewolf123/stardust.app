@@ -82,4 +82,5 @@ export type InstanceExecArgs = {
     ipAddress?: string
     sudo?: boolean
     env?: Record<string, string>
+    onProgress?: (progress: string) => void
 }
