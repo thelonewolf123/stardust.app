@@ -3,7 +3,7 @@ import Redlock from 'redlock'
 
 import { env } from '@/env'
 
-const redis = new Redis()
+const redis = new Redis(env.RABBITMQ_URL)
 
 const redlock = new Redlock([redis], {
     driftFactor: 0.01, // time in ms
@@ -40,6 +40,12 @@ async function runLuaScript(
     return null
 }
 
+const getPublisher = (ch: string) => {
+    return (msg: string) => {
+        redis.publish(ch, msg)
+    }
+}
+
 export default {
     client: redis,
     runLuaScript,
@@ -50,4 +56,4 @@ export default {
         })
 }
 
-export { redlock }
+export { redlock, getPublisher }

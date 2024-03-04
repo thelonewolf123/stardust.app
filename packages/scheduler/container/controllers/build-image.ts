@@ -1,16 +1,16 @@
-import Dockerode from 'dockerode';
-import invariant from 'invariant';
-import path from 'path';
-import { v4 } from 'uuid';
-import { z } from 'zod';
+import Dockerode from 'dockerode'
+import invariant from 'invariant'
+import path from 'path'
+import { v4 } from 'uuid'
+import { z } from 'zod'
 
-import models from '@/backend/database';
-import { makeQueryablePromise, sleep } from '@/core/utils';
-import InstanceStrategy from '@/scheduler/library/instance';
-import { deleteContainer, getContainer } from '@/scheduler/lua/container';
-import { ContainerBuildSchema } from '@/schema';
-import { Context, ProviderType } from '@/types';
-import { ERROR_CODES } from '@constants/aws-infra';
+import models from '@/backend/database'
+import { makeQueryablePromise, sleep } from '@/core/utils'
+import InstanceStrategy from '@/scheduler/library/instance'
+import { deleteContainer, getContainer } from '@/scheduler/lua/container'
+import { ContainerBuildSchema } from '@/schema'
+import { Context, ProviderType } from '@/types'
+import { ERROR_CODES } from '@constants/aws-infra'
 
 export class BuildImageStrategy {
     #data: z.infer<typeof ContainerBuildSchema>
@@ -30,15 +30,79 @@ export class BuildImageStrategy {
         this.#githubRepoPath = path.join('/home/ubuntu/', v4())
     }
 
+    // async #buildDockerImage() {
+    //     invariant(this.#instance, 'Instance not found')
+    //     invariant(this.#docker, 'Docker client not found')
+
+    //     const buildArgs = Object.entries(this.#data.buildArgs ?? {})
+    //         .map(([key, value]) => {
+    //             return ['--build-arg', `${key}=${value}`]
+    //         })
+    //         .flat()
+
+    //     const dockerPathArgs = []
+
+    //     if (this.#data.dockerPath) {
+    //         dockerPathArgs.push('-f', this.#data.dockerPath)
+    //     }
+
+    //     const [cancelBuild, buildProgress] = await this.#instance.exec({
+    //         command: 'docker',
+    //         args: [
+    //             'build',
+    //             '-t',
+    //             this.#data.ecrRepo,
+    //             ...dockerPathArgs,
+    //             ...buildArgs,
+    //             '.'
+    //         ],
+    //         cwd: this.#githubRepoPath,
+    //         sudo: true
+    //     })
+
+    //     // await buildProgress
+
+    //     const promiseQuery = makeQueryablePromise(buildProgress)
+
+    //     while (true) {
+    //         const containerInfo = await getContainer({
+    //             projectSlug: this.#data.projectSlug
+    //         })
+
+    //         console.log(
+    //             'Container info: ',
+    //             containerInfo,
+    //             new Date().toISOString()
+    //         )
+
+    //         if (containerInfo?.containerSlug !== this.#data.containerSlug) {
+    //             cancelBuild()
+    //             throw new Error('Container build failed')
+    //         }
+
+    //         if (promiseQuery.isFulfilled) break
+
+    //         await sleep(1000)
+    //     }
+
+    //     if (promiseQuery.isRejected) throw new Error('Container build failed')
+
+    //     const logs = await buildProgress
+    //     await models.Container.updateOne(
+    //         { containerSlug: this.#data.containerSlug },
+    //         {
+    //             $set: {
+    //                 containerBuildLogs: logs.split('\n')
+    //             }
+    //         }
+    //     )
+
+    //     console.log('Image built successfully.')
+    // }
+
     async #buildDockerImage() {
         invariant(this.#instance, 'Instance not found')
         invariant(this.#docker, 'Docker client not found')
-
-        const buildArgs = Object.entries(this.#data.buildArgs ?? {})
-            .map(([key, value]) => {
-                return ['--build-arg', `${key}=${value}`]
-            })
-            .flat()
 
         const dockerPathArgs = []
 
@@ -46,58 +110,34 @@ export class BuildImageStrategy {
             dockerPathArgs.push('-f', this.#data.dockerPath)
         }
 
-        const [cancelBuild, buildProgress] = await this.#instance.exec({
-            command: 'docker',
-            args: [
-                'build',
-                '-t',
-                this.#data.ecrRepo,
-                ...dockerPathArgs,
-                ...buildArgs,
-                '.'
-            ],
-            cwd: this.#githubRepoPath,
-            sudo: true
-        })
-
-        // await buildProgress
-
-        const promiseQuery = makeQueryablePromise(buildProgress)
-
-        while (true) {
-            const containerInfo = await getContainer({
-                projectSlug: this.#data.projectSlug
-            })
-
-            console.log(
-                'Container info: ',
-                containerInfo,
-                new Date().toISOString()
-            )
-
-            if (containerInfo?.containerSlug !== this.#data.containerSlug) {
-                cancelBuild()
-                throw new Error('Container build failed')
-            }
-
-            if (promiseQuery.isFulfilled) break
-
-            await sleep(1000)
-        }
-
-        if (promiseQuery.isRejected) throw new Error('Container build failed')
-
-        const logs = await buildProgress
-        await models.Container.updateOne(
-            { containerSlug: this.#data.containerSlug },
+        const stream = await this.#docker.buildImage(
             {
-                $set: {
-                    containerBuildLogs: logs.split('\n')
-                }
+                context: this.#githubRepoPath,
+                src: [this.#githubRepoPath]
+            },
+            {
+                t: this.#data.ecrRepo,
+                buildargs: this.#data.buildArgs ?? {},
+                dockerfile: this.#data.dockerPath
             }
         )
 
-        console.log('Image built successfully.')
+        return new Promise((resolve, reject) => {
+            invariant(this.#docker, 'Docker client not found')
+            this.#docker.modem.followProgress(
+                stream,
+                (err, res) => {
+                    if (err) {
+                        reject(err)
+                    } else {
+                        resolve(res)
+                    }
+                },
+                (result) => {
+                    console.log('Log -> ', result)
+                }
+            )
+        })
     }
 
     async #cloneRepo() {

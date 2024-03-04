@@ -43,7 +43,7 @@ async function purgeQueue() {
 async function purgeRedis() {
     await redis.connect()
     // purge all keys
-    await redis.client.flushDb()
+    await redis.client.flushdb()
     await redis.client.quit()
     console.log('Redis purged')
 }
