@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 import EventSource from 'eventsource'
-import { getContainerLogsInput } from '../prompt'
-import { BASE_URL } from '../client'
+import { getContainerLogsInput } from '../prompt/index.js'
+import { BASE_URL } from '../client/index.js'
 
 /**
  *

@@ -41,6 +41,14 @@ export async function getContainerBuildLogs(slug) {
     source.addEventListener('message', (event) => {
         console.log(event.data)
     })
+
+    return new Promise((resolve, reject) => {
+        source.addEventListener('error', (event) => {
+            source.close()
+            if (event.status === 200) resolve(event.data)
+            else reject(event)
+        })
+    })
 }
 
 export async function deployContainerHandler() {
@@ -54,8 +62,8 @@ export async function deployContainerHandler() {
             )
             return getContainerBuildLogs(data)
         })
-        .then(() => {
-            process.exit(0)
+        .then((data) => {
+            console.log('Container built successfully'.green.bold, data)
         })
         .catch((err) => {
             if (err.response)

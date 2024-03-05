@@ -4,8 +4,6 @@ RUN apk update
 RUN apk add --no-cache nodejs npm
 RUN mkdir /app
 WORKDIR /app
-ARG REDIS_HOST
-ENV REDIS_HOST=$REDIS_HOST
 COPY proxy.js .
 COPY package.json .
 RUN npm i
