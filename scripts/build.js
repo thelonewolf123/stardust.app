@@ -14,7 +14,9 @@ const entries = {
     backend: path.resolve(__dirname, '../packages/backend/index.ts'),
     lambda: path.resolve(__dirname, '../packages/lambda/index.ts'),
     cron: path.resolve(__dirname, '../packages/cron/index.ts'),
-    scheduler: path.resolve(__dirname, '../packages/scheduler/index.ts')
+    scheduler: path.resolve(__dirname, '../packages/scheduler/index.ts'),
+    logger: path.resolve(__dirname, '../packages/logger/index.ts'),
+    proxy: path.resolve(__dirname, '../packages/proxy/index.ts')
 }
 
 Object.entries(entries).map((value) => {

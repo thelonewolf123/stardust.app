@@ -2,7 +2,7 @@ import * as awsx from '@pulumi/awsx'
 
 import { REPLICAS } from '../../constants/aws-infra'
 import { getEnvArray } from '../utils'
-import { webListener } from './alb'
+import { proxyListener, webListener } from './alb'
 import { cluster } from './ecs'
 import { appImage } from './image'
 
@@ -51,4 +51,33 @@ export const cronService = new awsx.classic.ecs.FargateService('cron-svc', {
         }
     },
     desiredCount: REPLICAS.CRON // 1 is the default
+})
+
+export const logsService = new awsx.classic.ecs.FargateService('logs-svc', {
+    cluster,
+    taskDefinitionArgs: {
+        container: {
+            image: appImage.imageUri,
+            command: ['node', 'dist/logger.bundle.js'],
+            cpu: 256 /*25% of 1024*/,
+            memory: 512 /*MB*/,
+            environment: getEnvArray()
+        }
+    },
+    desiredCount: REPLICAS.LOGS // 1 is the default
+})
+
+export const proxyService = new awsx.classic.ecs.FargateService('proxy-svc', {
+    cluster,
+    taskDefinitionArgs: {
+        container: {
+            image: appImage.imageUri,
+            command: ['node', 'dist/proxy.bundle.js'],
+            cpu: 256 /*25% of 1024*/,
+            memory: 512 /*MB*/,
+            environment: getEnvArray(),
+            portMappings: [proxyListener]
+        }
+    },
+    desiredCount: REPLICAS.PROXY
 })

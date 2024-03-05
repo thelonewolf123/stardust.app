@@ -11,3 +11,8 @@ export const webListener = alb.createListener('web', {
     port: 80,
     external: true
 })
+
+export const proxyListener = alb.createListener('proxy', {
+    port: 80,
+    external: true
+})
