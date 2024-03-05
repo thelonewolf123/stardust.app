@@ -68,12 +68,14 @@ setInterval(() => {
 
         if (newContainers.length > 0) {
             containersList.push(...newContainers)
-            newContainers.forEach((container) => {
-                const containerLogs = docker.getContainer(container.Id).logs({
-                    follow: true,
-                    stdout: true,
-                    stderr: true
-                })
+            newContainers.forEach(async (container) => {
+                const containerLogs = await docker
+                    .getContainer(container.Id)
+                    .logs({
+                        follow: true,
+                        stdout: true,
+                        stderr: true
+                    })
 
                 containerLogs.on('data', (chunk) => {
                     redisClient.publish(
