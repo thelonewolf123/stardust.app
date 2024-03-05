@@ -52,6 +52,10 @@ export async function deployContainerHandler() {
                 'Container deployment scheduled successfully'.green.bold,
                 data
             )
+            return getContainerBuildLogs(data)
+        })
+        .then(() => {
+            process.exit(0)
         })
         .catch((err) => {
             if (err.response)

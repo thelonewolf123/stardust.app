@@ -12,7 +12,7 @@ sudo git checkout ${env.BRANCH}
 sudo git pull
 
 # Build the docker proxy
-sudo docker build -f infra/docker/Dockerfile.proxy -t docker.io/thelonewolf123/docker-proxy docker.proxy/
+sudo docker build -f infra/docker/Dockerfile.proxy --build-args REDIS_HOST=${env.REDIS_HOST} -t docker.io/thelonewolf123/docker-proxy docker.proxy/
 sudo rm -rf /home/ubuntu/app
 
 # Create a systemd service for the proxy

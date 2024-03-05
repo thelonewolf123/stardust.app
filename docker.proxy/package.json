@@ -4,6 +4,8 @@
   "main": "proxy.js",
   "license": "MIT",
   "dependencies": {
-    "http-proxy": "^1.18.1"
+    "dockerode": "^4.0.2",
+    "http-proxy": "^1.18.1",
+    "ioredis": "^5.3.2"
   }
 }

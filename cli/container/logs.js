@@ -32,7 +32,7 @@ export async function getContainerLogsHandler() {
     getContainerLogsInput()
         .then((input) => getContainerLogs(input.containerSlug))
         .then(() => {
-            process.exit(0)
+            console.log('Container logs fetched successfully'.green.bold)
         })
         .catch((err) => {
             if (err.response)
