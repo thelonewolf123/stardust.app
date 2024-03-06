@@ -105,7 +105,7 @@ async function terminateInstance(instanceId: string) {
 async function execCommand(params: InstanceExecArgs) {
     const key = SSM_PARAMETER_KEYS.ec2PrivateKey
     const privateKey = await ssmAws.getParameter(key, true)
-    let fullCommand = `${params.command} ${params.args.join(' ')}`
+    let fullCommand = `${params.command} ${params.args.map((arg) => encodeURIComponent(arg)).join(' ')}`
     const ssh = new SSHClient()
 
     if (params.sudo) {

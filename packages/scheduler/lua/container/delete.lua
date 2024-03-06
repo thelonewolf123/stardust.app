@@ -1,12 +1,12 @@
 -- Arguments passed from Node.js
-local containerSlug = ARGV[1]  -- The slug identifier for the container
+local containerSlug = ARGV[1] -- The slug identifier for the container
 
 -- Get the current 'physicalHost' data from Redis
 local data = redis.call('GET', 'physicalHost')
 
 -- Check if 'physicalHost' data exists in Redis
 if not data then
-    return nil  -- If it doesn't exist, return nil as there are no containers to remove
+    return nil -- If it doesn't exist, return nil as there are no containers to remove
 end
 
 -- Decode the JSON data into a Lua table
@@ -28,7 +28,7 @@ local instanceIndex, containerIndex = findContainerIndex()
 
 -- Check if the container was found
 if not instanceIndex or not containerIndex then
-    return nil  -- If it was not found, return nil as we cannot remove a non-existent container
+    return nil -- If it was not found, return nil as we cannot remove a non-existent container
 end
 
 -- Remove the container from the 'containers' array

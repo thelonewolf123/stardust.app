@@ -2,6 +2,7 @@ import gql from 'graphql-tag'
 import invariant from 'invariant'
 
 import { Resolvers } from '@/types/graphql-server'
+import { getRegularUser } from '@/core/utils'
 
 export const query: Resolvers['Query'] = {
     async getContainerInfo(_, { slug }, ctx) {
@@ -17,6 +18,17 @@ export const query: Resolvers['Query'] = {
             createdBy: user
         }).lean()
         return containers
+    },
+    async getBuildLogs(_, { containerSlug }, ctx) {
+        getRegularUser(ctx)
+        const container = await ctx.db.Container.findOne({
+            containerSlug,
+            createdBy: ctx.user?._id
+        }).lean()
+
+        invariant(container, 'Container not found')
+
+        return container.containerBuildLogs
     }
 }
 
@@ -24,5 +36,6 @@ export const queryType = gql`
     type Query {
         getContainerInfo(slug: String!): Container!
         getAllContainers: [Container!]!
+        getBuildLogs(containerSlug: String!): [String!]!
     }
 `

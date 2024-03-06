@@ -76,41 +76,11 @@ export const mutation: Resolvers['Mutation'] = {
 
         invariant(container, 'Container not found')
 
-        await ctx.db.Container.updateOne(
-            {
-                _id: container._id
-            },
-            {
-                status: 'terminated'
-            }
-        )
-
         ctx.queue.destroyContainer.publish({
-            containerId: container.containerId
+            containerId: container.containerId,
+            containerSlug: container.containerSlug
         })
         return true
-    },
-    async getLiveLogs(_, { projectSlug }, ctx) {
-        getRegularUser(ctx)
-        const container = await ctx.db.Container.findOne({
-            containerSlug: projectSlug,
-            createdBy: ctx.user?._id
-        }).lean()
-
-        invariant(container, 'Container not found')
-
-        return []
-    },
-    async getBuildLogs(_, { containerSlug }, ctx) {
-        getRegularUser(ctx)
-        const container = await ctx.db.Container.findOne({
-            containerSlug,
-            createdBy: ctx.user?._id
-        }).lean()
-
-        invariant(container, 'Container not found')
-
-        return container.containerBuildLogs
     }
 }
 
@@ -119,7 +89,5 @@ export const mutationType = gql`
         createContainer(input: ContainerInput!): Boolean!
         startContainer(projectSlug: String!): Boolean!
         stopContainer(projectSlug: String!): Boolean!
-        getLiveLogs(projectSlug: String!): [String!]!
-        getBuildLogs(containerSlug: String!): [String!]!
     }
 `

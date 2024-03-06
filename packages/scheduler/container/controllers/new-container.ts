@@ -101,7 +101,13 @@ export class NewContainerStrategy {
 
         await models.Container.updateOne(
             { containerSlug: this.#data.containerSlug },
-            { $set: { containerId: info.Id, status: 'running' } }
+            {
+                $set: {
+                    containerId: info.Id,
+                    status: 'running',
+                    updatedAt: new Date()
+                }
+            }
         )
     }
 
@@ -113,7 +119,7 @@ export class NewContainerStrategy {
                 containerSlug: this.#data.containerSlug
             },
             {
-                $set: { status: 'pending' }
+                $set: { status: 'pending', updatedAt: new Date() }
             }
         )
 

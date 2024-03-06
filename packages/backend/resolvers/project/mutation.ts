@@ -87,7 +87,8 @@ export const mutation: Resolvers['Mutation'] = {
 
         if (current && current.containerId) {
             ctx.queue.destroyContainer.publish({
-                containerId: current.containerId
+                containerId: current.containerId,
+                containerSlug: current.containerSlug
             })
         }
 
@@ -111,7 +112,7 @@ export const mutation: Resolvers['Mutation'] = {
 
         await ctx.db.Project.updateOne(
             { slug, user: user._id },
-            { $set: { current: container } }
+            { $set: { current: container, updatedAt: new Date() } }
         )
         const currentContainer = project.current
         invariant(currentContainer, 'Current container not found')
@@ -124,7 +125,8 @@ export const mutation: Resolvers['Mutation'] = {
         )
 
         ctx.queue.destroyContainer.publish({
-            containerId: currentContainer.containerId
+            containerId: currentContainer.containerId,
+            containerSlug: currentContainer.containerSlug
         })
 
         invariant(container instanceof ctx.db.Container, 'Container not found')
@@ -147,10 +149,13 @@ export const mutation: Resolvers['Mutation'] = {
 
         ctx.queue.createContainer.publish({
             containerSlug: containerSlug,
-            env: container.env.reduce((acc, { name, value }) => {
-                acc[name] = value
-                return acc
-            }, {} as Record<string, string>),
+            env: container.env.reduce(
+                (acc, { name, value }) => {
+                    acc[name] = value
+                    return acc
+                },
+                {} as Record<string, string>
+            ),
             image: container.image,
             ports: container.port ? [container.port] : []
         })
@@ -186,7 +191,8 @@ export const mutation: Resolvers['Mutation'] = {
         )
 
         ctx.queue.destroyContainer.publish({
-            containerId: current.containerId
+            containerId: current.containerId,
+            containerSlug: current.containerSlug
         })
 
         const newContainer = new ctx.db.Container({

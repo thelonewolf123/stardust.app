@@ -63,8 +63,6 @@ export type Mutation = {
   createContainer: Scalars['Boolean'];
   createProject: Scalars['String'];
   deleteProject: Scalars['Boolean'];
-  getBuildLogs: Array<Scalars['String']>;
-  getLiveLogs: Array<Scalars['String']>;
   refreshProject: Scalars['Boolean'];
   roleBackProject: Scalars['Boolean'];
   signup: Scalars['String'];
@@ -85,16 +83,6 @@ export type MutationCreateProjectArgs = {
 
 export type MutationDeleteProjectArgs = {
   slug: Scalars['String'];
-};
-
-
-export type MutationGetBuildLogsArgs = {
-  containerSlug: Scalars['String'];
-};
-
-
-export type MutationGetLiveLogsArgs = {
-  projectSlug: Scalars['String'];
 };
 
 
@@ -156,12 +144,18 @@ export type Query = {
   __typename?: 'Query';
   getAllContainers: Array<Container>;
   getAllProjects: Array<Project>;
+  getBuildLogs: Array<Scalars['String']>;
   getContainerInfo: Container;
   getNotRunningProjects: Array<Project>;
   getProjectBySlug: Project;
   getRunningProjects: Array<Project>;
   login: Scalars['String'];
   logout: Scalars['Boolean'];
+};
+
+
+export type QueryGetBuildLogsArgs = {
+  containerSlug: Scalars['String'];
 };
 
 
@@ -344,8 +338,6 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
   createContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationCreateContainerArgs, 'input'>>;
   createProject?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'input'>>;
   deleteProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteProjectArgs, 'slug'>>;
-  getBuildLogs?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationGetBuildLogsArgs, 'containerSlug'>>;
-  getLiveLogs?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationGetLiveLogsArgs, 'projectSlug'>>;
   refreshProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRefreshProjectArgs, 'input'>>;
   roleBackProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRoleBackProjectArgs, 'slug' | 'version'>>;
   signup?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'email' | 'password' | 'username'>>;
@@ -370,6 +362,7 @@ export type ProjectResolvers<ContextType = Context, ParentType extends Resolvers
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   getAllContainers?: Resolver<Array<ResolversTypes['Container']>, ParentType, ContextType>;
   getAllProjects?: Resolver<Array<ResolversTypes['Project']>, ParentType, ContextType>;
+  getBuildLogs?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType, RequireFields<QueryGetBuildLogsArgs, 'containerSlug'>>;
   getContainerInfo?: Resolver<ResolversTypes['Container'], ParentType, ContextType, RequireFields<QueryGetContainerInfoArgs, 'slug'>>;
   getNotRunningProjects?: Resolver<Array<ResolversTypes['Project']>, ParentType, ContextType>;
   getProjectBySlug?: Resolver<ResolversTypes['Project'], ParentType, ContextType, RequireFields<QueryGetProjectBySlugArgs, 'slug'>>;

@@ -12,7 +12,8 @@ export const ContainerSchedulerSchema = z
 
 export const ContainerDestroySchema = z
     .object({
-        containerId: z.string().min(1)
+        containerId: z.string().min(1),
+        containerSlug: z.string().min(1)
     })
     .strict()
 

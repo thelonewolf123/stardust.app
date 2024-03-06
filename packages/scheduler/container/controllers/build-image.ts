@@ -98,7 +98,8 @@ export class BuildImageStrategy {
             { containerSlug: this.#data.containerSlug },
             {
                 $set: {
-                    containerBuildLogs: logs.split('\n')
+                    containerBuildLogs: logs.split('\n'),
+                    updatedAt: new Date()
                 }
             }
         )

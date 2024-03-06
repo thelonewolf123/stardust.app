@@ -25,9 +25,7 @@ export class DestroyContainerStrategy {
 
     async #stopAndRemoveContainer() {
         invariant(this.#docker, 'Docker client not found')
-        const container = await this.#docker.getContainer(
-            this.#data.containerId
-        )
+        const container = this.#docker.getContainer(this.#data.containerId)
         await container.stop()
         await container.remove()
         await models.Container.updateOne(
@@ -36,10 +34,13 @@ export class DestroyContainerStrategy {
             },
             {
                 $set: {
-                    status: 'terminated'
+                    status: 'terminated',
+                    updatedAt: new Date(),
+                    terminatedAt: new Date()
                 }
             }
         ).lean()
+        await deleteContainer(this.#data.containerSlug)
     }
 
     async #handleError(error: Error) {
@@ -56,7 +57,9 @@ export class DestroyContainerStrategy {
                 },
                 {
                     $set: {
-                        status: 'terminated'
+                        status: 'terminated',
+                        updatedAt: new Date(),
+                        terminatedAt: new Date()
                     }
                 }
             ).lean()
@@ -64,7 +67,7 @@ export class DestroyContainerStrategy {
             if (!instance || !instance.InstanceId) return // instance already deleted
 
             await Promise.all([
-                deleteContainer(this.#data.containerId), // delete container
+                deleteContainer(this.#data.containerSlug), // delete container
                 updateInstance(instance.InstanceId, { status: 'failed' }), // update instance status
                 models.Instance.updateOne(
                     {
@@ -72,7 +75,8 @@ export class DestroyContainerStrategy {
                     },
                     {
                         $set: {
-                            status: 'failed'
+                            status: 'failed',
+                            updatedAt: new Date()
                         }
                     }
                 ).lean()
@@ -84,7 +88,7 @@ export class DestroyContainerStrategy {
         throw error
     }
 
-    destroyContainer() {
+    async destroyContainer() {
         return this.#instance
             .getContainerInstance(this.#data.containerId)
             .then(() => this.#instance.waitTillInstanceReady())
