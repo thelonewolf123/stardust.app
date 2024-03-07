@@ -9,6 +9,11 @@ export const ec2Vpc = new aws.ec2.Vpc('ec2Vpc', {
     }
 })
 
+export const ec2Subnet = new aws.ec2.Subnet('ec2Subnet', {
+    vpcId: ec2Vpc.id,
+    cidrBlock: '10.0.1.0/24'
+})
+
 export const vpc = new aws.ec2.VpcPeeringConnection('vpcPeeringConnection', {
     peerVpcId: proxyCluster.vpc.id.apply((id) => id), // replace with your Fargate VPC ID
     vpcId: ec2Vpc.id.apply((id) => id), // replace with your EC2 VPC ID
