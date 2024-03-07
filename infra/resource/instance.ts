@@ -4,7 +4,6 @@ import * as awsInfra from '../../constants/aws-infra'
 import { getAmi } from './ami'
 import { keyPair } from './keystore'
 import { securityGroup } from './securityGroup'
-import { ec2Subnet } from './vpc'
 
 export const instance = new aws.ec2.Instance(
     awsInfra.EC2_INSTANCE_NAME,
@@ -13,7 +12,6 @@ export const instance = new aws.ec2.Instance(
         instanceType: awsInfra.EC2_INSTANCE_TYPE,
         keyName: keyPair.id.apply((keyName) => keyName),
         vpcSecurityGroupIds: [securityGroup.id.apply((id) => id)],
-        subnetId: ec2Subnet.id.apply((id) => id),
         tags: {
             Name: awsInfra.EC2_INSTANCE_NAME
         }

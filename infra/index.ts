@@ -1,9 +1,5 @@
 import { SSM_PARAMETER_KEYS } from '../constants/aws-infra'
-import {
-    proxyAcceleratorIpAddresses,
-    proxyListener,
-    webListener
-} from './resource/alb'
+import { proxyListener, webListener } from './resource/alb'
 import { createAmiFromInstance } from './resource/ami'
 import {
     appService,
@@ -60,4 +56,3 @@ export const cron = cronService.urn
 export const scheduler = schedulerService.urn
 export const proxy = proxyService.urn
 export const logger = logsService.urn
-export const proxyAcceleratorIpAddr = proxyAcceleratorIpAddresses

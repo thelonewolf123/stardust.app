@@ -21,7 +21,6 @@ services:
         - CHECKPOINT_PATH=${CHECKPOINT_PATH}
         - REDIS_HOST=${REDIS_HOST}
         - REMOTE_DOCKER_PASSWORD=${REMOTE_DOCKER_PASSWORD}
-        - BACKEND_BASE_URL=${BACKEND_BASE_URL}
     ports:
       - "80:80"
     environment:
@@ -52,7 +51,6 @@ services:
         - CHECKPOINT_PATH=${CHECKPOINT_PATH}
         - REDIS_HOST=${REDIS_HOST}
         - REMOTE_DOCKER_PASSWORD=${REMOTE_DOCKER_PASSWORD}
-        - BACKEND_BASE_URL=${BACKEND_BASE_URL}
     command: ["node", "dist/cron.bundle.js"]
     env_file:
       - .env
@@ -76,7 +74,6 @@ services:
         - CHECKPOINT_PATH=${CHECKPOINT_PATH}
         - REDIS_HOST=${REDIS_HOST}
         - REMOTE_DOCKER_PASSWORD=${REMOTE_DOCKER_PASSWORD}
-        - BACKEND_BASE_URL=${BACKEND_BASE_URL}
     command: ["node", "dist/scheduler.bundle.js"]
     deploy:
       mode: replicated
