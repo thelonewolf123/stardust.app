@@ -2,8 +2,8 @@ import * as awsx from '@pulumi/awsx'
 
 import { REPLICAS } from '../../constants/aws-infra'
 import { getEnvArray } from '../utils'
-import { proxyListener, webListener } from './alb'
-import { cluster, proxyCluster } from './ecs'
+import { webListener } from './alb'
+import { cluster } from './ecs'
 import { appImage } from './image'
 
 // Create a Fargate service task that can scale out.
@@ -65,19 +65,4 @@ export const logsService = new awsx.classic.ecs.FargateService('logs-svc', {
         }
     },
     desiredCount: REPLICAS.LOGS // 1 is the default
-})
-
-export const proxyService = new awsx.classic.ecs.FargateService('proxy-svc', {
-    cluster: proxyCluster,
-    taskDefinitionArgs: {
-        container: {
-            image: appImage.imageUri,
-            command: ['node', 'dist/proxy.bundle.js'],
-            cpu: 256 /*25% of 1024*/,
-            memory: 512 /*MB*/,
-            environment: getEnvArray(),
-            portMappings: [proxyListener]
-        }
-    },
-    desiredCount: REPLICAS.PROXY
 })

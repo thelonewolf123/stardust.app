@@ -1,5 +1,6 @@
 /bin/
 node_modules
+/node_modules
 *.pub
 certs
 *.pem
