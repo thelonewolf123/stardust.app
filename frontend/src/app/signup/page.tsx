@@ -1,5 +1,7 @@
 'use client'
 
+import invariant from 'invariant'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -14,11 +16,15 @@ import {
     FormMessage
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { useSignupMutaionMutation } from '@/graphql-client'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 const formSchema = z.object({
     username: z.string().min(2, {
         message: 'Username must be at least 2 characters.'
+    }),
+    email: z.string().email({
+        message: 'Invalid email.'
     }),
     password: z.string().min(8, {
         message: 'Password must be at least 8 characters.'
@@ -28,21 +34,37 @@ const formSchema = z.object({
     })
 })
 
-export default function LoginPage() {
+export default function SignupPage() {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             username: '',
             password: '',
+            email: '',
             confirmPassword: ''
         }
     })
+    const [signup, { data, loading, error }] = useSignupMutaionMutation()
+    const router = useRouter()
 
-    // 2. Define a submit handler.
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
+    async function onSubmit(values: z.infer<typeof formSchema>) {
         console.log(values)
+        try {
+            const result = await signup({
+                variables: {
+                    username: values.username,
+                    password: values.password,
+                    email: values.email
+                }
+            })
+            console.log(result)
+            const token = result.data?.signup
+            invariant(token, 'Expected token to be defined')
+            localStorage.setItem('token', token)
+            router.push('/')
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     return (
@@ -75,6 +97,25 @@ export default function LoginPage() {
                         )}
                     />
                     <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        placeholder="whiteghost@gmail.com"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormDescription>
+                                    This is your email address.
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
                         name="password"
                         control={form.control}
                         render={({ field }) => (
@@ -94,7 +135,6 @@ export default function LoginPage() {
                             </FormItem>
                         )}
                     />
-
                     <FormField
                         control={form.control}
                         name="confirmPassword"
@@ -116,7 +156,9 @@ export default function LoginPage() {
                         )}
                     />
 
-                    <Button type="submit">Sign up</Button>
+                    <Button type="submit" disabled={loading}>
+                        Sign up
+                    </Button>
                 </form>
             </Form>
         </div>

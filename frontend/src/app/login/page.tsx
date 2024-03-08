@@ -1,5 +1,7 @@
 'use client'
 
+import invariant from 'invariant'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -14,6 +16,7 @@ import {
     FormMessage
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { useLoginQueryLazyQuery } from '@/graphql-client'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 const formSchema = z.object({
@@ -34,11 +37,27 @@ export default function LoginPage() {
         }
     })
 
-    // 2. Define a submit handler.
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
+    const [login, { data, loading, error }] = useLoginQueryLazyQuery()
+    const router = useRouter()
+
+    async function onSubmit(values: z.infer<typeof formSchema>) {
         console.log(values)
+
+        try {
+            const result = await login({
+                variables: {
+                    username: values.username,
+                    password: values.password
+                }
+            })
+            console.log(result)
+            const token = result.data?.login
+            invariant(token, 'Expected token to be defined')
+            localStorage.setItem('token', token)
+            router.push('/')
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     return (
@@ -88,7 +107,9 @@ export default function LoginPage() {
                             </FormItem>
                         )}
                     />
-                    <Button type="submit">Submit</Button>
+                    <Button type="submit" disabled={loading}>
+                        Submit
+                    </Button>
                 </form>
             </Form>
         </div>

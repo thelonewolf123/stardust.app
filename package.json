@@ -8,6 +8,7 @@
   },
   "scripts": {
     "gc": "graphql-codegen --config codegen-server.yml",
+    "gc:client": "graphql-codegen --config codegen-client.yml",
     "build": "node scripts/build.js",
     "dev:server": "ts-node packages/backend/index.ts",
     "infra:up": "npm run --prefix ./infra up",

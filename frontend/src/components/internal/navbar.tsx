@@ -2,7 +2,9 @@ export default function Navbar() {
     return (
         <nav className="bg-white shadow flex justify-between p-2">
             <a href="/">
-                <h1 className="text-2xl">Jet-Deploy</h1>
+                <h1 className="text-2xl px-2">
+                    <span className="text-2xl">✨</span> Stardust
+                </h1>
             </a>
             <span className="flex gap-2 items-baseline">
                 <a href="/login" className="hover:underline">

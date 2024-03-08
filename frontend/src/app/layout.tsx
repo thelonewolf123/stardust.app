@@ -2,8 +2,10 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 import { Inter } from 'next/font/google'
+import Head from 'next/head'
 
 import Navbar from '@/components/internal/navbar'
+import { ApolloWrapper } from '@/components/internal/wrapper/apollo'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,9 +21,14 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
+            <Head>
+                <title>Star Dust - Cloud Deployment Platform</title>
+            </Head>
             <body className={inter.className}>
-                <Navbar />
-                {children}
+                <ApolloWrapper>
+                    <Navbar />
+                    {children}
+                </ApolloWrapper>
             </body>
         </html>
     )
