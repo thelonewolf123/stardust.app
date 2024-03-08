@@ -12,7 +12,7 @@ export default function Navbar() {
                     href="/signup"
                     className="bg-pink-500 text-white p-1 px-2 rounded-sm hover:bg-pink-600 hover:outline-1"
                 >
-                    Signup
+                    Sign up
                 </a>
             </span>
         </nav>
