@@ -54,7 +54,14 @@ export default function LoginPage() {
             const token = result.data?.login
             invariant(token, 'Expected token to be defined')
             localStorage.setItem('token', token)
-            router.push('/')
+            await fetch('/api/authenticate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token })
+            }).then((res) => res.json())
+            router.push('/projects')
         } catch (error) {
             console.error(error)
         }
@@ -65,7 +72,7 @@ export default function LoginPage() {
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-8 w-full max-w-md mx-auto mt-8 p-8 bg-white rounded-lg shadow-lg"
+                    className="mx-auto mt-8 w-full max-w-md space-y-8 rounded-lg bg-white p-8 shadow-lg"
                 >
                     <h1 className="text-xl font-medium underline">Login</h1>
                     <FormField

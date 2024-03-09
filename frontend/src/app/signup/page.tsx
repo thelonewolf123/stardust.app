@@ -61,7 +61,7 @@ export default function SignupPage() {
             const token = result.data?.signup
             invariant(token, 'Expected token to be defined')
             localStorage.setItem('token', token)
-            router.push('/')
+            router.push('/projects')
         } catch (error) {
             console.error(error)
         }

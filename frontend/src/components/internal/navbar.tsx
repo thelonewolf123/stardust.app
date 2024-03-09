@@ -1,20 +1,19 @@
+import { Button } from '../ui/button'
+
 export default function Navbar() {
     return (
-        <nav className="bg-white shadow flex justify-between p-2">
+        <nav className="flex justify-between bg-white p-2 shadow">
             <a href="/">
-                <h1 className="text-2xl px-2">
+                <h1 className="px-2 text-2xl">
                     <span className="text-2xl">✨</span> Stardust
                 </h1>
             </a>
-            <span className="flex gap-2 items-baseline">
+            <span className="flex items-baseline gap-2">
                 <a href="/login" className="hover:underline">
                     Login
                 </a>
-                <a
-                    href="/signup"
-                    className="bg-pink-500 text-white p-1 px-2 rounded-sm hover:bg-pink-600 hover:outline-1"
-                >
-                    Sign up
+                <a href="/signup">
+                    <Button>Sign up</Button>
                 </a>
             </span>
         </nav>

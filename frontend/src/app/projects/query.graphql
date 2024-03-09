@@ -1,0 +1,30 @@
+query GetAllProjects {
+    getAllProjects {
+        createdAt
+        current {
+            command
+            containerSlug
+            env {
+                name
+                value
+            }
+            image
+            metaData {
+                name
+                value
+            }
+            port
+            status
+        }
+        description
+        dockerContext
+        dockerPath
+        githubBranch
+        githubUrl
+        history {
+            containerSlug
+        }
+        slug
+        name
+    }
+}
