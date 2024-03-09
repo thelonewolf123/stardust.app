@@ -12,19 +12,18 @@ export function getBackendServerUrl(): string {
 }
 
 export async function getAuthHeader(): Promise<{
-    'x-token': string
+    'x-access-token': string
 }> {
     if (typeof window === 'undefined') {
-        // this block will be reachable only during build
         return {
-            'x-token': ''
+            'x-access-token': ''
         }
     }
 
-    const token = sessionStorage.getItem('token') || ''
+    const token = localStorage.getItem('token') || ''
 
     return {
-        'x-token': token || ''
+        'x-access-token': token || ''
     }
 }
 
