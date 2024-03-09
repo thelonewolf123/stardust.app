@@ -44,12 +44,16 @@ export default function SignupPage() {
             confirmPassword: ''
         }
     })
-    const [signup, { data, loading, error }] = useSignupMutaionMutation()
+    const [signup, { loading }] = useSignupMutaionMutation()
     const router = useRouter()
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         console.log(values)
         try {
+            if (values.password !== values.confirmPassword) {
+                throw new Error('Passwords do not match')
+            }
+
             const result = await signup({
                 variables: {
                     username: values.username,
@@ -72,10 +76,10 @@ export default function SignupPage() {
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-8 w-full max-w-md mx-auto mt-8 p-8 bg-white rounded-lg shadow-lg"
+                    className="mx-auto mt-8 w-full max-w-md space-y-8 rounded-lg bg-white p-8 shadow-lg"
                 >
                     <h1 className="text-xl font-medium underline">
-                        Welcome to Jet-Deploy
+                        Welcome to Stardust!
                     </h1>
                     <FormField
                         control={form.control}

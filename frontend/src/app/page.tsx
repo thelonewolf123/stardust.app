@@ -1,16 +1,20 @@
+import Link from 'next/link'
+
 export default function Home() {
     return (
         <div className="container mx-auto">
-            <h1 className="text-3xl font-bold text-center mt-20">
+            <h1 className="mt-20 text-center text-3xl font-bold">
                 Welcome to Star Dust
             </h1>
-            <p className="text-lg text-center mt-4">
+            <p className="mt-4 text-center text-lg">
                 The ultimate cloud deployment platform for your business needs.
             </p>
-            <div className="flex justify-center mt-8">
-                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Get Started
-                </button>
+            <div className="mt-8 flex justify-center">
+                <Link href="/signup">
+                    <button className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700">
+                        Get Started
+                    </button>
+                </Link>
             </div>
         </div>
     )
