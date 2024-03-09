@@ -1,12 +1,15 @@
+import Link from 'next/link'
+import { FaCheckCircle } from 'react-icons/fa'
+import { IoCloseCircle } from 'react-icons/io5'
+import { MdPending } from 'react-icons/md'
 
-import Link from 'next/link';
-import { FaCheckCircle } from 'react-icons/fa';
-import { IoCloseCircle } from 'react-icons/io5';
-import { MdPending } from 'react-icons/md';
-
-import { Badge } from '@/components/ui/badge';
-import { ContainerStatus, GetAllProjectsDocument, GetAllProjectsQuery } from '@/graphql-client';
-import { getApolloClient } from '@/lib/server-utils';
+import { Badge } from '@/components/ui/badge'
+import {
+    ContainerStatus,
+    GetAllProjectsDocument,
+    GetAllProjectsQuery
+} from '@/graphql-client'
+import { getApolloClient } from '@/lib/server-utils'
 
 const fetchProjects = async () => {
     const client = await getApolloClient()
@@ -42,8 +45,8 @@ const SingleProject: React.FC<{
     project: GetAllProjectsQuery['getAllProjects'][number]
 }> = ({ project }) => {
     return (
-        <Link href={`/projects/${project.slug}`}>
-            <li className="rounded-xl border border-gray-200 bg-white p-5 shadow-md transition-transform duration-300 ease-in-out hover:scale-105 hover:cursor-pointer">
+        <Link href={`/project/${project.slug}`}>
+            <li className="rounded-xl p-5 shadow-md transition-transform duration-300 ease-in-out hover:scale-105 hover:cursor-pointer">
                 <div className="space-y-2 border-none shadow-none outline-none">
                     <h3 className="w-full truncate text-nowrap pb-1 text-xl">
                         {project.name}
@@ -58,7 +61,7 @@ const SingleProject: React.FC<{
     )
 }
 
-export default async function ProjectPage() {
+export default async function ProjectsPage() {
     const projects = await fetchProjects()
 
     return (

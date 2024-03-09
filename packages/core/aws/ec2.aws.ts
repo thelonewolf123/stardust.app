@@ -5,6 +5,7 @@ import { InstanceExecArgs } from '@/types'
 import {
     DescribeInstancesCommand,
     DescribeInstanceStatusCommand,
+    DescribeSpotFleetRequestsCommand,
     EC2Client,
     RequestSpotFleetCommand,
     RunInstancesCommand,
@@ -26,7 +27,7 @@ const client = new EC2Client({
     region: env.AWS_REGION
 })
 
-async function requestEc2SpotInstance(count: number) {
+async function requestEc2SpotInstance(count: number, pricePerHour: number) {
     const [ami, securityGroup, keyPairName] = await Promise.all([
         ssmAws.getParameter(SSM_PARAMETER_KEYS.baseAmiId),
         ssmAws.getParameter(SSM_PARAMETER_KEYS.baseSecurityGroup),
@@ -35,7 +36,7 @@ async function requestEc2SpotInstance(count: number) {
 
     const command = new RequestSpotFleetCommand({
         SpotFleetRequestConfig: {
-            SpotPrice: '0.050',
+            SpotPrice: pricePerHour.toString(),
             IamFleetRole:
                 'arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetTaggingRole',
             LaunchSpecifications: [
@@ -56,6 +57,29 @@ async function requestEc2SpotInstance(count: number) {
     })
 
     return client.send(command)
+}
+
+async function waitForSpotInstanceRequest(requestId: string) {
+    let attempts = 0
+    const maxAttempts = 10
+    const interval = 1000
+
+    while (attempts < maxAttempts) {
+        const command = new DescribeSpotFleetRequestsCommand({
+            SpotFleetRequestIds: [requestId]
+        })
+        const info = await client.send(command)
+        const request = info.SpotFleetRequestConfigs?.[0]
+
+        if (request?.SpotFleetRequestState === 'active') {
+            return request
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, interval))
+        attempts++
+    }
+
+    throw new Error('Spot request timed out')
 }
 
 async function requestEc2OnDemandInstance(count: number) {
@@ -105,7 +129,9 @@ async function terminateInstance(instanceId: string) {
 async function execCommand(params: InstanceExecArgs) {
     const key = SSM_PARAMETER_KEYS.ec2PrivateKey
     const privateKey = await ssmAws.getParameter(key, true)
-    let fullCommand = `${params.command} ${params.args.map((arg) => encodeURIComponent(arg)).join(' ')}`
+    let fullCommand = `${params.command} ${params.args
+        .map((arg) => encodeURIComponent(arg))
+        .join(' ')}`
     const ssh = new SSHClient()
 
     if (params.sudo) {
@@ -177,5 +203,6 @@ export default {
     requestEc2OnDemandInstance,
     getInstanceInfoById,
     getInstanceStatusById,
+    waitForSpotInstanceRequest,
     terminateInstance
 }
