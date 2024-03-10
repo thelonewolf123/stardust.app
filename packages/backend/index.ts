@@ -1,5 +1,6 @@
 import cors from 'cors'
 import express from 'express'
+import ExpressWs from 'express-ws'
 import jwt from 'jsonwebtoken'
 
 import { createQueue, getClient } from '@/core/queue'
@@ -22,8 +23,10 @@ import accountSchema from './resolvers/account'
 import containerSchema from './resolvers/container'
 import projectSchema from './resolvers/project'
 import { getLogHandler } from './routes/logs'
+import { sshHandler } from './routes/ssh'
 
 const app = express()
+const ws = ExpressWs(app)
 
 const server = new ApolloServer({
     typeDefs: mergeTypeDefs([
@@ -140,6 +143,7 @@ const main = async () => {
 
     app.get('/api/build/:username/:id/logs', getLogHandler('build'))
     app.get('/api/container/:username/:id/logs', getLogHandler('container'))
+    ws.app.ws('/api/container/:username/:id/ssh', sshHandler)
 
     const port = parseInt(process.env.PORT || '4000')
 
