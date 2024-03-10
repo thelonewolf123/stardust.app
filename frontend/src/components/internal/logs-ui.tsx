@@ -1,67 +1,33 @@
 'use client'
 
-import AnsiToHtml from 'ansi-to-html'
-import DomPurify from 'dompurify'
+import 'xterm/css/xterm.css'
+
+import dynamic from 'next/dynamic'
 import { useState } from 'react'
 
-import { Card, CardContent } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { Container, useGetBuildLogsQuery } from '@/graphql-client'
+import { Container } from '@/graphql-client'
+
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from '../ui/select'
+import BuildLogsTab from './tabs/build-tab'
+import ContainerLogsTab from './tabs/container-tab'
+
+const TerminalTabDynamic = dynamic(() => import('./tabs/terminal-tab'), {
+    loading: () => <p>Loading...</p>,
+    ssr: false
+})
 
 enum TABS {
     container = 'container',
     build = 'build',
     terminal = 'terminal'
-}
-
-const BuildLogsTab = ({ slug }: { slug: string }) => {
-    const [logs, setLogs] = useState<string[]>([])
-    const { data } = useGetBuildLogsQuery({
-        variables: { containerSlug: slug },
-        onCompleted: (data) => {
-            console.log(data)
-            const ansiToHtml = new AnsiToHtml()
-            const logs = data.getBuildLogs
-                .map((f) => {
-                    // handle caret return
-                    return f.replace(/\r/g, '\n')
-                })
-                .map((log) => ansiToHtml.toHtml(log))
-                .map((log) => DomPurify.sanitize(log))
-
-            setLogs(logs)
-        }
-    })
-
-    return (
-        <CardContent className="p-2 max-h-80 overflow-y-scroll">
-            {data ? (
-                logs.map((log, index) => (
-                    <div key={index}>
-                        <pre dangerouslySetInnerHTML={{ __html: log }}></pre>
-                    </div>
-                ))
-            ) : (
-                <p>Loading...</p>
-            )}
-        </CardContent>
-    )
-}
-
-const ContainerLogsTab = () => {
-    return (
-        <CardContent className="p-2">
-            <p>Container logs will be displayed here</p>
-        </CardContent>
-    )
-}
-
-const TerminalLogsTab = () => {
-    return (
-        <CardContent className="p-2">
-            <p>Terminal logs will be displayed here</p>
-        </CardContent>
-    )
 }
 
 export const LogsUi: React.FC<{
@@ -80,29 +46,53 @@ export const LogsUi: React.FC<{
 
     return (
         <Card className="h-full">
-            <div className="flex prose dark:prose-invert gap-4 p-4 pb-2">
-                {Object.values(TABS).map((tab) => (
-                    <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        className={`text-xl capitalize ${
-                            activeTab === tab
-                                ? 'text-blue-500 text-xl font-semibold border-b-2 border-blue-500'
-                                : ''
-                        }`}
-                    >
-                        {tab}
-                    </button>
-                ))}
+            <div className="flex items-baseline justify-between p-4">
+                <div className="flex prose dark:prose-invert gap-4 pb-2">
+                    {Object.values(TABS).map((tab) => (
+                        <h4
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            className={`text-xl capitalize hover:cursor-pointer ${
+                                activeTab === tab
+                                    ? 'text-blue-500 font-semibold border-b-2 border-blue-500'
+                                    : ''
+                            }`}
+                        >
+                            {tab}
+                        </h4>
+                    ))}
+                </div>
+                <Select defaultValue={selectedContainerSlug}>
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Version" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {history?.map((c) => (
+                            <SelectItem
+                                key={c.containerSlug}
+                                onClick={() =>
+                                    setSelectedContainerSlug(c.containerSlug)
+                                }
+                                value={c.containerSlug}
+                            >
+                                Version {c.containerSlug.split(':').at(-1)}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
             </div>
+
             <Separator className="w-full" />
-            <CardContent className="p-2">
-                {activeTab === TABS.container && <ContainerLogsTab />}
-                {activeTab === TABS.build && (
-                    <BuildLogsTab slug={selectedContainerSlug} />
-                )}
-                {activeTab === TABS.terminal && <TerminalLogsTab />}
-            </CardContent>
+
+            {activeTab === TABS.container && (
+                <ContainerLogsTab slug={selectedContainerSlug} />
+            )}
+            {activeTab === TABS.build && (
+                <BuildLogsTab slug={selectedContainerSlug} />
+            )}
+            {activeTab === TABS.terminal && (
+                <TerminalTabDynamic slug={selectedContainerSlug} />
+            )}
         </Card>
     )
 }

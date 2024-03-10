@@ -74,9 +74,9 @@ server.addPlugin({
 // Start the server
 const main = async () => {
     await server.start()
+    app.use(cors())
     app.use(
         '/graphql',
-        cors<cors.CorsRequest>(),
         express.json(),
         expressMiddleware(server, {
             context: async ({ req, res }) => {
@@ -138,8 +138,8 @@ const main = async () => {
         })
     )
 
-    app.get('/build/:id/logs', getLogHandler('build'))
-    app.get('/container/:id/logs', getLogHandler('container'))
+    app.get('/api/build/:username/:id/logs', getLogHandler('build'))
+    app.get('/api/container/:username/:id/logs', getLogHandler('container'))
 
     const port = parseInt(process.env.PORT || '4000')
 

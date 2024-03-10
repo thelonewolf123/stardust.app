@@ -13,12 +13,17 @@ import {
 import { getApolloClient } from '@/lib/server-utils'
 
 const fetchProjects = async () => {
-    const client = await getApolloClient()
-    const { data } = await client.query<GetAllProjectsQuery>({
-        query: GetAllProjectsDocument
-    })
+    try {
+        const client = await getApolloClient()
+        const { data } = await client.query<GetAllProjectsQuery>({
+            query: GetAllProjectsDocument
+        })
 
-    return data.getAllProjects
+        return data.getAllProjects
+    } catch (error) {
+        console.error('Error fetching projects', error)
+    }
+    return []
 }
 
 const SingleProject: React.FC<{

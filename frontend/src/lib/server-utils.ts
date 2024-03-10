@@ -5,13 +5,7 @@ import { cookies } from 'next/headers'
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 
-export function getBackendServerUrl(): string {
-    if (process.env.NODE_ENV === 'development') {
-        return 'http://localhost:4000'
-    } else {
-        throw new Error('Unknown deployment environment')
-    }
-}
+import { getBackendServerUrl } from './graphql'
 
 const httpLink = createHttpLink({
     uri: `${getBackendServerUrl()}/graphql` // Your GraphQL server URL

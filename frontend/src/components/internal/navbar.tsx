@@ -16,14 +16,16 @@ export default async function Navbar() {
                         <span className="text-2xl">✨</span> Stardust
                     </h1>
                 </Link>
-                <div className="flex items-center gap-3">
-                    <Link href="/projects" className="hover:underline">
-                        Projects
-                    </Link>
-                    <Link href="/new" className="hover:underline">
-                        New
-                    </Link>
-                </div>
+                {token ? (
+                    <div className="flex items-center gap-3">
+                        <Link href="/projects" className="hover:underline">
+                            Projects
+                        </Link>
+                        <Link href="/new" className="hover:underline">
+                            New
+                        </Link>
+                    </div>
+                ) : null}
             </div>
             <span className="flex items-center gap-2">
                 <ThemeToggle />

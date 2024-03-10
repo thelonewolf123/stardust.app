@@ -36,7 +36,7 @@ export async function createNewContainer(
  * @param {String} slug
  */
 export async function getContainerBuildLogs(slug) {
-    const source = new EventSource(`${BASE_URL}/build/${slug}/logs`)
+    const source = new EventSource(`${BASE_URL}/api/build/${slug}/logs`)
     console.log('Building container...')
     source.addEventListener('message', (event) => {
         console.log(event.data)

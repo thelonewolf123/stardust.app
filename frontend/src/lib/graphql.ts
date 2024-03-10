@@ -7,11 +7,11 @@ export function getBackendServerUrl(): string {
     if (process.env.NODE_ENV === 'development') {
         return 'http://localhost:4000'
     } else {
-        throw new Error('Unknown deployment environment')
+        // throw new Error('Unknown deployment environment')
+        return 'http://localhost:4000'
     }
 }
-
-export async function getAuthHeader(): Promise<{
+async function getAuthHeader(): Promise<{
     'x-access-token': string
 }> {
     if (typeof window === 'undefined') {

@@ -30,3 +30,10 @@ export const ContainerBuildSchema = z
         buildArgs: z.record(z.string()).optional()
     })
     .strict()
+
+export const LogMessageSchema = z
+    .object({
+        message: z.string().includes(''),
+        timestamp: z.number().min(0)
+    })
+    .strict()

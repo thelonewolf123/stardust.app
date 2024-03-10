@@ -9,7 +9,7 @@ import { BASE_URL } from '../client/index.js'
  */
 export async function getContainerLogs(containerSlug) {
     const source = new EventSource(
-        `${BASE_URL}/container/${containerSlug}/logs`
+        `${BASE_URL}/api/container/${containerSlug}/logs`
     )
     const headingStyle = chalk.bold.underline
     console.log(headingStyle('Container Logs:'))

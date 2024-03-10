@@ -10,13 +10,17 @@ import {
 import { getApolloClient } from '@/lib/server-utils'
 
 const getProject = async (username: string, slug: string) => {
-    const client = await getApolloClient()
-    const { data } = await client.query<GetProjectBySlugQuery>({
-        query: GetProjectBySlugDocument,
-        variables: { slug: `${username}/${slug}` }
-    })
+    try {
+        const client = await getApolloClient()
+        const { data } = await client.query<GetProjectBySlugQuery>({
+            query: GetProjectBySlugDocument,
+            variables: { slug: `${username}/${slug}` }
+        })
 
-    return data.getProjectBySlug
+        return data.getProjectBySlug
+    } catch (error) {
+        console.error('Error getting project by slug', error)
+    }
 }
 
 export default async function SingleProjectPage({
@@ -25,6 +29,10 @@ export default async function SingleProjectPage({
     params: { username: string; slug: string }
 }) {
     const project = await getProject(params.username, params.slug)
+
+    if (!project) {
+        return <h1>Project not found</h1>
+    }
 
     return (
         <div className="container mt-4 space-y-2">
