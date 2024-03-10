@@ -3,12 +3,13 @@
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 
-export function getBackendServerUrl(): string {
+export function getBackendServerUrl(urlType: 'http' | 'ws' = 'http'): string {
+    const scheme = urlType === 'ws' ? 'ws' : 'http'
+
     if (process.env.NODE_ENV === 'development') {
-        return 'http://localhost:4000'
+        return `${scheme}://localhost:4000`
     } else {
-        // throw new Error('Unknown deployment environment')
-        return 'http://localhost:4000'
+        throw new Error('Unknown deployment environment')
     }
 }
 async function getAuthHeader(): Promise<{

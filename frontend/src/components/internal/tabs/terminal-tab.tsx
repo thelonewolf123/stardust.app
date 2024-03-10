@@ -1,15 +1,16 @@
 import { use, useEffect, useRef } from 'react'
+import useWebSocket from 'react-use-websocket'
 import { Terminal } from 'xterm'
 import { FitAddon } from 'xterm-addon-fit'
 
 import { CardContent } from '@/components/ui/card'
+import { getBackendServerUrl } from '@/lib/graphql'
 
 export default function TerminalTab({ slug }: { slug: string }) {
     const terminalDiv = useRef<HTMLDivElement>(null)
     const fitAddOnRef = useRef<FitAddon>()
     const xtermRef = useRef<Terminal>()
-
-    useEffect(() => {}, [])
+    const BASE_URL = getBackendServerUrl('ws')
 
     useEffect(() => {
         if (!terminalDiv.current) return // No terminal div
@@ -31,6 +32,14 @@ export default function TerminalTab({ slug }: { slug: string }) {
             fitAddon.dispose()
         }
     }, [])
+
+    useWebSocket(`${BASE_URL}/api/container/${slug}/ssh`, {
+        onMessage: (e) => {
+            if (xtermRef.current) {
+                xtermRef.current.write(e.data)
+            }
+        }
+    })
 
     return (
         <CardContent className="p-0">

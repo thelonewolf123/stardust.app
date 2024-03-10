@@ -1,6 +1,7 @@
 import AnsiToHtml from 'ansi-to-html'
 import DomPurify from 'dompurify'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEventSource } from 'react-use-websocket'
 
 import { CardContent } from '@/components/ui/card'
 import { getBackendServerUrl } from '@/lib/graphql'
@@ -9,20 +10,14 @@ export default function ContainerLogsTab({ slug }: { slug: string }) {
     const [logs, setLogs] = useState<{ message: string; timestamp: number }[]>(
         []
     )
+    const BASE_URL = getBackendServerUrl()
     const logsRef = useRef<HTMLDivElement>(null)
-
-    useEffect(() => {
-        // Fetch container logs
-        const BASE_URL = getBackendServerUrl()
-        const eventSource = new EventSource(
-            `${BASE_URL}/api/container/${slug}/logs`
-        )
-        const ansiToHtml = new AnsiToHtml()
-
-        const logHandler = (e: MessageEvent<any>) => {
+    useEventSource(`${BASE_URL}/api/container/${slug}/logs`, {
+        onMessage: (e) => {
             setLogs((prevLogs) => {
                 const msgObject = JSON.parse(e.data)
                 const { message, timestamp } = msgObject
+                const ansiToHtml = new AnsiToHtml()
                 const ansiToHtmlMessage = ansiToHtml.toHtml(message)
                 const purifiedMessage = DomPurify.sanitize(ansiToHtmlMessage)
                 const newLogs = [
@@ -32,13 +27,7 @@ export default function ContainerLogsTab({ slug }: { slug: string }) {
                 return newLogs
             })
         }
-        eventSource.addEventListener('message', logHandler)
-
-        return () => {
-            eventSource.removeEventListener('message', logHandler)
-            eventSource.close()
-        }
-    }, [slug])
+    })
 
     useLayoutEffect(() => {
         if (logsRef.current) {
