@@ -1,3 +1,7 @@
+import Image from 'next/image'
+import Link from 'next/link'
+
+import { StatusIcon } from '@/components/internal/status'
 import {
     GetProjectBySlugDocument,
     GetProjectBySlugQuery
@@ -23,11 +27,46 @@ export default async function SingleProjectPage({
 
     return (
         <div className="container mt-4 space-y-2">
-            <h1 className="text-2xl font-semibold">{project.name}</h1>
-            <p className="text-xl">{project.description}</p>
-            <p className="text-muted-foreground mb-2">
-                {project.current?.status}
-            </p>
+            <h1 className="text-3xl space-y-2 capitalize underline">
+                {project.name}
+            </h1>
+            <div className="rounded shadow-md p-5 px-4 flex gap-2 w-full">
+                <div className="w-1/3 prose dark:prose-invert">
+                    <h3>Preview</h3>
+                    <Image
+                        src={'/placeholder.jpeg'}
+                        alt={project.name}
+                        className="w-full rounded-md bg-black"
+                        height={600}
+                        width={400}
+                    />
+                </div>
+                <div className="prose dark:prose-invert">
+                    <h3>Description</h3>
+                    <p>{project.description}</p>
+                    <h4>
+                        Created on {new Date(project.createdAt).toDateString()}
+                    </h4>
+                    <span className="flex gap-2 items-baseline">
+                        <h4>Github URL:</h4>
+                        <Link href={project.githubUrl} target="_blank">
+                            {project.githubUrl}
+                        </Link>
+                    </span>
+                    <span className="flex gap-2 items-baseline">
+                        <h4>Github Branch:</h4>
+                        <p>{project.githubBranch}</p>
+                    </span>
+                    <span className="flex gap-2 items-baseline">
+                        <h4>Current Container:</h4>
+                        <p>{project.current?.containerSlug || 'N/A'}</p>
+                    </span>
+                    <h4 className="flex gap-2 items-baseline">
+                        Current Container Status:{' '}
+                        <StatusIcon status={project.current?.status} />
+                    </h4>
+                </div>
+            </div>
         </div>
     )
 }
