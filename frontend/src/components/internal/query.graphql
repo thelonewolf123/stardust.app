@@ -1,0 +1,3 @@
+query GetBuildLogs($containerSlug: String!) {
+  getBuildLogs(containerSlug: $containerSlug)
+}

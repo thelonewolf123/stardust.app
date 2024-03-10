@@ -234,6 +234,13 @@ export type SignupMutaionMutationVariables = Exact<{
 
 export type SignupMutaionMutation = { __typename?: 'Mutation', signup: string };
 
+export type GetBuildLogsQueryVariables = Exact<{
+  containerSlug: Scalars['String'];
+}>;
+
+
+export type GetBuildLogsQuery = { __typename?: 'Query', getBuildLogs: Array<string> };
+
 
 export const LoginQueryDocument = gql`
     query LoginQuery($username: String!, $password: String!) {
@@ -421,3 +428,36 @@ export function useSignupMutaionMutation(baseOptions?: Apollo.MutationHookOption
 export type SignupMutaionMutationHookResult = ReturnType<typeof useSignupMutaionMutation>;
 export type SignupMutaionMutationResult = Apollo.MutationResult<SignupMutaionMutation>;
 export type SignupMutaionMutationOptions = Apollo.BaseMutationOptions<SignupMutaionMutation, SignupMutaionMutationVariables>;
+export const GetBuildLogsDocument = gql`
+    query GetBuildLogs($containerSlug: String!) {
+  getBuildLogs(containerSlug: $containerSlug)
+}
+    `;
+
+/**
+ * __useGetBuildLogsQuery__
+ *
+ * To run a query within a React component, call `useGetBuildLogsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBuildLogsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBuildLogsQuery({
+ *   variables: {
+ *      containerSlug: // value for 'containerSlug'
+ *   },
+ * });
+ */
+export function useGetBuildLogsQuery(baseOptions: Apollo.QueryHookOptions<GetBuildLogsQuery, GetBuildLogsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetBuildLogsQuery, GetBuildLogsQueryVariables>(GetBuildLogsDocument, options);
+      }
+export function useGetBuildLogsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetBuildLogsQuery, GetBuildLogsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetBuildLogsQuery, GetBuildLogsQueryVariables>(GetBuildLogsDocument, options);
+        }
+export type GetBuildLogsQueryHookResult = ReturnType<typeof useGetBuildLogsQuery>;
+export type GetBuildLogsLazyQueryHookResult = ReturnType<typeof useGetBuildLogsLazyQuery>;
+export type GetBuildLogsQueryResult = Apollo.QueryResult<GetBuildLogsQuery, GetBuildLogsQueryVariables>;

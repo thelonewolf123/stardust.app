@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { LogsUi } from '@/components/internal/logs-ui'
 import { StatusIcon } from '@/components/internal/status'
 import {
     GetProjectBySlugDocument,
@@ -66,6 +67,10 @@ export default async function SingleProjectPage({
                         <StatusIcon status={project.current?.status} />
                     </h4>
                 </div>
+            </div>
+            <div className="py-4">
+                <h3 className="font-semibold text-2xl mb-2">Logs</h3>
+                <LogsUi current={project.current} history={project.history} />
             </div>
         </div>
     )
