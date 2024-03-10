@@ -39,8 +39,8 @@ export default async function SingleProjectPage({
             <h1 className="text-3xl space-y-2 capitalize underline">
                 {project.name}
             </h1>
-            <div className="rounded shadow-md p-5 px-4 flex gap-4 w-full dark:bg-slate-900">
-                <div className="w-1/3 prose dark:prose-invert">
+            <div className="rounded shadow-md p-5 px-4 md:flex gap-4 w-full dark:bg-slate-900">
+                <div className="md:w-1/3 prose dark:prose-invert">
                     <h3>Preview</h3>
                     <Image
                         src={'/placeholder.jpeg'}

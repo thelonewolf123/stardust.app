@@ -12,6 +12,17 @@ export default function TerminalTab({ slug }: { slug: string }) {
     const xtermRef = useRef<Terminal>()
     const BASE_URL = getBackendServerUrl('ws')
 
+    const { sendMessage } = useWebSocket(
+        `${BASE_URL}/api/container/${slug}/ssh`,
+        {
+            onMessage: (e) => {
+                if (xtermRef.current) {
+                    xtermRef.current.write(e.data)
+                }
+            }
+        }
+    )
+
     useEffect(() => {
         if (!terminalDiv.current) return // No terminal div
 
@@ -24,22 +35,18 @@ export default function TerminalTab({ slug }: { slug: string }) {
         terminal.open(terminalDiv.current)
         terminal.focus()
         fitAddon.fit()
-        terminal.write('Hello from xterm.js')
         xtermRef.current = terminal
         fitAddOnRef.current = fitAddon
+
+        terminal.onData((data) => {
+            sendMessage(data)
+        })
+
         return () => {
             terminal.dispose()
             fitAddon.dispose()
         }
-    }, [])
-
-    useWebSocket(`${BASE_URL}/api/container/${slug}/ssh`, {
-        onMessage: (e) => {
-            if (xtermRef.current) {
-                xtermRef.current.write(e.data)
-            }
-        }
-    })
+    }, [sendMessage])
 
     return (
         <CardContent className="p-0">
