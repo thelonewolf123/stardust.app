@@ -76,7 +76,7 @@ export default function SignupPage() {
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="mx-auto mt-8 w-full max-w-md space-y-8 rounded-lg bg-white p-8 shadow-lg"
+                    className="mx-auto mt-8 w-full max-w-md space-y-8 rounded-lg bg-white dark:bg-slate-900 p-8 shadow-lg"
                 >
                     <h1 className="text-xl font-medium underline">
                         Welcome to Stardust!

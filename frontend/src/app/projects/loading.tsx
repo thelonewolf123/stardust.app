@@ -9,7 +9,7 @@ export default function Loading() {
             <ul className="grid grid-cols-1 gap-3 md:grid-cols-3">
                 {list.map((id) => (
                     <li
-                        className="rounded-xl p-5 shadow-md transition-transform duration-300 ease-in-out hover:scale-105 hover:cursor-pointer"
+                        className="rounded-xl p-5 shadow-md transition-transform duration-300 ease-in-out hover:scale-105 hover:cursor-pointer dark:bg-slate-900"
                         key={id}
                     >
                         <div className="space-y-2 border-none shadow-none outline-none">

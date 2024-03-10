@@ -3,6 +3,7 @@ import { FaCheckCircle } from 'react-icons/fa'
 import { IoCloseCircle } from 'react-icons/io5'
 import { MdPending } from 'react-icons/md'
 
+import { StatusIcon } from '@/components/internal/status'
 import { Badge } from '@/components/ui/badge'
 import {
     ContainerStatus,
@@ -20,33 +21,12 @@ const fetchProjects = async () => {
     return data.getAllProjects
 }
 
-const StatusIcon: React.FC<{ status?: ContainerStatus }> = ({ status }) => {
-    let icon = null
-    switch (status) {
-        case 'running':
-            icon = <FaCheckCircle className="text-green-500" />
-            break
-        case 'pending':
-            icon = <MdPending className="text-yellow-500" />
-            break
-        case 'failed':
-            icon = <IoCloseCircle className="text-red-500" />
-    }
-
-    return (
-        <Badge className="flex w-fit gap-4 capitalize">
-            <span>{status}</span>
-            {icon}
-        </Badge>
-    )
-}
-
 const SingleProject: React.FC<{
     project: GetAllProjectsQuery['getAllProjects'][number]
 }> = ({ project }) => {
     return (
         <Link href={`/project/${project.slug}`}>
-            <li className="rounded-xl p-5 shadow-md transition-transform duration-300 ease-in-out hover:scale-105 hover:cursor-pointer">
+            <li className="rounded-xl p-5 shadow-md transition-transform duration-300 ease-in-out hover:scale-105 hover:cursor-pointer dark:bg-slate-900">
                 <div className="space-y-2 border-none shadow-none outline-none">
                     <h3 className="w-full truncate text-nowrap pb-1 text-xl">
                         {project.name}

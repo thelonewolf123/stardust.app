@@ -29,13 +29,18 @@ const authMiddleware = (token: string) =>
         }
     })
 
-export async function getApolloClient() {
+export async function getAccessToken() {
     const cookie = await cookies()
     const token = cookie.get('token')
+    return token?.value
+}
+
+export async function getApolloClient() {
+    const token = await getAccessToken()
 
     const client = new ApolloClient({
         ssrMode: true,
-        link: authMiddleware(token?.value || '').concat(httpLink),
+        link: authMiddleware(token || '').concat(httpLink),
         cache: new InMemoryCache()
     })
 

@@ -5,6 +5,7 @@ import { Inter } from 'next/font/google'
 
 import Navbar from '@/components/internal/navbar'
 import { ApolloWrapper } from '@/components/internal/wrapper/apollo'
+import { ThemeProvider } from '@/components/internal/wrapper/theme'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -43,8 +44,15 @@ export default function RootLayout({
             </head>
             <body className={inter.className}>
                 <ApolloWrapper>
-                    <Navbar />
-                    {children}
+                    <ThemeProvider
+                        attribute="class"
+                        defaultTheme="system"
+                        enableSystem
+                        disableTransitionOnChange
+                    >
+                        <Navbar />
+                        {children}
+                    </ThemeProvider>
                 </ApolloWrapper>
             </body>
         </html>
