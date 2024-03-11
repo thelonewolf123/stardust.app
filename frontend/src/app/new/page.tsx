@@ -1,6 +1,7 @@
 'use client'
 
-import { useCallback, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { MdOutlineRemoveCircleOutline } from 'react-icons/md'
 import { z } from 'zod'
@@ -17,6 +18,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { useCreateProjectMutation } from '@/graphql-client'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 const BuildArgsInput = z.object({
@@ -25,23 +27,41 @@ const BuildArgsInput = z.object({
 })
 
 const EnvInput = z.object({
-    key: z.string(),
+    name: z.string(),
     value: z.string()
 })
 
 const metaDataInput = z.object({
-    key: z.string(),
+    name: z.string(),
     value: z.string()
 })
 
 const ProjectInputSchema = z.object({
-    name: z.string(),
-    description: z.string(),
+    name: z
+        .string()
+        .min(2, {
+            message: 'Project name must be at least 2 characters.'
+        })
+        .regex(/^[a-z0-9-]+$/i, {
+            message: 'Invalid project name.'
+        }),
+    description: z.string().min(2, {
+        message: 'Project description must be at least 2 characters.'
+    }),
     githubUrl: z.string().url(),
-    githubBranch: z.string(),
-    dockerPath: z.string(),
-    dockerContext: z.string(),
-    port: z.number().optional(),
+    githubBranch: z.string().min(2, {
+        message: 'Invalid github branch.'
+    }),
+    dockerPath: z.string().min(1, {
+        message: 'Invalid docker path.'
+    }),
+    dockerContext: z.string().min(1, {
+        message: 'Invalid docker context.'
+    }),
+    port: z
+        .string()
+        .transform((v) => parseInt(v))
+        .optional(),
     env: z.array(EnvInput),
     buildArgs: z.array(BuildArgsInput),
     metaData: z.array(metaDataInput)
@@ -66,13 +86,13 @@ export default function NewProjectPage() {
             port: undefined,
             env: [
                 {
-                    key: '',
+                    name: '',
                     value: ''
                 }
             ],
             metaData: [
                 {
-                    key: '',
+                    name: '',
                     value: ''
                 }
             ]
@@ -106,21 +126,47 @@ export default function NewProjectPage() {
         name: 'metaData'
     })
 
-    function onSubmit(values: z.infer<typeof ProjectInputSchema>) {
-        console.log(values)
-    }
+    const [createProject, { data, loading, error }] = useCreateProjectMutation()
+    const router = useRouter()
 
-    const loading = false
+    async function onSubmit(values: z.infer<typeof ProjectInputSchema>) {
+        try {
+            const result = await createProject({
+                variables: {
+                    input: {
+                        name: values.name,
+                        description: values.description,
+                        githubUrl: values.githubUrl,
+                        githubBranch: values.githubBranch,
+                        dockerPath: values.dockerPath,
+                        dockerContext: values.dockerContext,
+                        buildArgs: values.buildArgs,
+                        port: values.port,
+                        env: values.env,
+                        metaData: values.metaData
+                    }
+                }
+            })
+            const containerSlug = result.data?.createProject
+            if (!containerSlug) throw new Error('Container slug not found')
+
+            const projectSlug = containerSlug.split(':')[0]
+            console.log('Project created', containerSlug)
+            router.push(`/project/${projectSlug}`)
+        } catch (error) {
+            console.error(error)
+        }
+    }
 
     useEffect(() => {
         // check all fields and remove empty ones, and if there are no fields, add one
 
         const isAllFieldsUsed = envFields.every((field, index) => {
-            return field.key.trim() && field.value.trim()
+            return field.name.trim() && field.value.trim()
         })
 
         if (isAllFieldsUsed) {
-            appendEnv({ key: '', value: '' })
+            appendEnv({ name: '', value: '' })
         }
     }, [envFields, appendEnv, removeEnv])
 
@@ -140,11 +186,11 @@ export default function NewProjectPage() {
         // check all fields and remove empty ones, and if there are no fields, add one
 
         const isAllFieldsUsed = metaDataFields.every((field, index) => {
-            return field.key.trim() && field.value.trim()
+            return field.name.trim() && field.value.trim()
         })
 
         if (isAllFieldsUsed) {
-            appendMetaData({ key: '', value: '' })
+            appendMetaData({ name: '', value: '' })
         }
     }, [metaDataFields, appendMetaData, removeMetaData])
 
@@ -153,7 +199,7 @@ export default function NewProjectPage() {
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="mx-auto mt-8 space-y-8 rounded-lg bg-white dark:bg-slate-900 p-8 shadow-lg"
+                    className="mx-auto my-8 space-y-8 rounded-lg bg-white dark:bg-slate-900 p-8 shadow-lg"
                 >
                     <h1 className="text-xl font-medium underline">
                         New Project
@@ -279,6 +325,8 @@ export default function NewProjectPage() {
                                             placeholder=""
                                             inputMode="numeric"
                                             type="number"
+                                            min={'0'}
+                                            max={'65535'}
                                             {...field}
                                         />
                                     </FormControl>
@@ -298,7 +346,7 @@ export default function NewProjectPage() {
                                 {buildArgsFields.map((field, index) => (
                                     <div
                                         key={field.id}
-                                        className="grid gap-4 md:grid-cols-2 grid-cols-1"
+                                        className="grid gap-4 grid-cols-2"
                                     >
                                         <FormField
                                             control={form.control}
@@ -375,11 +423,11 @@ export default function NewProjectPage() {
                                 {envFields.map((field, index) => (
                                     <div
                                         key={field.id}
-                                        className="grid gap-4 md:grid-cols-2 grid-cols-1"
+                                        className="grid gap-4 grid-cols-2"
                                     >
                                         <FormField
                                             control={form.control}
-                                            name={`env.${index}.key`}
+                                            name={`env.${index}.name`}
                                             render={({ field }) => (
                                                 <FormItem>
                                                     {index === 0 ? (
@@ -450,11 +498,11 @@ export default function NewProjectPage() {
                                 {metaDataFields.map((field, index) => (
                                     <div
                                         key={field.id}
-                                        className="grid gap-4 md:grid-cols-2 grid-cols-1"
+                                        className="grid gap-4 grid-cols-2"
                                     >
                                         <FormField
                                             control={form.control}
-                                            name={`metaData.${index}.key`}
+                                            name={`metaData.${index}.name`}
                                             render={({ field }) => (
                                                 <FormItem>
                                                     {index === 0 && (
@@ -519,7 +567,7 @@ export default function NewProjectPage() {
                         </div>
                     </div>
 
-                    <Button type="submit" disabled={loading}>
+                    <Button type="submit" loading={loading}>
                         Submit
                     </Button>
                 </form>

@@ -45,7 +45,7 @@ export default async function SingleProjectPage({
                     <Image
                         src={'/placeholder.jpeg'}
                         alt={project.name}
-                        className="w-full rounded-md bg-black"
+                        className="w-full rounded-md bg-black transition-transform ease-in-out duration-300 transform hover:scale-105 max-h-72"
                         height={600}
                         width={400}
                     />

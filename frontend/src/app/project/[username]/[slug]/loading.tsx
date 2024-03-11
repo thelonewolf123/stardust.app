@@ -1,3 +1,5 @@
+import { Card } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export default async function SingleProjectLoading() {
@@ -7,11 +9,11 @@ export default async function SingleProjectLoading() {
                 <Skeleton className="w-1/2 h-10" />
             </h1>
             <div className="rounded shadow-md p-5 px-4 flex gap-4 w-full dark:bg-slate-900">
-                <div className="w-1/3 prose dark:prose-invert">
+                <div className="w-1/2 prose dark:prose-invert">
                     <h3>
                         <Skeleton className="w-1/2 h-10" />
                     </h3>
-                    <Skeleton className="w-full rounded-md h-52" />
+                    <Skeleton className="w-full rounded-md h-72" />
                 </div>
                 <div className="w-full flex flex-col gap-4">
                     <Skeleton className="w-2/3 h-10" />
@@ -34,6 +36,31 @@ export default async function SingleProjectLoading() {
                         <Skeleton className="w-1/4 h-5" />
                     </h4>
                 </div>
+            </div>
+            <div className="py-4">
+                <h3 className="mb-2">
+                    <Skeleton className="w-1/2 h-10" />
+                </h3>
+                <Card className="h-full">
+                    <div className="flex items-baseline justify-between p-4">
+                        <div className="flex prose dark:prose-invert gap-4 pb-2">
+                            <h4>
+                                <Skeleton className="w-52 h-8" />
+                            </h4>
+                            <h4>
+                                <Skeleton className="w-52 h-8" />
+                            </h4>
+                            <h4>
+                                <Skeleton className="w-52 h-8" />
+                            </h4>
+                        </div>
+                        <Skeleton className="w-[180px] h-8" />
+                    </div>
+
+                    <Separator className="w-full" />
+
+                    <Skeleton className="w-full h-96" />
+                </Card>
             </div>
         </div>
     )

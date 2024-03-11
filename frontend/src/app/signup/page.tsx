@@ -160,7 +160,7 @@ export default function SignupPage() {
                         )}
                     />
 
-                    <Button type="submit" disabled={loading}>
+                    <Button type="submit" loading={loading}>
                         Sign up
                     </Button>
                 </form>

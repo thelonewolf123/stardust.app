@@ -114,7 +114,7 @@ export default function LoginPage() {
                             </FormItem>
                         )}
                     />
-                    <Button type="submit" disabled={loading}>
+                    <Button type="submit" loading={loading}>
                         Submit
                     </Button>
                 </form>
