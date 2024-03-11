@@ -22,6 +22,7 @@ export type BuildArgsInput = {
 
 export type Container = {
   __typename?: 'Container';
+  buildArgs?: Maybe<Array<BuildArgs>>;
   command?: Maybe<Array<Scalars['String']>>;
   containerSlug: Scalars['String'];
   env?: Maybe<Array<Env>>;
@@ -194,6 +195,12 @@ export type User = {
   username: Scalars['String'];
 };
 
+export type BuildArgs = {
+  __typename?: 'buildArgs';
+  name: Scalars['String'];
+  value: Scalars['String'];
+};
+
 export type MetaData = {
   __typename?: 'metaData';
   name: Scalars['String'];
@@ -292,6 +299,7 @@ export type ResolversTypes = {
   RefreshProjectInput: RefreshProjectInput;
   String: ResolverTypeWrapper<Scalars['String']>;
   User: ResolverTypeWrapper<User>;
+  buildArgs: ResolverTypeWrapper<BuildArgs>;
   metaData: ResolverTypeWrapper<MetaData>;
   metaDataInput: MetaDataInput;
 };
@@ -313,11 +321,13 @@ export type ResolversParentTypes = {
   RefreshProjectInput: RefreshProjectInput;
   String: Scalars['String'];
   User: User;
+  buildArgs: BuildArgs;
   metaData: MetaData;
   metaDataInput: MetaDataInput;
 };
 
 export type ContainerResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Container'] = ResolversParentTypes['Container']> = {
+  buildArgs?: Resolver<Maybe<Array<ResolversTypes['buildArgs']>>, ParentType, ContextType>;
   command?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   containerSlug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   env?: Resolver<Maybe<Array<ResolversTypes['Env']>>, ParentType, ContextType>;
@@ -378,6 +388,12 @@ export type UserResolvers<ContextType = Context, ParentType extends ResolversPar
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type BuildArgsResolvers<ContextType = Context, ParentType extends ResolversParentTypes['buildArgs'] = ResolversParentTypes['buildArgs']> = {
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  value?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type MetaDataResolvers<ContextType = Context, ParentType extends ResolversParentTypes['metaData'] = ResolversParentTypes['metaData']> = {
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   value?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -391,6 +407,7 @@ export type Resolvers<ContextType = Context> = {
   Project?: ProjectResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
+  buildArgs?: BuildArgsResolvers<ContextType>;
   metaData?: MetaDataResolvers<ContextType>;
 };
 

@@ -7,7 +7,13 @@ import { Button } from '@/components/ui/button'
 import { CardContent } from '@/components/ui/card'
 import { getBackendServerUrl } from '@/lib/graphql'
 
-export default function TerminalComp({ slug }: { slug: string }) {
+export default function TerminalComp({
+    slug,
+    show
+}: {
+    slug: string
+    show: boolean
+}) {
     const terminalDiv = useRef<HTMLDivElement>(null)
     const fitAddOnRef = useRef<FitAddon>()
     const xtermRef = useRef<Terminal>()
@@ -50,7 +56,7 @@ export default function TerminalComp({ slug }: { slug: string }) {
     }, [sendMessage])
 
     return (
-        <CardContent className="p-0">
+        <CardContent className={`p-0 ${show ? '' : 'hidden'}`}>
             <div ref={terminalDiv} className="h-80 rounded"></div>
         </CardContent>
     )

@@ -5,7 +5,15 @@ import { useState } from 'react'
 import { CardContent } from '@/components/ui/card'
 import { useGetBuildLogsQuery } from '@/graphql-client'
 
-export default function BuildLogsTab({ slug }: { slug: string }) {
+import LoaderUi from './loader-ui'
+
+export default function BuildLogsTab({
+    slug,
+    show
+}: {
+    slug: string
+    show: boolean
+}) {
     const [logs, setLogs] = useState<string[]>([])
     const { loading } = useGetBuildLogsQuery({
         variables: { containerSlug: slug },
@@ -25,9 +33,11 @@ export default function BuildLogsTab({ slug }: { slug: string }) {
     })
 
     return (
-        <CardContent className="p-2 h-80 overflow-y-scroll">
+        <CardContent
+            className={`${show ? 'p-2 h-80 overflow-y-scroll' : 'hidden h-0'}`}
+        >
             {loading ? (
-                <p>Loading...</p>
+                <LoaderUi />
             ) : logs.length === 0 ? (
                 <p>No logs available</p>
             ) : (

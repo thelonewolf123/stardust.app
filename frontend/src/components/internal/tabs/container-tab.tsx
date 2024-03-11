@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { CardContent } from '@/components/ui/card'
 import { getBackendServerUrl } from '@/lib/graphql'
 
-function ContainerLogsComp({ slug }: { slug: string }) {
+function ContainerLogsComp({ slug, show }: { slug: string; show: boolean }) {
     const [logs, setLogs] = useState<{ message: string; timestamp: number }[]>(
         []
     )
@@ -37,7 +37,10 @@ function ContainerLogsComp({ slug }: { slug: string }) {
     }, [logsRef, logs])
 
     return (
-        <CardContent className="p-2 h-80 overflow-y-scroll" ref={logsRef}>
+        <CardContent
+            className={`p-2 h-80 overflow-y-scroll ${show ? '' : 'hidden'}`}
+            ref={logsRef}
+        >
             {logs.length === 0 ? (
                 <p>No logs available</p>
             ) : (
@@ -59,12 +62,22 @@ function ContainerLogsComp({ slug }: { slug: string }) {
     )
 }
 
-export default function BuildLogsTab({ slug }: { slug: string }) {
+export default function BuildLogsTab({
+    slug,
+    show
+}: {
+    slug: string
+    show: boolean
+}) {
     const [start, setStart] = useState(false)
 
     if (!start) {
         return (
-            <CardContent className="p-2 flex h-80 justify-center items-center">
+            <CardContent
+                className={`p-2 flex h-80 justify-center items-center ${
+                    show ? '' : 'hidden'
+                }`}
+            >
                 <Button
                     className="btn btn-primary"
                     onClick={() => {
@@ -77,5 +90,5 @@ export default function BuildLogsTab({ slug }: { slug: string }) {
         )
     }
 
-    return <ContainerLogsComp slug={slug} />
+    return <ContainerLogsComp slug={slug} show={show} />
 }

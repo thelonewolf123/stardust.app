@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { BsGearFill } from 'react-icons/bs'
 
 import { LogsUi } from '@/components/internal/logs-ui'
 import { StatusIcon } from '@/components/internal/status'
@@ -39,7 +40,7 @@ export default async function SingleProjectPage({
             <h1 className="text-3xl space-y-2 capitalize underline">
                 {project.name}
             </h1>
-            <div className="rounded shadow-md p-5 px-4 md:flex gap-4 w-full dark:bg-slate-900">
+            <div className="rounded shadow-md p-5 px-4 md:flex gap-4 w-full dark:bg-slate-900 relative">
                 <div className="md:w-1/3 prose dark:prose-invert">
                     <h3>Preview</h3>
                     <Image
@@ -75,6 +76,12 @@ export default async function SingleProjectPage({
                         <StatusIcon status={project.current?.status} />
                     </h4>
                 </div>
+                <Link
+                    href={`/project/${params.username}/${params.slug}/edit`}
+                    className="absolute bottom-4 right-4 text-4xl text-muted-foreground hover:text-primary hover:cursor-pointer"
+                >
+                    <BsGearFill />
+                </Link>
             </div>
             <div className="py-4">
                 <h3 className="font-semibold text-2xl mb-2">Logs</h3>

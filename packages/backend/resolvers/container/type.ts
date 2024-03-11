@@ -37,6 +37,11 @@ export const typeDefs = gql`
         value: String!
     }
 
+    type buildArgs {
+        name: String!
+        value: String!
+    }
+
     type Container {
         containerSlug: String!
         image: String!
@@ -45,5 +50,6 @@ export const typeDefs = gql`
         env: [Env!]
         metaData: [metaData!]
         status: ContainerStatus!
+        buildArgs: [buildArgs!]
     }
 `

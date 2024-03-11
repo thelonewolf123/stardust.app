@@ -8,6 +8,34 @@ import ProjectForm, {
 } from '@/components/internal/project-form'
 import { useCreateProjectMutation } from '@/graphql-client'
 
+const defaultFormValues = {
+    name: '',
+    description: '',
+    githubUrl: '',
+    githubBranch: 'main',
+    dockerPath: 'Dockerfile',
+    dockerContext: '.',
+    buildArgs: [
+        {
+            name: '',
+            value: ''
+        }
+    ],
+    port: undefined,
+    env: [
+        {
+            name: '',
+            value: ''
+        }
+    ],
+    metaData: [
+        {
+            name: '',
+            value: ''
+        }
+    ]
+}
+
 export default function NewProjectPage() {
     const [createProject, { data, loading, error }] = useCreateProjectMutation()
     const router = useRouter()
@@ -41,5 +69,11 @@ export default function NewProjectPage() {
         }
     }
 
-    return <ProjectForm loading={loading} onSubmit={onSubmit} />
+    return (
+        <ProjectForm
+            loading={loading}
+            onSubmit={onSubmit}
+            defaultValues={defaultFormValues}
+        />
+    )
 }

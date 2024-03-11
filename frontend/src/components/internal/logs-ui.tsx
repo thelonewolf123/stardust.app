@@ -19,15 +19,10 @@ import {
 } from '../ui/select'
 import BuildLogsTab from './tabs/build-tab'
 import ContainerLogsTab from './tabs/container-tab'
+import LoaderUi from './tabs/loader-ui'
 
 const TerminalComp = dynamic(() => import('./tabs/terminal-tab'), {
-    loading: () => (
-        <CardContent className="p-2 flex h-80 justify-center items-center">
-            <Button className="btn btn-primary" loading={true}>
-                Loading...
-            </Button>
-        </CardContent>
-    ),
+    loading: () => <LoaderUi />,
     ssr: false
 })
 
@@ -37,12 +32,22 @@ enum TABS {
     terminal = 'terminal'
 }
 
-export default function TerminalTab({ slug }: { slug: string }) {
+export default function TerminalTab({
+    slug,
+    show
+}: {
+    slug: string
+    show: boolean
+}) {
     const [start, setStart] = useState(false)
 
     if (!start) {
         return (
-            <CardContent className="p-2 flex h-80 justify-center items-center">
+            <CardContent
+                className={`p-2 flex h-80 justify-center items-center ${
+                    show ? '' : 'hidden'
+                }`}
+            >
                 <Button
                     className="btn btn-primary"
                     onClick={() => {
@@ -55,7 +60,7 @@ export default function TerminalTab({ slug }: { slug: string }) {
         )
     }
 
-    return <TerminalComp slug={slug} />
+    return <TerminalComp slug={slug} show={show} />
 }
 
 export const LogsUi: React.FC<{
@@ -111,16 +116,18 @@ export const LogsUi: React.FC<{
             </div>
 
             <Separator className="w-full" />
-
-            {activeTab === TABS.container && (
-                <ContainerLogsTab slug={selectedContainerSlug} />
-            )}
-            {activeTab === TABS.build && (
-                <BuildLogsTab slug={selectedContainerSlug} />
-            )}
-            {activeTab === TABS.terminal && (
-                <TerminalTab slug={selectedContainerSlug} />
-            )}
+            <ContainerLogsTab
+                slug={selectedContainerSlug}
+                show={activeTab === TABS.container}
+            />
+            <BuildLogsTab
+                slug={selectedContainerSlug}
+                show={activeTab === TABS.build}
+            />
+            <TerminalTab
+                slug={selectedContainerSlug}
+                show={activeTab === TABS.terminal}
+            />
         </Card>
     )
 }

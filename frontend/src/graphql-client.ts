@@ -22,6 +22,7 @@ export type BuildArgsInput = {
 
 export type Container = {
   __typename?: 'Container';
+  buildArgs?: Maybe<Array<BuildArgs>>;
   command?: Maybe<Array<Scalars['String']>>;
   containerSlug: Scalars['String'];
   env?: Maybe<Array<Env>>;
@@ -194,6 +195,12 @@ export type User = {
   username: Scalars['String'];
 };
 
+export type BuildArgs = {
+  __typename?: 'buildArgs';
+  name: Scalars['String'];
+  value: Scalars['String'];
+};
+
 export type MetaData = {
   __typename?: 'metaData';
   name: Scalars['String'];
@@ -219,6 +226,13 @@ export type CreateProjectMutationVariables = Exact<{
 
 
 export type CreateProjectMutation = { __typename?: 'Mutation', createProject: string };
+
+export type GetProjectBySlugForEditQueryVariables = Exact<{
+  slug: Scalars['String'];
+}>;
+
+
+export type GetProjectBySlugForEditQuery = { __typename?: 'Query', getProjectBySlug: { __typename?: 'Project', createdAt: number, description: string, dockerContext: string, dockerPath: string, githubBranch: string, githubUrl: string, slug: string, name: string, current?: { __typename?: 'Container', command?: Array<string> | null, containerSlug: string, image: string, port?: number | null, status: ContainerStatus, env?: Array<{ __typename?: 'Env', name: string, value: string }> | null, metaData?: Array<{ __typename?: 'metaData', name: string, value: string }> | null, buildArgs?: Array<{ __typename?: 'buildArgs', name: string, value: string }> | null } | null, history?: Array<{ __typename?: 'Container', containerSlug: string }> | null } };
 
 export type GetProjectBySlugQueryVariables = Exact<{
   slug: Scalars['String'];
@@ -314,6 +328,70 @@ export function useCreateProjectMutation(baseOptions?: Apollo.MutationHookOption
 export type CreateProjectMutationHookResult = ReturnType<typeof useCreateProjectMutation>;
 export type CreateProjectMutationResult = Apollo.MutationResult<CreateProjectMutation>;
 export type CreateProjectMutationOptions = Apollo.BaseMutationOptions<CreateProjectMutation, CreateProjectMutationVariables>;
+export const GetProjectBySlugForEditDocument = gql`
+    query GetProjectBySlugForEdit($slug: String!) {
+  getProjectBySlug(slug: $slug) {
+    createdAt
+    current {
+      command
+      containerSlug
+      env {
+        name
+        value
+      }
+      image
+      metaData {
+        name
+        value
+      }
+      buildArgs {
+        name
+        value
+      }
+      port
+      status
+    }
+    description
+    dockerContext
+    dockerPath
+    githubBranch
+    githubUrl
+    history {
+      containerSlug
+    }
+    slug
+    name
+  }
+}
+    `;
+
+/**
+ * __useGetProjectBySlugForEditQuery__
+ *
+ * To run a query within a React component, call `useGetProjectBySlugForEditQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetProjectBySlugForEditQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetProjectBySlugForEditQuery({
+ *   variables: {
+ *      slug: // value for 'slug'
+ *   },
+ * });
+ */
+export function useGetProjectBySlugForEditQuery(baseOptions: Apollo.QueryHookOptions<GetProjectBySlugForEditQuery, GetProjectBySlugForEditQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetProjectBySlugForEditQuery, GetProjectBySlugForEditQueryVariables>(GetProjectBySlugForEditDocument, options);
+      }
+export function useGetProjectBySlugForEditLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetProjectBySlugForEditQuery, GetProjectBySlugForEditQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetProjectBySlugForEditQuery, GetProjectBySlugForEditQueryVariables>(GetProjectBySlugForEditDocument, options);
+        }
+export type GetProjectBySlugForEditQueryHookResult = ReturnType<typeof useGetProjectBySlugForEditQuery>;
+export type GetProjectBySlugForEditLazyQueryHookResult = ReturnType<typeof useGetProjectBySlugForEditLazyQuery>;
+export type GetProjectBySlugForEditQueryResult = Apollo.QueryResult<GetProjectBySlugForEditQuery, GetProjectBySlugForEditQueryVariables>;
 export const GetProjectBySlugDocument = gql`
     query GetProjectBySlug($slug: String!) {
   getProjectBySlug(slug: $slug) {

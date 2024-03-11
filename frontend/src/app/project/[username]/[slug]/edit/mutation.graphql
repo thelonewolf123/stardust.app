@@ -1,0 +1,34 @@
+query GetProjectBySlugForEdit($slug: String!) {
+    getProjectBySlug(slug: $slug) {
+        createdAt
+        current {
+            command
+            containerSlug
+            env {
+                name
+                value
+            }
+            image
+            metaData {
+                name
+                value
+            }
+            buildArgs {
+                name
+                value
+            }
+            port
+            status
+        }
+        description
+        dockerContext
+        dockerPath
+        githubBranch
+        githubUrl
+        history {
+            containerSlug
+        }
+        slug
+        name
+    }
+}
