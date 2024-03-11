@@ -1,12 +1,13 @@
 import AnsiToHtml from 'ansi-to-html'
 import DomPurify from 'dompurify'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { useEventSource } from 'react-use-websocket'
 
+import { Button } from '@/components/ui/button'
 import { CardContent } from '@/components/ui/card'
 import { getBackendServerUrl } from '@/lib/graphql'
 
-export default function ContainerLogsTab({ slug }: { slug: string }) {
+function ContainerLogsComp({ slug }: { slug: string }) {
     const [logs, setLogs] = useState<{ message: string; timestamp: number }[]>(
         []
     )
@@ -56,4 +57,25 @@ export default function ContainerLogsTab({ slug }: { slug: string }) {
             )}
         </CardContent>
     )
+}
+
+export default function BuildLogsTab({ slug }: { slug: string }) {
+    const [start, setStart] = useState(false)
+
+    if (!start) {
+        return (
+            <CardContent className="p-2 flex h-80 justify-center items-center">
+                <Button
+                    className="btn btn-primary"
+                    onClick={() => {
+                        setStart(true)
+                    }}
+                >
+                    Start Logs
+                </Button>
+            </CardContent>
+        )
+    }
+
+    return <ContainerLogsComp slug={slug} />
 }

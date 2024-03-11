@@ -1,12 +1,13 @@
-import { use, useEffect, useRef } from 'react'
+import { use, useEffect, useRef, useState } from 'react'
 import useWebSocket from 'react-use-websocket'
 import { Terminal } from 'xterm'
 import { FitAddon } from 'xterm-addon-fit'
 
+import { Button } from '@/components/ui/button'
 import { CardContent } from '@/components/ui/card'
 import { getBackendServerUrl } from '@/lib/graphql'
 
-export default function TerminalTab({ slug }: { slug: string }) {
+export default function TerminalComp({ slug }: { slug: string }) {
     const terminalDiv = useRef<HTMLDivElement>(null)
     const fitAddOnRef = useRef<FitAddon>()
     const xtermRef = useRef<Terminal>()

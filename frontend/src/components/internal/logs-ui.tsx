@@ -5,10 +5,11 @@ import 'xterm/css/xterm.css'
 import dynamic from 'next/dynamic'
 import { useState } from 'react'
 
-import { Card } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Container } from '@/graphql-client'
 
+import { Button } from '../ui/button'
 import {
     Select,
     SelectContent,
@@ -19,8 +20,14 @@ import {
 import BuildLogsTab from './tabs/build-tab'
 import ContainerLogsTab from './tabs/container-tab'
 
-const TerminalTabDynamic = dynamic(() => import('./tabs/terminal-tab'), {
-    loading: () => <p>Loading...</p>,
+const TerminalComp = dynamic(() => import('./tabs/terminal-tab'), {
+    loading: () => (
+        <CardContent className="p-2 flex h-80 justify-center items-center">
+            <Button className="btn btn-primary" loading={true}>
+                Loading...
+            </Button>
+        </CardContent>
+    ),
     ssr: false
 })
 
@@ -28,6 +35,27 @@ enum TABS {
     container = 'container',
     build = 'build',
     terminal = 'terminal'
+}
+
+export default function TerminalTab({ slug }: { slug: string }) {
+    const [start, setStart] = useState(false)
+
+    if (!start) {
+        return (
+            <CardContent className="p-2 flex h-80 justify-center items-center">
+                <Button
+                    className="btn btn-primary"
+                    onClick={() => {
+                        setStart(true)
+                    }}
+                >
+                    Start terminal
+                </Button>
+            </CardContent>
+        )
+    }
+
+    return <TerminalComp slug={slug} />
 }
 
 export const LogsUi: React.FC<{
@@ -91,7 +119,7 @@ export const LogsUi: React.FC<{
                 <BuildLogsTab slug={selectedContainerSlug} />
             )}
             {activeTab === TABS.terminal && (
-                <TerminalTabDynamic slug={selectedContainerSlug} />
+                <TerminalTab slug={selectedContainerSlug} />
             )}
         </Card>
     )
