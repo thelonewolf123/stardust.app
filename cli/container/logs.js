@@ -17,14 +17,16 @@ export async function getContainerLogs(containerSlug) {
         console.log(event.data)
     })
 
-    source.addEventListener('error', (event) => {
-        if (event.status === EventSource.CLOSED) {
-            console.log('Connection closed'.red.bold)
-            process.exit(0)
-        } else {
-            console.error('Error occurred'.red.bold, event)
-            process.exit(1)
-        }
+    await new Promise((resolve) => {
+        source.addEventListener('error', (event) => {
+            if (event.status === EventSource.CLOSED) {
+                console.log('Connection closed'.red.bold)
+                resolve(true)
+            } else {
+                console.error('Error occurred'.red.bold, event)
+                process.exit(1)
+            }
+        })
     })
 }
 
