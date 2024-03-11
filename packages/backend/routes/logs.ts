@@ -19,4 +19,8 @@ export const getLogHandler =
             }
         }
         LOGS_EMITTER.on(type, listener)
+
+        res.on('close', () => {
+            LOGS_EMITTER.off(type, listener)
+        })
     }
