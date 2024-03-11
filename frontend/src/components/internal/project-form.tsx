@@ -1,7 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-import { use, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { MdOutlineRemoveCircleOutline } from 'react-icons/md'
 import { z } from 'zod'
@@ -60,18 +59,79 @@ type ArrayFieldsBuilderType = ReturnType<
     typeof useForm<z.infer<typeof ProjectInputSchema>>
 >
 
+function parseEnv(data: string) {
+    // Split the file content into lines
+    const lines = data.split('\n')
+
+    const envVariables: {
+        name: string
+        value: string
+    }[] = []
+    let currentKey = ''
+    let isMultilineValue = false
+
+    // Iterate through each line
+    lines.forEach((line) => {
+        // Ignore comments and empty lines
+        if (line.trim() !== '' && !line.startsWith('#')) {
+            // If line starts with '"', it's a multiline value
+            if (line.startsWith('"')) {
+                // If multiline value is already in progress, add current line
+                if (isMultilineValue) {
+                    currentKey += '\n' + line.trim()
+                } else {
+                    currentKey = line.trim()
+                    isMultilineValue = true
+                }
+            } else if (isMultilineValue) {
+                // If line doesn't start with '"', but is part of multiline value, add current line
+                currentKey += '\n' + line.trim()
+            } else {
+                // Split each line into key-value pair
+                const [key, value] = line.split('=')
+                // Trim whitespace from key and value
+                if (!key || !value) return
+                const trimmedKey = key.trim()
+                let trimmedValue = value.trim()
+                // If value is wrapped in double quotes, remove them
+                if (
+                    trimmedValue.startsWith('"') &&
+                    trimmedValue.endsWith('"')
+                ) {
+                    trimmedValue = trimmedValue.substring(
+                        1,
+                        trimmedValue.length - 1
+                    )
+                }
+                // Add key-value pair to the object
+                envVariables.push({
+                    name: trimmedKey,
+                    value: trimmedValue
+                })
+                // Reset multiline value tracking
+                isMultilineValue = false
+                currentKey = ''
+            }
+        }
+    })
+
+    return envVariables
+}
+
 function ArrayFieldsBuilder<T extends ArrayFieldsBuilderType>({
     form,
     propertyName,
     title,
     descriptionName,
-    placeHolderPrefix
+    placeHolderPrefix,
+    inputType = 'text'
 }: {
     form: T
     propertyName: 'buildArgs' | 'env' | 'metaData'
     title: string
     descriptionName: string
     placeHolderPrefix: string
+    inputType?: 'text' | 'password'
 }) {
     const { append, remove, fields } = useFieldArray({
         control: form.control,
@@ -93,14 +153,14 @@ function ArrayFieldsBuilder<T extends ArrayFieldsBuilderType>({
     const handlePasteEvent = (e: React.ClipboardEvent<HTMLInputElement>) => {
         e.preventDefault()
         const text = e.clipboardData.getData('text')
-        const lines = text.split('\n').filter((line) => line.trim())
-        lines.forEach((line) => {
-            const [name, value] = line.split('=')
-            append({ name, value })
+        const envs = parseEnv(text)
+        envs.map((env) => {
+            append({
+                name: env.name,
+                value: env.value
+            })
         })
     }
-
-    console.log('fields', fields, propertyName)
 
     return (
         <div className="col-span-2">
@@ -144,7 +204,7 @@ function ArrayFieldsBuilder<T extends ArrayFieldsBuilderType>({
                                         <FormControl>
                                             <Input
                                                 placeholder={`${placeHolderPrefix}_value`.toLowerCase()}
-                                                type="password"
+                                                type={inputType}
                                                 {...field}
                                             />
                                         </FormControl>
@@ -359,6 +419,7 @@ export default function ProjectForm({
                             title="Build Args"
                             descriptionName="build arg"
                             placeHolderPrefix="ARG"
+                            inputType="password"
                         />
                         <ArrayFieldsBuilder
                             form={form}
@@ -366,6 +427,7 @@ export default function ProjectForm({
                             title="Environment Variables"
                             descriptionName="environment variable"
                             placeHolderPrefix="ENV"
+                            inputType="password"
                         />
                         <ArrayFieldsBuilder
                             form={form}
