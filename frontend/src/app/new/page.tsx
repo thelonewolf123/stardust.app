@@ -57,10 +57,25 @@ export default function NewProjectPage() {
             githubBranch: 'main',
             dockerPath: 'Dockerfile',
             dockerContext: '.',
-            buildArgs: [],
+            buildArgs: [
+                {
+                    name: '',
+                    value: ''
+                }
+            ],
             port: undefined,
-            env: [],
-            metaData: []
+            env: [
+                {
+                    key: '',
+                    value: ''
+                }
+            ],
+            metaData: [
+                {
+                    key: '',
+                    value: ''
+                }
+            ]
         }
     })
 
@@ -99,46 +114,37 @@ export default function NewProjectPage() {
 
     useEffect(() => {
         // check all fields and remove empty ones, and if there are no fields, add one
-        if (envFields.length === 0) {
-            appendEnv({ key: '', value: '' })
-        } else {
-            const isAllFieldsUsed = envFields.every((field, index) => {
-                return field.key.trim() && field.value.trim()
-            })
 
-            if (isAllFieldsUsed) {
-                appendEnv({ key: '', value: '' })
-            }
+        const isAllFieldsUsed = envFields.every((field, index) => {
+            return field.key.trim() && field.value.trim()
+        })
+
+        if (isAllFieldsUsed) {
+            appendEnv({ key: '', value: '' })
         }
     }, [envFields, appendEnv, removeEnv])
 
     useEffect(() => {
         // check all fields and remove empty ones, and if there are no fields, add one
-        if (buildArgsFields.length === 0) {
-            appendBuildArgs({ name: '', value: '' })
-        } else {
-            const isAllFieldsUsed = buildArgsFields.every((field, index) => {
-                return field.name.trim() && field.value.trim()
-            })
 
-            if (isAllFieldsUsed) {
-                appendBuildArgs({ name: '', value: '' })
-            }
+        const isAllFieldsUsed = buildArgsFields.every((field, index) => {
+            return field.name.trim() && field.value.trim()
+        })
+
+        if (isAllFieldsUsed) {
+            appendBuildArgs({ name: '', value: '' })
         }
     }, [buildArgsFields, appendBuildArgs, removeBuildArgs])
 
     useEffect(() => {
         // check all fields and remove empty ones, and if there are no fields, add one
-        if (metaDataFields.length === 0) {
-            appendMetaData({ key: '', value: '' })
-        } else {
-            const isAllFieldsUsed = metaDataFields.every((field, index) => {
-                return field.key.trim() && field.value.trim()
-            })
 
-            if (isAllFieldsUsed) {
-                appendMetaData({ key: '', value: '' })
-            }
+        const isAllFieldsUsed = metaDataFields.every((field, index) => {
+            return field.key.trim() && field.value.trim()
+        })
+
+        if (isAllFieldsUsed) {
+            appendMetaData({ key: '', value: '' })
         }
     }, [metaDataFields, appendMetaData, removeMetaData])
 
