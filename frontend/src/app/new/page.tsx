@@ -1,6 +1,8 @@
 'use client'
 
+import { useCallback, useEffect } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
+import { MdOutlineRemoveCircleOutline } from 'react-icons/md'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
@@ -94,6 +96,51 @@ export default function NewProjectPage() {
     }
 
     const loading = false
+
+    useEffect(() => {
+        // check all fields and remove empty ones, and if there are no fields, add one
+        if (envFields.length === 0) {
+            appendEnv({ key: '', value: '' })
+        } else {
+            const isAllFieldsUsed = envFields.every((field, index) => {
+                return field.key.trim() && field.value.trim()
+            })
+
+            if (isAllFieldsUsed) {
+                appendEnv({ key: '', value: '' })
+            }
+        }
+    }, [envFields, appendEnv, removeEnv])
+
+    useEffect(() => {
+        // check all fields and remove empty ones, and if there are no fields, add one
+        if (buildArgsFields.length === 0) {
+            appendBuildArgs({ name: '', value: '' })
+        } else {
+            const isAllFieldsUsed = buildArgsFields.every((field, index) => {
+                return field.name.trim() && field.value.trim()
+            })
+
+            if (isAllFieldsUsed) {
+                appendBuildArgs({ name: '', value: '' })
+            }
+        }
+    }, [buildArgsFields, appendBuildArgs, removeBuildArgs])
+
+    useEffect(() => {
+        // check all fields and remove empty ones, and if there are no fields, add one
+        if (metaDataFields.length === 0) {
+            appendMetaData({ key: '', value: '' })
+        } else {
+            const isAllFieldsUsed = metaDataFields.every((field, index) => {
+                return field.key.trim() && field.value.trim()
+            })
+
+            if (isAllFieldsUsed) {
+                appendMetaData({ key: '', value: '' })
+            }
+        }
+    }, [metaDataFields, appendMetaData, removeMetaData])
 
     return (
         <div className="container">
@@ -273,42 +320,44 @@ export default function NewProjectPage() {
                                                 </FormItem>
                                             )}
                                         />
-                                        <FormField
-                                            control={form.control}
-                                            name={`buildArgs.${index}.value`}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    {index === 0 && (
-                                                        <FormLabel>
-                                                            Value
-                                                        </FormLabel>
-                                                    )}
-                                                    <FormControl>
-                                                        <Input
-                                                            placeholder="arg_value"
-                                                            {...field}
-                                                        />
-                                                    </FormControl>
-                                                    {index === 0 && (
-                                                        <FormDescription>
-                                                            This is your build
-                                                            arg value.
-                                                        </FormDescription>
-                                                    )}
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
+                                        <div className="flex items-center gap-2">
+                                            <FormField
+                                                control={form.control}
+                                                name={`buildArgs.${index}.value`}
+                                                render={({ field }) => (
+                                                    <FormItem className="flex-grow">
+                                                        {index === 0 && (
+                                                            <FormLabel>
+                                                                Value
+                                                            </FormLabel>
+                                                        )}
+                                                        <FormControl>
+                                                            <Input
+                                                                placeholder="arg_value"
+                                                                type="password"
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        {index === 0 && (
+                                                            <FormDescription>
+                                                                This is your
+                                                                build arg value.
+                                                            </FormDescription>
+                                                        )}
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <MdOutlineRemoveCircleOutline
+                                                className="text-red-500 hover:text-red-700 cursor-pointer"
+                                                size={22}
+                                                onClick={() =>
+                                                    removeBuildArgs(index)
+                                                }
+                                            />
+                                        </div>
                                     </div>
                                 ))}
-                                <Button
-                                    type="button"
-                                    onClick={() =>
-                                        appendBuildArgs({ name: '', value: '' })
-                                    }
-                                >
-                                    Add Build Arg
-                                </Button>
                             </div>
                         </div>
 
@@ -348,42 +397,43 @@ export default function NewProjectPage() {
                                                 </FormItem>
                                             )}
                                         />
-                                        <FormField
-                                            control={form.control}
-                                            name={`env.${index}.value`}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    {index === 0 ? (
-                                                        <FormLabel>
-                                                            Value
-                                                        </FormLabel>
-                                                    ) : null}
-                                                    <FormControl>
-                                                        <Input
-                                                            placeholder="env_value"
-                                                            {...field}
-                                                        />
-                                                    </FormControl>
-                                                    {index === 0 ? (
-                                                        <FormDescription>
-                                                            This is your env
-                                                            value.
-                                                        </FormDescription>
-                                                    ) : null}
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
+                                        <div className="flex items-center gap-2">
+                                            <FormField
+                                                control={form.control}
+                                                name={`env.${index}.value`}
+                                                render={({ field }) => (
+                                                    <FormItem className="flex-grow">
+                                                        {index === 0 ? (
+                                                            <FormLabel>
+                                                                Value
+                                                            </FormLabel>
+                                                        ) : null}
+                                                        <FormControl>
+                                                            <Input
+                                                                placeholder="env_value"
+                                                                type="password"
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        {index === 0 ? (
+                                                            <FormDescription>
+                                                                This is your env
+                                                                value.
+                                                            </FormDescription>
+                                                        ) : null}
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <MdOutlineRemoveCircleOutline
+                                                className="text-red-500 hover:text-red-700 cursor-pointer"
+                                                size={22}
+                                                onClick={() => removeEnv(index)}
+                                            />
+                                        </div>
                                     </div>
                                 ))}
-                                <Button
-                                    type="button"
-                                    onClick={() =>
-                                        appendEnv({ key: '', value: '' })
-                                    }
-                                >
-                                    Add Env
-                                </Button>
                             </div>
                         </div>
                         <div className="col-span-2">
@@ -422,42 +472,43 @@ export default function NewProjectPage() {
                                                 </FormItem>
                                             )}
                                         />
-                                        <FormField
-                                            control={form.control}
-                                            name={`metaData.${index}.value`}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    {index === 0 && (
-                                                        <FormLabel>
-                                                            Value
-                                                        </FormLabel>
-                                                    )}
-                                                    <FormControl>
-                                                        <Input
-                                                            placeholder="meta_value"
-                                                            {...field}
-                                                        />
-                                                    </FormControl>
-                                                    {index === 0 && (
-                                                        <FormDescription>
-                                                            This is your meta
-                                                            data value.
-                                                        </FormDescription>
-                                                    )}
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
+                                        <span className="flex items-center gap-2">
+                                            <FormField
+                                                control={form.control}
+                                                name={`metaData.${index}.value`}
+                                                render={({ field }) => (
+                                                    <FormItem className="flex-grow">
+                                                        {index === 0 && (
+                                                            <FormLabel>
+                                                                Value
+                                                            </FormLabel>
+                                                        )}
+                                                        <FormControl>
+                                                            <Input
+                                                                placeholder="meta_value"
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        {index === 0 && (
+                                                            <FormDescription>
+                                                                This is your
+                                                                meta data value.
+                                                            </FormDescription>
+                                                        )}
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <MdOutlineRemoveCircleOutline
+                                                className="text-red-500 hover:text-red-700 cursor-pointer"
+                                                size={22}
+                                                onClick={() =>
+                                                    removeMetaData(index)
+                                                }
+                                            />
+                                        </span>
                                     </div>
                                 ))}
-                                <Button
-                                    type="button"
-                                    onClick={() =>
-                                        appendMetaData({ key: '', value: '' })
-                                    }
-                                >
-                                    Add Meta Data
-                                </Button>
                             </div>
                         </div>
                     </div>
