@@ -18,6 +18,10 @@ import { mergeResolvers, mergeTypeDefs } from '@graphql-tools/merge'
 
 import models from './database'
 import { connect } from './database/mongoose'
+import {
+    projectVerificationMiddleware,
+    projectVerificationMiddlewareWs
+} from './library'
 import { startLogsPublisher } from './publisher'
 import accountSchema from './resolvers/account'
 import containerSchema from './resolvers/container'
@@ -138,9 +142,21 @@ const main = async () => {
         })
     )
 
-    app.get('/api/build/:username/:id/logs', getLogHandler('build'))
-    app.get('/api/container/:username/:id/logs', getLogHandler('container'))
-    ws.app.ws('/api/container/:username/:id/ssh', sshHandler)
+    app.get(
+        '/api/build/:username/:id/logs',
+        projectVerificationMiddleware,
+        getLogHandler('build')
+    )
+    app.get(
+        '/api/container/:username/:id/logs',
+        projectVerificationMiddleware,
+        getLogHandler('container')
+    )
+    ws.app.ws(
+        '/api/container/:username/:id/ssh',
+        projectVerificationMiddlewareWs,
+        sshHandler
+    )
 
     const port = parseInt(process.env.PORT || '4000')
 
