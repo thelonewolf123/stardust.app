@@ -149,22 +149,18 @@ export const mutation: Resolvers['Mutation'] = {
 
         ctx.queue.createContainer.publish({
             containerSlug: containerSlug,
-            env: container.env.reduce(
-                (acc, { name, value }) => {
-                    acc[name] = value
-                    return acc
-                },
-                {} as Record<string, string>
-            ),
+            env: container.env.reduce((acc, { name, value }) => {
+                acc[name] = value
+                return acc
+            }, {} as Record<string, string>),
             image: container.image,
             ports: container.port ? [container.port] : []
         })
 
         return true
     },
-    refreshProject: async (_, { input }, ctx) => {
+    refreshProject: async (_, { slug, input }, ctx) => {
         const user = getRegularUser(ctx)
-        const slug = input.name
 
         const project = await ctx.db.Project.findOne({ slug, user: user._id })
             .populate(['current'])
@@ -243,6 +239,6 @@ export const mutationType = gql`
         createProject(input: ProjectInput!): String!
         deleteProject(slug: String!): Boolean!
         roleBackProject(slug: String!, version: Int!): Boolean!
-        refreshProject(input: RefreshProjectInput!): Boolean!
+        refreshProject(slug: String!, input: RefreshProjectInput!): Boolean!
     }
 `

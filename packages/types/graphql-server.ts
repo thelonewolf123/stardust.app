@@ -89,6 +89,7 @@ export type MutationDeleteProjectArgs = {
 
 export type MutationRefreshProjectArgs = {
   input: RefreshProjectInput;
+  slug: Scalars['String'];
 };
 
 
@@ -348,7 +349,7 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
   createContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationCreateContainerArgs, 'input'>>;
   createProject?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'input'>>;
   deleteProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteProjectArgs, 'slug'>>;
-  refreshProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRefreshProjectArgs, 'input'>>;
+  refreshProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRefreshProjectArgs, 'input' | 'slug'>>;
   roleBackProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRoleBackProjectArgs, 'slug' | 'version'>>;
   signup?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'email' | 'password' | 'username'>>;
   startContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationStartContainerArgs, 'projectSlug'>>;

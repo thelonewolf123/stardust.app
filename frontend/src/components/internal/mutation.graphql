@@ -1,0 +1,3 @@
+mutation RefreshProject($slug: String!, $input: RefreshProjectInput!) {
+    refreshProject(slug: $slug, input: $input)
+}

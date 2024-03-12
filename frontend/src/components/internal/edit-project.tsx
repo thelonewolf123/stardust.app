@@ -1,25 +1,45 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { z } from 'zod'
 
 import ProjectForm, {
     ProjectInputSchema
 } from '@/components/internal/project-form'
+import { useRefreshProjectMutation } from '@/graphql-client'
 
 export default function EditProject({
-    defaultValues
+    defaultValues,
+    slug
 }: {
+    slug: string
     defaultValues: z.infer<typeof ProjectInputSchema>
 }) {
+    const [updateProject, { loading }] = useRefreshProjectMutation()
+    const router = useRouter()
+
     const onSubmit = (values: z.infer<typeof ProjectInputSchema>) => {
-        console.log(values)
+        updateProject({
+            variables: {
+                slug,
+                input: {
+                    ...values,
+                    env: values.env,
+                    buildArgs: values.buildArgs,
+                    metaData: values.metaData
+                }
+            }
+        }).then(() => {
+            router.push(`/project/${values.name}/${values.name}`)
+        })
     }
 
     return (
         <ProjectForm
             onSubmit={onSubmit}
             defaultValues={defaultValues}
-            loading={false}
+            loading={loading}
+            title="Edit Project"
         />
     )
 }

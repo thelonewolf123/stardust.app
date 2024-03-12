@@ -14,6 +14,7 @@ async function getProjectDetails(username: string, slug: string) {
     const project = data.getProjectBySlug
     return {
         name: project.name,
+        slug: project.slug,
         description: project.description,
         githubBranch: project.githubBranch || '',
         githubUrl: project.githubUrl || '',
@@ -33,5 +34,5 @@ export default async function ProjectEditPage({
     }
 }) {
     const project = await getProjectDetails(params.username, params.slug)
-    return <EditProject defaultValues={project} />
+    return <EditProject defaultValues={project} slug={project.slug} />
 }

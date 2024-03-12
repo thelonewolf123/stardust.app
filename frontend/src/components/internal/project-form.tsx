@@ -1,8 +1,12 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import { MdOutlineRemoveCircleOutline } from 'react-icons/md'
+import {
+    MdOutlineAddCircle,
+    MdOutlineAddCircleOutline,
+    MdOutlineRemoveCircleOutline
+} from 'react-icons/md'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
@@ -83,7 +87,7 @@ function ArrayFieldsBuilder<T extends ArrayFieldsBuilderType>({
     useEffect(() => {
         // check all fields and remove empty ones, and if there are no fields, add one
 
-        const isAllFieldsUsed = fields.every((field, index) => {
+        const isAllFieldsUsed: boolean = fields.every((field, index) => {
             return field.name.trim() && field.value.trim()
         })
 
@@ -160,6 +164,15 @@ function ArrayFieldsBuilder<T extends ArrayFieldsBuilderType>({
                                     </FormItem>
                                 )}
                             />
+                            {index === fields.length - 1 ? (
+                                <MdOutlineAddCircleOutline
+                                    className="text-green-500 hover:text-green-700 cursor-pointer"
+                                    size={22}
+                                    onClick={() =>
+                                        append({ name: '', value: '' })
+                                    }
+                                />
+                            ) : null}
                             <MdOutlineRemoveCircleOutline
                                 className="text-red-500 hover:text-red-700 cursor-pointer"
                                 size={22}
@@ -176,11 +189,13 @@ function ArrayFieldsBuilder<T extends ArrayFieldsBuilderType>({
 export default function ProjectForm({
     onSubmit,
     defaultValues,
-    loading
+    loading,
+    title
 }: {
     onSubmit: (values: z.infer<typeof ProjectInputSchema>) => void
     defaultValues?: z.infer<typeof ProjectInputSchema>
     loading: boolean
+    title?: string
 }) {
     const form = useForm<z.infer<typeof ProjectInputSchema>>({
         resolver: zodResolver(ProjectInputSchema),
@@ -195,7 +210,7 @@ export default function ProjectForm({
                     className="mx-auto my-8 space-y-8 rounded-lg bg-white dark:bg-slate-900 p-8 shadow-lg"
                 >
                     <h1 className="text-xl font-medium underline">
-                        New Project
+                        {title || 'New Project'}
                     </h1>
                     <div className="grid gap-4 md:grid-cols-2 grid-cols-1">
                         <FormField

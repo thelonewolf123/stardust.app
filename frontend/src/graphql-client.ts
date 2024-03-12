@@ -89,6 +89,7 @@ export type MutationDeleteProjectArgs = {
 
 export type MutationRefreshProjectArgs = {
   input: RefreshProjectInput;
+  slug: Scalars['String'];
 };
 
 
@@ -254,6 +255,14 @@ export type SignupMutaionMutationVariables = Exact<{
 
 
 export type SignupMutaionMutation = { __typename?: 'Mutation', signup: string };
+
+export type RefreshProjectMutationVariables = Exact<{
+  slug: Scalars['String'];
+  input: RefreshProjectInput;
+}>;
+
+
+export type RefreshProjectMutation = { __typename?: 'Mutation', refreshProject: boolean };
 
 export type GetBuildLogsQueryVariables = Exact<{
   containerSlug: Scalars['String'];
@@ -544,6 +553,38 @@ export function useSignupMutaionMutation(baseOptions?: Apollo.MutationHookOption
 export type SignupMutaionMutationHookResult = ReturnType<typeof useSignupMutaionMutation>;
 export type SignupMutaionMutationResult = Apollo.MutationResult<SignupMutaionMutation>;
 export type SignupMutaionMutationOptions = Apollo.BaseMutationOptions<SignupMutaionMutation, SignupMutaionMutationVariables>;
+export const RefreshProjectDocument = gql`
+    mutation RefreshProject($slug: String!, $input: RefreshProjectInput!) {
+  refreshProject(slug: $slug, input: $input)
+}
+    `;
+export type RefreshProjectMutationFn = Apollo.MutationFunction<RefreshProjectMutation, RefreshProjectMutationVariables>;
+
+/**
+ * __useRefreshProjectMutation__
+ *
+ * To run a mutation, you first call `useRefreshProjectMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRefreshProjectMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [refreshProjectMutation, { data, loading, error }] = useRefreshProjectMutation({
+ *   variables: {
+ *      slug: // value for 'slug'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useRefreshProjectMutation(baseOptions?: Apollo.MutationHookOptions<RefreshProjectMutation, RefreshProjectMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RefreshProjectMutation, RefreshProjectMutationVariables>(RefreshProjectDocument, options);
+      }
+export type RefreshProjectMutationHookResult = ReturnType<typeof useRefreshProjectMutation>;
+export type RefreshProjectMutationResult = Apollo.MutationResult<RefreshProjectMutation>;
+export type RefreshProjectMutationOptions = Apollo.BaseMutationOptions<RefreshProjectMutation, RefreshProjectMutationVariables>;
 export const GetBuildLogsDocument = gql`
     query GetBuildLogs($containerSlug: String!) {
   getBuildLogs(containerSlug: $containerSlug)
