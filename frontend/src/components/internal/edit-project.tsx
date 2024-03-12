@@ -30,7 +30,7 @@ export default function EditProject({
                 }
             }
         }).then(() => {
-            router.push(`/project/${values.name}/${values.name}`)
+            router.push(`/project/${slug}`)
         })
     }
 

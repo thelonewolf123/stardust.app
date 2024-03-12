@@ -1,0 +1,11 @@
+query GetDeploymentHistory($slug: String!) {
+    getProjectBySlug(slug: $slug) {
+        history {
+            containerSlug
+            createdAt
+            status
+        }
+        slug
+        name
+    }
+}

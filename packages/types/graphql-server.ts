@@ -25,11 +25,14 @@ export type Container = {
   buildArgs?: Maybe<Array<BuildArgs>>;
   command?: Maybe<Array<Scalars['String']>>;
   containerSlug: Scalars['String'];
+  createdAt: Scalars['Float'];
   env?: Maybe<Array<Env>>;
   image: Scalars['String'];
   metaData?: Maybe<Array<MetaData>>;
   port?: Maybe<Scalars['Int']>;
   status: ContainerStatus;
+  terminatedAt?: Maybe<Scalars['Float']>;
+  updatedAt?: Maybe<Scalars['Float']>;
 };
 
 export type ContainerInput = {
@@ -331,11 +334,14 @@ export type ContainerResolvers<ContextType = Context, ParentType extends Resolve
   buildArgs?: Resolver<Maybe<Array<ResolversTypes['buildArgs']>>, ParentType, ContextType>;
   command?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   containerSlug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   env?: Resolver<Maybe<Array<ResolversTypes['Env']>>, ParentType, ContextType>;
   image?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   metaData?: Resolver<Maybe<Array<ResolversTypes['metaData']>>, ParentType, ContextType>;
   port?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['ContainerStatus'], ParentType, ContextType>;
+  terminatedAt?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  updatedAt?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 

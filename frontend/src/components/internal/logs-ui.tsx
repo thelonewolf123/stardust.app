@@ -7,7 +7,7 @@ import { useState } from 'react'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { Container } from '@/graphql-client'
+import { Container, GetProjectBySlugForEditQuery } from '@/graphql-client'
 
 import { Button } from '../ui/button'
 import {
@@ -64,7 +64,7 @@ export default function TerminalTab({
 }
 
 export const LogsUi: React.FC<{
-    current?: Container | null
+    current?: GetProjectBySlugForEditQuery['getProjectBySlug']['current'] | null
     history?: Pick<Container, 'containerSlug'>[] | null
 }> = ({ current, history }) => {
     const [activeTab, setActiveTab] = useState<TABS>(TABS.container)

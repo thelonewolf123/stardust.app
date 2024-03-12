@@ -1,9 +1,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { BsGearFill } from 'react-icons/bs'
 
 import { LogsUi } from '@/components/internal/logs-ui'
 import { StatusIcon } from '@/components/internal/status'
+import { Button } from '@/components/ui/button'
 import {
     GetProjectBySlugDocument,
     GetProjectBySlugQuery
@@ -41,10 +41,27 @@ export default async function SingleProjectPage({
 
     return (
         <div className="container mt-4 space-y-2">
-            <h1 className="text-3xl space-y-2 capitalize underline">
-                {project.name}
-            </h1>
-            <div className="rounded shadow-md p-5 px-4 md:flex gap-4 w-full dark:bg-slate-900 relative">
+            <div className="flex justify-between my-8">
+                <h1 className="text-3xl space-y-2 capitalize mb-4">
+                    {project.name}
+                </h1>
+                <div className="flex gap-2">
+                    <Link href={project.githubUrl} target="_blank">
+                        <Button variant={'outline'}>Github Repo</Button>
+                    </Link>
+                    <Link
+                        href={`/project/${params.username}/${params.slug}/edit`}
+                    >
+                        <Button variant={'outline'}>Edit</Button>
+                    </Link>
+                    <Link
+                        href={`/project/${params.username}/${params.slug}/edit`}
+                    >
+                        <Button>View</Button>
+                    </Link>
+                </div>
+            </div>
+            <div className="rounded shadow-md p-5 px-4 md:flex gap-4 w-full dark:bg-slate-900">
                 <div className="md:w-1/3 prose dark:prose-invert">
                     <h3>Preview</h3>
                     <Image
@@ -62,12 +79,6 @@ export default async function SingleProjectPage({
                         Created on {new Date(project.createdAt).toDateString()}
                     </h4>
                     <span className="flex gap-2 items-baseline">
-                        <h4>Github URL:</h4>
-                        <Link href={project.githubUrl} target="_blank">
-                            {project.githubUrl}
-                        </Link>
-                    </span>
-                    <span className="flex gap-2 items-baseline">
                         <h4>Github Branch:</h4>
                         <p>{project.githubBranch}</p>
                     </span>
@@ -80,12 +91,6 @@ export default async function SingleProjectPage({
                         <StatusIcon status={project.current?.status} />
                     </h4>
                 </div>
-                <Link
-                    href={`/project/${params.username}/${params.slug}/edit`}
-                    className="absolute bottom-4 right-4 text-4xl text-muted-foreground hover:text-primary hover:cursor-pointer"
-                >
-                    <BsGearFill />
-                </Link>
             </div>
             <div className="py-4">
                 <h3 className="font-semibold text-2xl mb-2">Logs</h3>

@@ -25,11 +25,14 @@ export type Container = {
   buildArgs?: Maybe<Array<BuildArgs>>;
   command?: Maybe<Array<Scalars['String']>>;
   containerSlug: Scalars['String'];
+  createdAt: Scalars['Float'];
   env?: Maybe<Array<Env>>;
   image: Scalars['String'];
   metaData?: Maybe<Array<MetaData>>;
   port?: Maybe<Scalars['Int']>;
   status: ContainerStatus;
+  terminatedAt?: Maybe<Scalars['Float']>;
+  updatedAt?: Maybe<Scalars['Float']>;
 };
 
 export type ContainerInput = {
@@ -228,6 +231,13 @@ export type CreateProjectMutationVariables = Exact<{
 
 export type CreateProjectMutation = { __typename?: 'Mutation', createProject: string };
 
+export type GetDeploymentHistoryQueryVariables = Exact<{
+  slug: Scalars['String'];
+}>;
+
+
+export type GetDeploymentHistoryQuery = { __typename?: 'Query', getProjectBySlug: { __typename?: 'Project', slug: string, name: string, history?: Array<{ __typename?: 'Container', containerSlug: string, createdAt: number, status: ContainerStatus }> | null } };
+
 export type GetProjectBySlugForEditQueryVariables = Exact<{
   slug: Scalars['String'];
 }>;
@@ -337,6 +347,47 @@ export function useCreateProjectMutation(baseOptions?: Apollo.MutationHookOption
 export type CreateProjectMutationHookResult = ReturnType<typeof useCreateProjectMutation>;
 export type CreateProjectMutationResult = Apollo.MutationResult<CreateProjectMutation>;
 export type CreateProjectMutationOptions = Apollo.BaseMutationOptions<CreateProjectMutation, CreateProjectMutationVariables>;
+export const GetDeploymentHistoryDocument = gql`
+    query GetDeploymentHistory($slug: String!) {
+  getProjectBySlug(slug: $slug) {
+    history {
+      containerSlug
+      createdAt
+      status
+    }
+    slug
+    name
+  }
+}
+    `;
+
+/**
+ * __useGetDeploymentHistoryQuery__
+ *
+ * To run a query within a React component, call `useGetDeploymentHistoryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDeploymentHistoryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDeploymentHistoryQuery({
+ *   variables: {
+ *      slug: // value for 'slug'
+ *   },
+ * });
+ */
+export function useGetDeploymentHistoryQuery(baseOptions: Apollo.QueryHookOptions<GetDeploymentHistoryQuery, GetDeploymentHistoryQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDeploymentHistoryQuery, GetDeploymentHistoryQueryVariables>(GetDeploymentHistoryDocument, options);
+      }
+export function useGetDeploymentHistoryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDeploymentHistoryQuery, GetDeploymentHistoryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDeploymentHistoryQuery, GetDeploymentHistoryQueryVariables>(GetDeploymentHistoryDocument, options);
+        }
+export type GetDeploymentHistoryQueryHookResult = ReturnType<typeof useGetDeploymentHistoryQuery>;
+export type GetDeploymentHistoryLazyQueryHookResult = ReturnType<typeof useGetDeploymentHistoryLazyQuery>;
+export type GetDeploymentHistoryQueryResult = Apollo.QueryResult<GetDeploymentHistoryQuery, GetDeploymentHistoryQueryVariables>;
 export const GetProjectBySlugForEditDocument = gql`
     query GetProjectBySlugForEdit($slug: String!) {
   getProjectBySlug(slug: $slug) {

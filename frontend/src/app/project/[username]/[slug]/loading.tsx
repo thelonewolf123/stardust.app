@@ -5,9 +5,14 @@ import { Skeleton } from '@/components/ui/skeleton'
 export default async function SingleProjectLoading() {
     return (
         <div className="container mt-4 space-y-2">
-            <h1 className="text-3xl space-y-2 capitalize underline">
+            <div className="flex justify-between my-8">
                 <Skeleton className="w-1/2 h-10" />
-            </h1>
+                <div className="flex gap-2">
+                    <Skeleton className="w-20 h-10" />
+                    <Skeleton className="w-20 h-10" />
+                    <Skeleton className="w-20 h-10" />
+                </div>
+            </div>
             <div className="rounded shadow-md p-5 px-4 flex gap-4 w-full dark:bg-slate-900">
                 <div className="w-1/2 prose dark:prose-invert">
                     <h3>
