@@ -78,12 +78,48 @@ server.addPlugin({
 const main = async () => {
     await server.start()
     app.use(cors())
+
+    app.use(async (req, res, next) => {
+        const token = req.headers['x-access-token']
+        try {
+            const { username, count } = await new Promise<{
+                username: string
+                count: number
+            }>((resolve, reject) => {
+                jwt.verify(`${token}`, env.JWT_SECRET, (err, decoded) => {
+                    if (err) {
+                        return reject(err)
+                    }
+
+                    if (typeof decoded === 'string')
+                        return reject('Decoded token is string')
+
+                    if (!decoded || !decoded.exp)
+                        return reject('No decoded token')
+
+                    if (decoded.exp < Date.now() / 1000)
+                        return reject('Token expired')
+
+                    resolve(decoded as any)
+                })
+            })
+
+            const user = await models.User.findOne({
+                username: `${username}`
+            }).lean()
+
+            req.user = user && user.count === count ? (user as any) : null
+        } catch (err) {
+            console.log(err)
+        }
+
+        next()
+    })
     app.use(
         '/graphql',
         express.json(),
         expressMiddleware(server, {
             context: async ({ req, res }) => {
-                const token = req.headers['x-access-token']
                 const [createContainer, destroyContainer, buildContainer] =
                     await queuePromise
 
@@ -94,46 +130,7 @@ const main = async () => {
                         buildContainer
                     },
                     db: models,
-                    user: null
-                }
-
-                if (!token) return ctx
-
-                try {
-                    const { username, count } = await new Promise<{
-                        username: string
-                        count: number
-                    }>((resolve, reject) => {
-                        jwt.verify(
-                            `${token}`,
-                            env.JWT_SECRET,
-                            (err, decoded) => {
-                                if (err) {
-                                    return reject(err)
-                                }
-
-                                if (typeof decoded === 'string')
-                                    return reject('Decoded token is string')
-
-                                if (!decoded || !decoded.exp)
-                                    return reject('No decoded token')
-
-                                if (decoded.exp < Date.now() / 1000)
-                                    return reject('Token expired')
-
-                                resolve(decoded as any)
-                            }
-                        )
-                    })
-
-                    const user = await models.User.findOne({ username }).lean()
-
-                    ctx.user =
-                        user && user.count === count ? (user as any) : null
-
-                    return ctx
-                } catch (err) {
-                    console.log(err)
+                    user: req.user || null
                 }
 
                 return ctx

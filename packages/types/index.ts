@@ -86,3 +86,11 @@ export type InstanceExecArgs = {
 }
 
 export type PublisherType = 'BUILD_LOGS' | 'CONTAINER_LOGS'
+
+declare global {
+    namespace Express {
+        interface Request {
+            user?: Context['user']
+        }
+    }
+}
