@@ -6,6 +6,7 @@ import { FitAddon } from 'xterm-addon-fit'
 import { Button } from '@/components/ui/button'
 import { CardContent } from '@/components/ui/card'
 import { getBackendServerUrl } from '@/lib/graphql'
+import { getClientAccessToken } from '@/lib/utils'
 
 export default function TerminalComp({
     slug,
@@ -18,9 +19,10 @@ export default function TerminalComp({
     const fitAddOnRef = useRef<FitAddon>()
     const xtermRef = useRef<Terminal>()
     const BASE_URL = getBackendServerUrl('ws')
+    const token = getClientAccessToken()
 
     const { sendMessage } = useWebSocket(
-        `${BASE_URL}/api/container/${slug}/ssh`,
+        `${BASE_URL}/api/container/${slug}/ssh?token=${token}`,
         {
             onMessage: (e) => {
                 if (xtermRef.current) {

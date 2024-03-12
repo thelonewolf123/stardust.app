@@ -84,7 +84,7 @@ const main = async () => {
     app.use(cors())
 
     app.use(async (req, res, next) => {
-        const token = req.headers['x-access-token']
+        const token = req.headers['x-access-token'] || req.query.token
         try {
             const { username, count } = await new Promise<{
                 username: string

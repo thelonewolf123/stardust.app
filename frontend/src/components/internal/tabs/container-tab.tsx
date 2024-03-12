@@ -6,14 +6,18 @@ import { useEventSource } from 'react-use-websocket'
 import { Button } from '@/components/ui/button'
 import { CardContent } from '@/components/ui/card'
 import { getBackendServerUrl } from '@/lib/graphql'
+import { getClientAccessToken } from '@/lib/utils'
+
+type ContainerLogsType = { message: string; timestamp: number }
 
 function ContainerLogsComp({ slug, show }: { slug: string; show: boolean }) {
-    const [logs, setLogs] = useState<{ message: string; timestamp: number }[]>(
-        []
-    )
-    const BASE_URL = getBackendServerUrl()
+    const [logs, setLogs] = useState<ContainerLogsType[]>([])
     const logsRef = useRef<HTMLDivElement>(null)
-    useEventSource(`${BASE_URL}/api/container/${slug}/logs`, {
+
+    const BASE_URL = getBackendServerUrl()
+    const token = getClientAccessToken()
+
+    useEventSource(`${BASE_URL}/api/container/${slug}/logs?token=${token}`, {
         onMessage: (e) => {
             setLogs((prevLogs) => {
                 const msgObject = JSON.parse(e.data)

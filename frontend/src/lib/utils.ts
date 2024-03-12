@@ -48,3 +48,7 @@ export function parseEnv(src: string) {
 
     return obj
 }
+
+export function getClientAccessToken() {
+    return localStorage.getItem('token') || ''
+}
