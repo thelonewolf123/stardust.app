@@ -1,25 +1,19 @@
 'use client'
 
-import 'xterm/css/xterm.css'
+import 'xterm/css/xterm.css';
 
-import dynamic from 'next/dynamic'
-import { useState } from 'react'
+import dynamic from 'next/dynamic';
+import { useState } from 'react';
 
-import { Card, CardContent } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import { Container, GetProjectBySlugForEditQuery } from '@/graphql-client'
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Container, GetProjectBySlugForEditQuery } from '@/graphql-client';
 
-import { Button } from '../ui/button'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue
-} from '../ui/select'
-import BuildLogsTab from './tabs/build-tab'
-import ContainerLogsTab from './tabs/container-tab'
-import LoaderUi from './tabs/loader-ui'
+import { Button } from '../ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import BuildLogsTab from './tabs/build-tab';
+import ContainerLogsTab from './tabs/container-tab';
+import LoaderUi from './tabs/loader-ui';
 
 const TerminalComp = dynamic(() => import('./tabs/terminal-tab'), {
     loading: () => <LoaderUi />,
@@ -44,7 +38,7 @@ export default function TerminalTab({
     if (!start) {
         return (
             <CardContent
-                className={`p-2 flex h-80 justify-center items-center ${
+                className={`p-2 h-80 flex justify-center items-center ${
                     show ? '' : 'hidden'
                 }`}
             >

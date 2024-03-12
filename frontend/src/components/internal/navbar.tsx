@@ -1,10 +1,11 @@
-import Link from 'next/link'
+import Link from 'next/link';
 
-import { getAccessToken } from '@/lib/server-utils'
+import { getAccessToken } from '@/lib/server-utils';
 
-import { Button } from '../ui/button'
-import { Separator } from '../ui/separator'
-import { ThemeToggle } from './theme-toggle'
+import { Button } from '../ui/button';
+import { Separator } from '../ui/separator';
+import { LogoutBtn } from './logout-btn';
+import { ThemeToggle } from './theme-toggle';
 
 export default async function Navbar() {
     const token = await getAccessToken()
@@ -33,9 +34,7 @@ export default async function Navbar() {
                     <ThemeToggle />
 
                     {token ? (
-                        <Link href="/api/logout">
-                            <Button>Logout</Button>
-                        </Link>
+                        <LogoutBtn />
                     ) : (
                         <div className="flex items-center gap-1">
                             <Link href="/login" className="hover:underline">

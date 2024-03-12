@@ -1,12 +1,12 @@
-import { use, useEffect, useRef, useState } from 'react'
-import useWebSocket from 'react-use-websocket'
-import { Terminal } from 'xterm'
-import { FitAddon } from 'xterm-addon-fit'
+import { use, useEffect, useRef, useState } from 'react';
+import useWebSocket from 'react-use-websocket';
+import { Terminal } from 'xterm';
+import { FitAddon } from 'xterm-addon-fit';
 
-import { Button } from '@/components/ui/button'
-import { CardContent } from '@/components/ui/card'
-import { getBackendServerUrl } from '@/lib/graphql'
-import { getClientAccessToken } from '@/lib/utils'
+import { Button } from '@/components/ui/button';
+import { CardContent } from '@/components/ui/card';
+import { getBackendServerUrl } from '@/lib/graphql';
+import { getClientAccessToken } from '@/lib/utils';
 
 export default function TerminalComp({
     slug,
@@ -58,7 +58,7 @@ export default function TerminalComp({
     }, [sendMessage])
 
     return (
-        <CardContent className={`p-0 ${show ? '' : 'hidden'}`}>
+        <CardContent className={`p-2 bg-black ${show ? '' : 'hidden'}`}>
             <div ref={terminalDiv} className="h-80 rounded"></div>
         </CardContent>
     )
