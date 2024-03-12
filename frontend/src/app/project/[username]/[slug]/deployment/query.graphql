@@ -5,6 +5,10 @@ query GetDeploymentHistory($slug: String!) {
             createdAt
             status
         }
+        current {
+            containerSlug
+            status
+        }
         slug
         name
     }

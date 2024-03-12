@@ -231,12 +231,20 @@ export type CreateProjectMutationVariables = Exact<{
 
 export type CreateProjectMutation = { __typename?: 'Mutation', createProject: string };
 
+export type RollbackProjectMutationVariables = Exact<{
+  slug: Scalars['String'];
+  version: Scalars['Int'];
+}>;
+
+
+export type RollbackProjectMutation = { __typename?: 'Mutation', roleBackProject: boolean };
+
 export type GetDeploymentHistoryQueryVariables = Exact<{
   slug: Scalars['String'];
 }>;
 
 
-export type GetDeploymentHistoryQuery = { __typename?: 'Query', getProjectBySlug: { __typename?: 'Project', slug: string, name: string, history?: Array<{ __typename?: 'Container', containerSlug: string, createdAt: number, status: ContainerStatus }> | null } };
+export type GetDeploymentHistoryQuery = { __typename?: 'Query', getProjectBySlug: { __typename?: 'Project', slug: string, name: string, history?: Array<{ __typename?: 'Container', containerSlug: string, createdAt: number, status: ContainerStatus }> | null, current?: { __typename?: 'Container', containerSlug: string, status: ContainerStatus } | null } };
 
 export type GetProjectBySlugForEditQueryVariables = Exact<{
   slug: Scalars['String'];
@@ -347,12 +355,48 @@ export function useCreateProjectMutation(baseOptions?: Apollo.MutationHookOption
 export type CreateProjectMutationHookResult = ReturnType<typeof useCreateProjectMutation>;
 export type CreateProjectMutationResult = Apollo.MutationResult<CreateProjectMutation>;
 export type CreateProjectMutationOptions = Apollo.BaseMutationOptions<CreateProjectMutation, CreateProjectMutationVariables>;
+export const RollbackProjectDocument = gql`
+    mutation RollbackProject($slug: String!, $version: Int!) {
+  roleBackProject(slug: $slug, version: $version)
+}
+    `;
+export type RollbackProjectMutationFn = Apollo.MutationFunction<RollbackProjectMutation, RollbackProjectMutationVariables>;
+
+/**
+ * __useRollbackProjectMutation__
+ *
+ * To run a mutation, you first call `useRollbackProjectMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRollbackProjectMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [rollbackProjectMutation, { data, loading, error }] = useRollbackProjectMutation({
+ *   variables: {
+ *      slug: // value for 'slug'
+ *      version: // value for 'version'
+ *   },
+ * });
+ */
+export function useRollbackProjectMutation(baseOptions?: Apollo.MutationHookOptions<RollbackProjectMutation, RollbackProjectMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RollbackProjectMutation, RollbackProjectMutationVariables>(RollbackProjectDocument, options);
+      }
+export type RollbackProjectMutationHookResult = ReturnType<typeof useRollbackProjectMutation>;
+export type RollbackProjectMutationResult = Apollo.MutationResult<RollbackProjectMutation>;
+export type RollbackProjectMutationOptions = Apollo.BaseMutationOptions<RollbackProjectMutation, RollbackProjectMutationVariables>;
 export const GetDeploymentHistoryDocument = gql`
     query GetDeploymentHistory($slug: String!) {
   getProjectBySlug(slug: $slug) {
     history {
       containerSlug
       createdAt
+      status
+    }
+    current {
+      containerSlug
       status
     }
     slug

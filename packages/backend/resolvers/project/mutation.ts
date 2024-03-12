@@ -101,35 +101,22 @@ export const mutation: Resolvers['Mutation'] = {
             .lean()
         if (!project) throw new Error('Project not found')
 
-        const container = project.history.find((c) => {
-            if (c instanceof ctx.db.Container) {
-                return c.version === version
-            }
-            return false
+        const container: any = project.history.find((c: any) => {
+            return c.version === version
         })
 
         invariant(container, 'Container not found')
 
-        await ctx.db.Project.updateOne(
-            { slug, user: user._id },
-            { $set: { current: container, updatedAt: new Date() } }
-        )
-        const currentContainer = project.current
+        const currentContainer = project.current as any
         invariant(currentContainer, 'Current container not found')
 
+        const history = project.history
         const containerSlug = `${slug}:${history.length}`
-
-        invariant(
-            currentContainer instanceof ctx.db.Container,
-            'Container not found'
-        )
 
         ctx.queue.destroyContainer.publish({
             containerId: currentContainer.containerId,
             containerSlug: currentContainer.containerSlug
         })
-
-        invariant(container instanceof ctx.db.Container, 'Container not found')
 
         const newContainer = new ctx.db.Container({
             containerSlug: containerSlug,
@@ -144,15 +131,24 @@ export const mutation: Resolvers['Mutation'] = {
         await newContainer.save()
         await ctx.db.Project.updateOne(
             { slug, user: user._id },
-            { $push: { history: newContainer } }
+            {
+                $push: { history: newContainer },
+                $set: { current: newContainer }
+            }
         )
 
         ctx.queue.createContainer.publish({
             containerSlug: containerSlug,
-            env: container.env.reduce((acc, { name, value }) => {
-                acc[name] = value
-                return acc
-            }, {} as Record<string, string>),
+            env: container.env.reduce(
+                (
+                    acc: Record<string, string>,
+                    { name, value }: { name: string; value: string }
+                ) => {
+                    acc[name] = value
+                    return acc
+                },
+                {} as Record<string, string>
+            ),
             image: container.image,
             ports: container.port ? [container.port] : []
         })
@@ -175,6 +171,7 @@ export const mutation: Resolvers['Mutation'] = {
             'Current container not found'
         )
 
+        const history = project.history
         const containerSlug = `${slug}:${history.length}`
         const repoWithHash = `${project.ecrRepo}:${history.length}`
 

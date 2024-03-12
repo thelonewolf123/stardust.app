@@ -1,14 +1,6 @@
-import { MdMoreHoriz } from 'react-icons/md'
-
+import { CurrentBadge } from '@/components/internal/current'
+import { RollbackForm } from '@/components/internal/rollback'
 import { StatusIcon } from '@/components/internal/status'
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
 import {
     GetDeploymentHistoryDocument,
     GetDeploymentHistoryQuery
@@ -22,27 +14,13 @@ const getDeploymentHistory = async (slug: string) => {
         variables: { slug }
     })
     const project = data.getProjectBySlug
-    return {
-        history: project.history || [],
-        name: project.name
-    }
-}
+    const history = project.history?.toReversed() || []
 
-function DeploymentMenu({ containerSlug }: { containerSlug: string }) {
-    return (
-        <DropdownMenu>
-            <DropdownMenuTrigger>
-                <MdMoreHoriz className="hover:cursor-pointer rounded-full hover:bg-gray-100 p-1 dark:hover:bg-slate-800 w-8 h-8" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-                <DropdownMenuLabel>
-                    <p className="font-semibold">Actions</p>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Rollback</DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
-    )
+    return {
+        history,
+        name: project.name,
+        currentSlug: project.current?.containerSlug || ''
+    }
 }
 
 export default async function ProjectDeploymentPage({
@@ -51,29 +29,38 @@ export default async function ProjectDeploymentPage({
     params: { username: string; slug: string }
 }) {
     const slug = `${params.username}/${params.slug}`
-    const { history, name } = await getDeploymentHistory(slug)
+    const { history, currentSlug, name } = await getDeploymentHistory(slug)
+
     return (
         <div className="container">
-            <h1 className="text-3xl space-y-2 capitalize my-4">{name}</h1>
-            <div>
+            <h1 className="text-3xl space-y-2 capitalize my-8">{name}</h1>
+            <div className="flex flex-col gap-4">
                 {history.map((deploy, idx) => (
                     <div
                         key={idx}
                         className="border flex justify-between rounded p-4"
                     >
-                        <div className="flex gap-2">
-                            <p className="font-semibold">
-                                Version {deploy.containerSlug.split(':').at(-1)}
-                            </p>
-                            <p className="text-muted-foreground">
-                                deployed by {params.username}
-                            </p>
+                        <div className="flex flex-col gap-2">
+                            <div className="flex gap-2">
+                                <p className="font-semibold">
+                                    Version{' '}
+                                    {deploy.containerSlug.split(':').at(-1)}
+                                </p>
+                                <p className="text-muted-foreground">
+                                    deployed by {params.username}
+                                </p>
+                            </div>
+                            {deploy.containerSlug === currentSlug ? (
+                                <CurrentBadge />
+                            ) : null}
                         </div>
 
                         <StatusIcon status={deploy.status} />
                         <p>{new Date(deploy.createdAt).toLocaleString()}</p>
-
-                        <DeploymentMenu containerSlug={deploy.containerSlug} />
+                        <RollbackForm
+                            slug={deploy.containerSlug}
+                            currentSlug={currentSlug}
+                        />
                     </div>
                 ))}
             </div>

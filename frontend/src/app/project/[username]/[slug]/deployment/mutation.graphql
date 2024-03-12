@@ -1,0 +1,3 @@
+mutation RollbackProject($slug: String!, $version: Int!) {
+  roleBackProject(slug: $slug , version: $version)
+}
