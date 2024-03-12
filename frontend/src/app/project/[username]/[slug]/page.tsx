@@ -32,7 +32,11 @@ export default async function SingleProjectPage({
     const project = await getProject(params.username, params.slug)
 
     if (!project) {
-        return <h1>Project not found</h1>
+        return (
+            <div className="flex justify-center h-full items-center">
+                <h1 className="text-4xl">Project not found</h1>
+            </div>
+        )
     }
 
     return (
