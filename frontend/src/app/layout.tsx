@@ -6,6 +6,7 @@ import { Inter } from 'next/font/google'
 import Navbar from '@/components/internal/navbar'
 import { ApolloWrapper } from '@/components/internal/wrapper/apollo'
 import { ThemeProvider } from '@/components/internal/wrapper/theme'
+import { Toaster } from '@/components/ui/toaster'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -49,6 +50,7 @@ export default function RootLayout({
                         enableSystem
                         disableTransitionOnChange
                     >
+                        <Toaster />
                         <Navbar />
                         {children}
                     </ThemeProvider>
