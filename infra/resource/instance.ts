@@ -17,6 +17,6 @@ export const instance = new aws.ec2.Instance(
         }
     },
     {
-        replaceOnChanges: ['*']
+        // replaceOnChanges: ['*']
     }
 )

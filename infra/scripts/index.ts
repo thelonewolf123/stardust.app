@@ -2,6 +2,7 @@ import { env } from '../../packages/env'
 
 export const ec2UserData = `#!/bin/bash
 sudo apt update
+sudo apt upgrade -y
 sudo apt install git curl nodejs podman docker.io awscli -y
 
 # Create a systemd service for the proxy
@@ -39,5 +40,5 @@ sudo podman login --username AWS --password $(sudo aws ecr get-login-password --
 
 export const ec2ProxyUserData = `#!/bin/bash
 echo "Starting proxy container"
-sudo docker run -d --restart --name reverse-proxy-container -p 80:80 -e REDIS_HOST='${env.REDIS_HOST}' docker.io/thelonewolf123/docker-proxy node /app/reverse-proxy.js 2> /home/ubuntu/reverse-proxy-create.log 
+sudo docker run -d --restart always --name reverse-proxy-container -p 80:80 -e REDIS_HOST='${env.REDIS_HOST}' docker.io/thelonewolf123/docker-proxy node /app/reverse-proxy.js 2> /home/ubuntu/reverse-proxy-create.log 
 `

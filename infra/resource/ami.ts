@@ -76,5 +76,3 @@ export const getAmi = (distro?: 'arch' | 'amzn' | 'ubuntu') => {
     // default to ubuntu
     return ubuntuAmi
 }
-
-export const ami = createAmiFromInstance(instance, remoteCommand)
