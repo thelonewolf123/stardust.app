@@ -242,6 +242,12 @@ class InstanceStrategyAws {
         invariant(this.instanceId, ERROR_CODES.INSTANCE_NOT_FOUND)
         await deleteContainer(containerSlug)
     }
+
+    async getInstanceIp() {
+        invariant(this.instanceId, ERROR_CODES.INSTANCE_NOT_FOUND)
+        const info = await ec2Aws.getInstanceInfoById(this.instanceId)
+        return info?.PublicIpAddress
+    }
 }
 
 export default InstanceStrategyAws

@@ -35,7 +35,7 @@ export class Project {
     public history!: Ref<typeof Container>[]
 
     @prop({ type: String, required: true }, PropType.ARRAY)
-    public domain!: string[]
+    public domains!: string[]
 
     @prop({ ref: () => Container, required: false })
     public current!: Ref<typeof Container>

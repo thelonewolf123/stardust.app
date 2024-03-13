@@ -62,7 +62,7 @@ export const mutation: Resolvers['Mutation'] = {
             ecrRepo: repositoryUri,
             current: container,
             history: [container],
-            domain: [subdomain],
+            domains: [subdomain],
             user: user
         })
         await project.save()
@@ -236,7 +236,7 @@ export const mutation: Resolvers['Mutation'] = {
         const project = await ctx.db.Project.findOne({ slug, user: user._id })
         if (!project) throw new Error('Project not found')
 
-        project.domain.push(domain)
+        project.domains.push(domain)
         await project.save()
         return true
     },
@@ -245,7 +245,7 @@ export const mutation: Resolvers['Mutation'] = {
         const project = await ctx.db.Project.findOne({ slug, user: user._id })
         if (!project) throw new Error('Project not found')
 
-        project.domain = project.domain.filter((d) => d !== domain)
+        project.domains = project.domains.filter((d) => d !== domain)
         await project.save()
         return true
     }

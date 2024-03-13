@@ -78,11 +78,33 @@ async function getContainer(
     return null
 }
 
+async function attachDomainToContainer(args: {
+    containerSlug: string
+    domain: string
+    ipAddr: string
+    portNumber: number
+}): Promise<void> {
+    const { containerSlug, portNumber, domain, ipAddr } = args
+    const container = await getContainer({ containerSlug })
+    if (!container) {
+        throw new Error('Container not found')
+    }
+
+    const domains = container.domains || []
+    const hostPortMap = container.hostPortMap || {}
+    hostPortMap[domain] = portNumber
+    domains.push(domain)
+
+    await updateContainer(containerSlug, { domains, hostPortMap })
+    await redis.client.hset('domainMap', domain, `${ipAddr}:${portNumber}`)
+}
+
 export {
     getContainer,
     deleteContainer,
     scheduleContainer,
     updateContainer,
     scheduleContainerBuild,
+    attachDomainToContainer,
     getInstanceIdByContainerId
 }

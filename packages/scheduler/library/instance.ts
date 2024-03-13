@@ -1,4 +1,5 @@
 import Dockerode from 'dockerode'
+import invariant from 'invariant'
 
 import { getDockerClient } from '@/core/docker'
 import { InstanceExecArgs, ProviderType } from '@/types'
@@ -64,6 +65,12 @@ class InstanceStrategy {
 
     freeContainerInstance(containerId: string): Promise<void> {
         return this.strategy.freeContainerInstance(containerId)
+    }
+
+    async getInstanceIp(): Promise<string> {
+        const ipAddr = await this.strategy.getInstanceIp()
+        invariant(ipAddr, 'Instance IP not found')
+        return ipAddr
     }
 }
 

@@ -37,8 +37,8 @@ export type PhysicalHostType = {
         containerId: string
         containerSlug: string
         projectSlug?: string
-        subdomain?: string
-        hostPort?: number
+        domains?: string[]
+        hostPortMap?: Record<string, number>
         updatedAt: Date
         scheduledAt: Date
         status: 'running' | 'pending'
@@ -96,3 +96,8 @@ declare global {
         }
     }
 }
+
+export type PortBindingMap = Record<
+    string,
+    [{ HostIp: string; HostPort: string }]
+>

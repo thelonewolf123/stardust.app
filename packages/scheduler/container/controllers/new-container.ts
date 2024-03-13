@@ -3,11 +3,16 @@ import invariant from 'invariant'
 import { z } from 'zod'
 
 import models from '@/backend/database'
-import { getPublisher } from '@/core/redis'
+import redis, { getPublisher } from '@/core/redis'
+import { sleep } from '@/core/utils'
 import InstanceStrategy from '@/scheduler/library/instance'
-import { deleteContainer, updateContainer } from '@/scheduler/lua/container'
+import {
+    attachDomainToContainer,
+    deleteContainer,
+    updateContainer
+} from '@/scheduler/lua/container'
 import { ContainerSchedulerSchema } from '@/schema'
-import { ProviderType } from '@/types'
+import { PortBindingMap, ProviderType } from '@/types'
 import { ERROR_CODES } from '@constants/aws-infra'
 
 export class NewContainerStrategy {
@@ -130,6 +135,62 @@ export class NewContainerStrategy {
         throw error
     }
 
+    async #waitForPortNumbers(): Promise<Record<number, number>> {
+        invariant(this.#container, 'Container not found!')
+        let attempt_count = 0
+
+        const portMap: Record<number, number> = {}
+
+        if (!this.#data.ports || this.#data.ports.length === 0) {
+            return portMap
+        }
+
+        while (attempt_count < 300) {
+            const info = await this.#container.inspect()
+            const bindings: PortBindingMap = info.HostConfig.PortBindings
+            const ports = this.#data.ports || []
+            ports.map((port) => {
+                const binding = bindings[`${port}/tcp`]
+                if (binding) {
+                    portMap[port] = parseInt(binding[0].HostPort, 10)
+                }
+            })
+
+            if (Object.keys(portMap).length === ports.length) {
+                return portMap
+            }
+
+            await sleep(1000)
+        }
+
+        throw new Error("Ports didn't bind in time")
+    }
+
+    async #addDomainToContainer(portMap: Record<number, number>) {
+        const projectSlug = this.#data.containerSlug.split(':')[0]
+        invariant(projectSlug, 'Project slug not found')
+        const project = await models.Project.findOne({
+            slug: projectSlug
+        }).lean()
+        const domains = project?.domains || []
+        const ipAddr = await this.#instance.getInstanceIp()
+        const ports = this.#data.ports || []
+        if (ports.length === 0) return
+
+        // TODO: Handle port specific domains here @thelonewolf123
+        const defaultHttpPort = portMap[ports[0]]
+        const domainsPromise = domains.map(async (domain) =>
+            attachDomainToContainer({
+                domain,
+                containerSlug: this.#data.containerSlug,
+                ipAddr,
+                portNumber: defaultHttpPort
+            })
+        )
+
+        await Promise.all(domainsPromise)
+    }
+
     createNewContainer = async () => {
         return this.#instance
             .getInstanceForNewContainer(this.#data.containerSlug)
@@ -139,6 +200,8 @@ export class NewContainerStrategy {
             .then(() => this.#pullImageIfNeeded())
             .then(() => this.#startContainer())
             .then(() => this.#updateContainerStatus())
+            .then(() => this.#waitForPortNumbers())
+            .then((portMap) => this.#addDomainToContainer(portMap))
             .catch((err) => this.#handleError(err))
     }
 }
