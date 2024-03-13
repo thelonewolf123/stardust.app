@@ -3,8 +3,11 @@ import { env } from '../../packages/env'
 export const ec2UserData = `#!/bin/bash
 sudo apt update
 sudo apt upgrade -y
-sudo apt install git curl nodejs podman docker.io awscli -y
-
+sudo apt install git -y
+sudo snap install node --classic
+sudo snap install aws-cli --classic
+sudo snap install docker
+  
 # Create a systemd service for the proxy
 echo '[Unit]
 Description=Start Proxy Container
@@ -35,7 +38,6 @@ region=${env.AWS_REGION}"  | sudo tee /root/.aws/config
 sudo chmod 600 /root/.aws/config
 
 sudo docker login --username AWS --password $(sudo aws ecr get-login-password --region ${env.AWS_REGION}) ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com
-sudo podman login --username AWS --password $(sudo aws ecr get-login-password --region ${env.AWS_REGION}) ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com 
 `
 
 export const ec2ProxyUserData = `#!/bin/bash

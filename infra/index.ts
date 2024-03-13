@@ -1,5 +1,6 @@
 import { SSM_PARAMETER_KEYS } from '../constants/aws-infra'
 import { createAmiFromInstance } from './resource/ami'
+import { addDnsRecord } from './resource/cloudflare'
 import { instance } from './resource/instance'
 import { dockerHostPassword, keyPair } from './resource/keystore'
 import { proxyCommandFn } from './resource/proxy'
@@ -30,10 +31,12 @@ const ec2InstanceSSM = storeSecret({
 })
 const proxySSM = storeProxyIpAddr(instance.publicIp)
 const proxyCommand = proxyCommandFn(ami)
+const dnsRecord = addDnsRecord(instance.publicIp)
 
 export const amiId = ami.id
 export const instanceId = instance.id
 export const proxySSMId = proxySSM.id
+export const dnsRecordId = dnsRecord.id
 export const proxyCmdId = proxyCommand.id
 export const sshKeyName = keyPair.keyName
 export const baseAmiSSMId = baseAmiSSM.id

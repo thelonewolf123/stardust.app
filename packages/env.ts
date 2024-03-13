@@ -30,7 +30,9 @@ export const serverEnvSchema = {
     REDIS_HOST: z.string().min(1),
     REMOTE_DOCKER_PASSWORD: z.string().min(1),
     EC2_PRIVATE_KEY: z.string().min(1).optional(),
-    EC2_PUBLIC_KEY: z.string().min(1).optional()
+    EC2_PUBLIC_KEY: z.string().min(1).optional(),
+    CLOUDFLARE_ZONE_ID: z.string().min(1),
+    DOMAIN_NAME: z.string().min(1)
 }
 
 export const env = createEnv({
@@ -52,6 +54,8 @@ export const env = createEnv({
         REDIS_HOST: process.env.REDIS_HOST,
         REMOTE_DOCKER_PASSWORD: process.env.REMOTE_DOCKER_PASSWORD,
         EC2_PRIVATE_KEY: process.env.EC2_PRIVATE_KEY,
-        EC2_PUBLIC_KEY: process.env.EC2_PUBLIC_KEY
+        EC2_PUBLIC_KEY: process.env.EC2_PUBLIC_KEY,
+        CLOUDFLARE_ZONE_ID: process.env.CLOUDFLARE_ZONE_ID,
+        DOMAIN_NAME: process.env.DOMAIN_NAME
     }
 })

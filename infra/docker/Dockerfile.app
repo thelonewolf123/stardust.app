@@ -35,7 +35,7 @@ ENV PORT=80
 
 WORKDIR /app
 RUN apk add --no-cache git
-RUN git clone -b $BRANCH https://oauth:$GITHUB_TOKEN@github.com/thelonewolf123/soul-forge /app
+RUN git clone -b $BRANCH https://oauth:$GITHUB_TOKEN@github.com/thelonewolf123/stardust.app /app
 RUN yarn install --frozen-lockfile
 RUN yarn build
 
