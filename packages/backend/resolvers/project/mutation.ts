@@ -16,6 +16,7 @@ export const mutation: Resolvers['Mutation'] = {
         const repositoryUri = ecrResponse.repository?.repositoryUri
         invariant(repositoryUri, 'Repository URI is not defined')
         const repoWithHash = `${repositoryUri}:${version}`
+        const subdomain = `${projectSlug}.${process.env.DOMAIN}`
 
         const buildArgs = (input.buildArgs || []).reduce(
             (acc, { name, value }) => {
@@ -61,6 +62,7 @@ export const mutation: Resolvers['Mutation'] = {
             ecrRepo: repositoryUri,
             current: container,
             history: [container],
+            domain: [subdomain],
             user: user
         })
         await project.save()
@@ -228,6 +230,24 @@ export const mutation: Resolvers['Mutation'] = {
         })
 
         return true
+    },
+    addDomain: async (_, { slug, domain }, ctx) => {
+        const user = getRegularUser(ctx)
+        const project = await ctx.db.Project.findOne({ slug, user: user._id })
+        if (!project) throw new Error('Project not found')
+
+        project.domain.push(domain)
+        await project.save()
+        return true
+    },
+    removeDomain: async (_, { slug, domain }, ctx) => {
+        const user = getRegularUser(ctx)
+        const project = await ctx.db.Project.findOne({ slug, user: user._id })
+        if (!project) throw new Error('Project not found')
+
+        project.domain = project.domain.filter((d) => d !== domain)
+        await project.save()
+        return true
     }
 }
 
@@ -237,5 +257,7 @@ export const mutationType = gql`
         deleteProject(slug: String!): Boolean!
         roleBackProject(slug: String!, version: Int!): Boolean!
         refreshProject(slug: String!, input: RefreshProjectInput!): Boolean!
+        addDomain(slug: String!, domain: String!): Boolean!
+        removeDomain(slug: String!, domain: String!): Boolean!
     }
 `

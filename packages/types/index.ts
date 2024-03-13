@@ -37,6 +37,8 @@ export type PhysicalHostType = {
         containerId: string
         containerSlug: string
         projectSlug?: string
+        subdomain?: string
+        hostPort?: number
         updatedAt: Date
         scheduledAt: Date
         status: 'running' | 'pending'

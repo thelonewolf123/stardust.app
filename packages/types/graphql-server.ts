@@ -64,14 +64,22 @@ export type EnvInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addDomain: Scalars['Boolean'];
   createContainer: Scalars['Boolean'];
   createProject: Scalars['String'];
   deleteProject: Scalars['Boolean'];
   refreshProject: Scalars['Boolean'];
+  removeDomain: Scalars['Boolean'];
   roleBackProject: Scalars['Boolean'];
   signup: Scalars['String'];
   startContainer: Scalars['Boolean'];
   stopContainer: Scalars['Boolean'];
+};
+
+
+export type MutationAddDomainArgs = {
+  domain: Scalars['String'];
+  slug: Scalars['String'];
 };
 
 
@@ -92,6 +100,12 @@ export type MutationDeleteProjectArgs = {
 
 export type MutationRefreshProjectArgs = {
   input: RefreshProjectInput;
+  slug: Scalars['String'];
+};
+
+
+export type MutationRemoveDomainArgs = {
+  domain: Scalars['String'];
   slug: Scalars['String'];
 };
 
@@ -352,10 +366,12 @@ export type EnvResolvers<ContextType = Context, ParentType extends ResolversPare
 };
 
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  addDomain?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationAddDomainArgs, 'domain' | 'slug'>>;
   createContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationCreateContainerArgs, 'input'>>;
   createProject?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'input'>>;
   deleteProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteProjectArgs, 'slug'>>;
   refreshProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRefreshProjectArgs, 'input' | 'slug'>>;
+  removeDomain?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRemoveDomainArgs, 'domain' | 'slug'>>;
   roleBackProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRoleBackProjectArgs, 'slug' | 'version'>>;
   signup?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'email' | 'password' | 'username'>>;
   startContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationStartContainerArgs, 'projectSlug'>>;

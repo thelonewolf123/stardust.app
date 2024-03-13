@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { WebsocketRequestHandler } from 'express-ws'
+import { generate } from 'random-words'
 
 import models from '@backend/database'
 
@@ -54,4 +55,8 @@ export const projectVerificationMiddlewareWs: WebsocketRequestHandler = async (
     }
 
     next()
+}
+
+export function generateSubdomain() {
+    return generate({ exactly: 2, join: '-' })
 }
