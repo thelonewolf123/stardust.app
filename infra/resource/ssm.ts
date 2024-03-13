@@ -45,3 +45,11 @@ export function storeSecret(param: {
         value: param.secret
     })
 }
+
+export function storeProxyIpAddr(proxyIpAddr: Output<string>) {
+    return new aws.ssm.Parameter(SSM_PARAMETER_KEYS.proxyIpAddr, {
+        name: SSM_PARAMETER_KEYS.proxyIpAddr,
+        type: 'StringList',
+        value: proxyIpAddr
+    })
+}

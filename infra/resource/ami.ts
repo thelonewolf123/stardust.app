@@ -3,7 +3,9 @@ import * as command from '@pulumi/command'
 
 import * as awsInfra from '../../constants/aws-infra'
 import { getArchLinuxAmiId } from '../utils'
+import { instance } from './instance'
 import { regionName } from './region'
+import { remoteCommand } from './ssh'
 
 export const ubuntuAmi = aws.ec2.getAmi({
     filters: [
@@ -74,3 +76,5 @@ export const getAmi = (distro?: 'arch' | 'amzn' | 'ubuntu') => {
     // default to ubuntu
     return ubuntuAmi
 }
+
+export const ami = createAmiFromInstance(instance, remoteCommand)
