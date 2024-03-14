@@ -1,5 +1,3 @@
-import Link from 'next/link'
-
 import { ProjectNavLink } from '@/components/internal/project-navlink'
 import { Separator } from '@/components/ui/separator'
 

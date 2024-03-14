@@ -1,5 +1,7 @@
 'use server'
 
+import { revalidatePath } from 'next/cache'
+
 import {
     RollbackProjectDocument,
     RollbackProjectMutation
@@ -20,6 +22,7 @@ export const rollbackToVersion = async (formData: FormData) => {
             }
         })
 
+        revalidatePath(`/project/${slug}/deployment`)
         return { success: true }
     } catch (error: any) {
         return { success: false, error: error.message }
