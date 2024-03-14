@@ -43,5 +43,6 @@ export const typeDefs = gql`
         dockerContext: String!
         createdAt: Float!
         history: [Container!]
+        domains: [String!]
     }
 `
