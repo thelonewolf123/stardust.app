@@ -5,6 +5,7 @@ import { Inter } from 'next/font/google'
 
 import Navbar from '@/components/internal/common/navbar'
 import { ApolloWrapper } from '@/components/internal/wrapper/apollo'
+import { NextAuthProvider } from '@/components/internal/wrapper/session'
 import { ThemeProvider } from '@/components/internal/wrapper/theme'
 import { Toaster } from '@/components/ui/toaster'
 
@@ -43,18 +44,20 @@ export default function RootLayout({
                 <link rel="manifest" href="/site.webmanifest" />
             </head>
             <body className={inter.className}>
-                <ApolloWrapper>
-                    <ThemeProvider
-                        attribute="class"
-                        defaultTheme="system"
-                        enableSystem
-                        disableTransitionOnChange
-                    >
-                        <Toaster />
-                        <Navbar />
-                        {children}
-                    </ThemeProvider>
-                </ApolloWrapper>
+                <NextAuthProvider>
+                    <ApolloWrapper>
+                        <ThemeProvider
+                            attribute="class"
+                            defaultTheme="system"
+                            enableSystem
+                            disableTransitionOnChange
+                        >
+                            <Toaster />
+                            <Navbar />
+                            {children}
+                        </ThemeProvider>
+                    </ApolloWrapper>
+                </NextAuthProvider>
             </body>
         </html>
     )
