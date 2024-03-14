@@ -1,8 +1,10 @@
 import gql from 'graphql-tag'
 import invariant from 'invariant'
 
+import { generateSubdomain } from '@/backend/library'
 import { ecr } from '@/core/aws/ecr.aws'
 import { getRegularUser } from '@/core/utils'
+import { env } from '@/env'
 import { Resolvers } from '@/types/graphql-server'
 
 export const mutation: Resolvers['Mutation'] = {
@@ -16,7 +18,9 @@ export const mutation: Resolvers['Mutation'] = {
         const repositoryUri = ecrResponse.repository?.repositoryUri
         invariant(repositoryUri, 'Repository URI is not defined')
         const repoWithHash = `${repositoryUri}:${version}`
-        const subdomain = `${projectSlug}.${process.env.DOMAIN}`
+
+        const prefix = generateSubdomain()
+        const subdomain = `${prefix}.${env.DOMAIN_NAME}`
 
         const buildArgs = (input.buildArgs || []).reduce(
             (acc, { name, value }) => {

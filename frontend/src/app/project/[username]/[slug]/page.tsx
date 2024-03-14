@@ -54,11 +54,13 @@ export default async function SingleProjectPage({
                     >
                         <Button variant={'outline'}>Edit</Button>
                     </Link>
-                    <Link
-                        href={`/project/${params.username}/${params.slug}/edit`}
-                    >
-                        <Button>View</Button>
-                    </Link>
+                    {project.domains ? (
+                        <Link href={project.domains[0]} target="_blank">
+                            <Button>View</Button>
+                        </Link>
+                    ) : (
+                        <Button disabled>View</Button>
+                    )}
                 </div>
             </div>
             <div className="rounded shadow-md p-5 px-4 md:flex gap-4 w-full dark:bg-slate-900">

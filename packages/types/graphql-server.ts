@@ -139,6 +139,7 @@ export type Project = {
   description: Scalars['String'];
   dockerContext: Scalars['String'];
   dockerPath: Scalars['String'];
+  domains?: Maybe<Array<Scalars['String']>>;
   githubBranch: Scalars['String'];
   githubUrl: Scalars['String'];
   history?: Maybe<Array<Container>>;
@@ -384,6 +385,7 @@ export type ProjectResolvers<ContextType = Context, ParentType extends Resolvers
   description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   dockerContext?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   dockerPath?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  domains?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   githubBranch?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   githubUrl?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   history?: Resolver<Maybe<Array<ResolversTypes['Container']>>, ParentType, ContextType>;

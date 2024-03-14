@@ -24,6 +24,7 @@ query GetProjectBySlug($slug: String!) {
         history {
             containerSlug
         }
+        domains
         slug
         name
     }

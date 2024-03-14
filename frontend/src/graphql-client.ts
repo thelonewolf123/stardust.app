@@ -64,14 +64,22 @@ export type EnvInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addDomain: Scalars['Boolean'];
   createContainer: Scalars['Boolean'];
   createProject: Scalars['String'];
   deleteProject: Scalars['Boolean'];
   refreshProject: Scalars['Boolean'];
+  removeDomain: Scalars['Boolean'];
   roleBackProject: Scalars['Boolean'];
   signup: Scalars['String'];
   startContainer: Scalars['Boolean'];
   stopContainer: Scalars['Boolean'];
+};
+
+
+export type MutationAddDomainArgs = {
+  domain: Scalars['String'];
+  slug: Scalars['String'];
 };
 
 
@@ -92,6 +100,12 @@ export type MutationDeleteProjectArgs = {
 
 export type MutationRefreshProjectArgs = {
   input: RefreshProjectInput;
+  slug: Scalars['String'];
+};
+
+
+export type MutationRemoveDomainArgs = {
+  domain: Scalars['String'];
   slug: Scalars['String'];
 };
 
@@ -125,6 +139,7 @@ export type Project = {
   description: Scalars['String'];
   dockerContext: Scalars['String'];
   dockerPath: Scalars['String'];
+  domains?: Maybe<Array<Scalars['String']>>;
   githubBranch: Scalars['String'];
   githubUrl: Scalars['String'];
   history?: Maybe<Array<Container>>;
@@ -258,7 +273,7 @@ export type GetProjectBySlugQueryVariables = Exact<{
 }>;
 
 
-export type GetProjectBySlugQuery = { __typename?: 'Query', getProjectBySlug: { __typename?: 'Project', createdAt: number, description: string, dockerContext: string, dockerPath: string, githubBranch: string, githubUrl: string, slug: string, name: string, current?: { __typename?: 'Container', command?: Array<string> | null, containerSlug: string, image: string, port?: number | null, status: ContainerStatus, env?: Array<{ __typename?: 'Env', name: string, value: string }> | null, metaData?: Array<{ __typename?: 'metaData', name: string, value: string }> | null } | null, history?: Array<{ __typename?: 'Container', containerSlug: string }> | null } };
+export type GetProjectBySlugQuery = { __typename?: 'Query', getProjectBySlug: { __typename?: 'Project', createdAt: number, description: string, dockerContext: string, dockerPath: string, githubBranch: string, githubUrl: string, domains?: Array<string> | null, slug: string, name: string, current?: { __typename?: 'Container', command?: Array<string> | null, containerSlug: string, image: string, port?: number | null, status: ContainerStatus, env?: Array<{ __typename?: 'Env', name: string, value: string }> | null, metaData?: Array<{ __typename?: 'metaData', name: string, value: string }> | null } | null, history?: Array<{ __typename?: 'Container', containerSlug: string }> | null } };
 
 export type GetAllProjectsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -523,6 +538,7 @@ export const GetProjectBySlugDocument = gql`
     history {
       containerSlug
     }
+    domains
     slug
     name
   }
