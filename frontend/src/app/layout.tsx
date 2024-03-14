@@ -3,7 +3,7 @@ import './globals.css'
 
 import { Inter } from 'next/font/google'
 
-import Navbar from '@/components/internal/navbar'
+import Navbar from '@/components/internal/common/navbar'
 import { ApolloWrapper } from '@/components/internal/wrapper/apollo'
 import { ThemeProvider } from '@/components/internal/wrapper/theme'
 import { Toaster } from '@/components/ui/toaster'

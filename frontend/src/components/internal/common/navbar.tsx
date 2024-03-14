@@ -2,10 +2,10 @@ import Link from 'next/link'
 
 import { getAccessToken } from '@/lib/server-utils'
 
-import { Button } from '../ui/button'
-import { Separator } from '../ui/separator'
-import { LogoutBtn } from './common/logout-btn'
-import { ThemeToggle } from './common/theme-toggle'
+import { Button } from '../../ui/button'
+import { Separator } from '../../ui/separator'
+import { LogoutBtn } from './logout-btn'
+import { ThemeToggle } from './theme-toggle'
 
 export default async function Navbar() {
     const token = await getAccessToken()
