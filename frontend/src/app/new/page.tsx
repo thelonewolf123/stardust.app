@@ -5,7 +5,7 @@ import { z } from 'zod'
 
 import ProjectForm, {
     ProjectInputSchema
-} from '@/components/internal/project-form'
+} from '@/components/internal/project/project-form'
 import { useCreateProjectMutation } from '@/graphql-client'
 
 const defaultFormValues = {

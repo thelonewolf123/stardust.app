@@ -1,4 +1,4 @@
-import EditProject from '@/components/internal/edit-project'
+import EditProject from '@/components/internal/project/edit-project'
 import {
     GetProjectBySlugForEditDocument,
     GetProjectBySlugForEditQuery

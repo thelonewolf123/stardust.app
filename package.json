@@ -87,6 +87,7 @@
     "lru-cache": "^8.0.4",
     "mongoose": "^7.4.1",
     "nanoid": "^4.0.2",
+    "node-ssh": "^13.1.0",
     "random-words": "^2.0.1",
     "redis": "^4.6.7",
     "redlock": "^5.0.0-beta.2",

@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { LogsUi } from '@/components/internal/logs-ui'
-import { StatusIcon } from '@/components/internal/status'
+import { StatusIcon } from '@/components/internal/project/status'
 import { Button } from '@/components/ui/button'
 import {
     GetProjectBySlugDocument,

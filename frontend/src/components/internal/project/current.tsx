@@ -1,6 +1,6 @@
 import { FaArrowCircleUp } from 'react-icons/fa'
 
-import { Badge } from '../ui/badge'
+import { Badge } from '../../ui/badge'
 
 export function CurrentBadge() {
     return (

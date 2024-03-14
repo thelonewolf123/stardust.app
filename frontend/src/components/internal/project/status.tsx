@@ -4,7 +4,7 @@ import { MdPending } from 'react-icons/md'
 
 import { ContainerStatus } from '@/graphql-client'
 
-import { Badge } from '../ui/badge'
+import { Badge } from '../../ui/badge'
 
 export const StatusIcon: React.FC<{ status?: ContainerStatus }> = ({
     status

@@ -4,7 +4,7 @@ import { useFormStatus } from 'react-dom'
 
 import { rollbackToVersion } from '@/action/rollback'
 
-import { Button } from '../ui/button'
+import { Button } from '../../ui/button'
 
 export function SubmitButton({ text }: { text: string }) {
     const { pending } = useFormStatus()

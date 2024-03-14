@@ -5,7 +5,7 @@ import { z } from 'zod'
 
 import ProjectForm, {
     ProjectInputSchema
-} from '@/components/internal/project-form'
+} from '@/components/internal/project/project-form'
 import { useRefreshProjectMutation } from '@/graphql-client'
 
 export default function EditProject({

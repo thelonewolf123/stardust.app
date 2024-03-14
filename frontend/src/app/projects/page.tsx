@@ -3,7 +3,7 @@ import { FaCheckCircle } from 'react-icons/fa'
 import { IoCloseCircle } from 'react-icons/io5'
 import { MdPending } from 'react-icons/md'
 
-import { StatusIcon } from '@/components/internal/status'
+import { StatusIcon } from '@/components/internal/project/status'
 import { Badge } from '@/components/ui/badge'
 import {
     ContainerStatus,

@@ -1,3 +1,4 @@
+import { NodeSSH } from 'node-ssh'
 import { Client as SSHClient } from 'ssh2'
 
 import { env } from '@/env'
@@ -129,69 +130,42 @@ async function terminateInstance(instanceId: string) {
 async function execCommand(params: InstanceExecArgs) {
     const key = SSM_PARAMETER_KEYS.ec2PrivateKey
     const privateKey = await ssmAws.getParameter(key, true)
-    let fullCommand = `${params.command} ${params.args
-        .map((arg) => encodeURIComponent(arg))
-        .join(' ')}`
-    const ssh = new SSHClient()
+
+    const ssh = new NodeSSH()
 
     if (params.sudo) {
-        fullCommand = `sudo ${fullCommand}`
+        params.command = 'sudo'
+        params.args = [params.command, ...params.args]
     }
 
-    if (params.cwd) {
-        fullCommand = `cd ${params.cwd} && ${fullCommand}`
-    } else {
-        fullCommand = `cd /home/${EC2_INSTANCE_USERNAME} && ${fullCommand}`
-    }
-
-    console.log('Full command: ', fullCommand)
-
-    ssh.connect({
+    await ssh.connect({
         host: params.ipAddress,
         port: 22,
         username: EC2_INSTANCE_USERNAME, // Modify this if your instance uses a different username
         privateKey: privateKey
     })
 
-    await new Promise<void>((resolve) => ssh.on('ready', resolve))
+    let output = ''
 
-    const resultPromise = new Promise<string>((resolve, reject) => {
-        let output = ''
-
-        // TODO: this code is vulnerable to shell injection, fix it @thelonewolf123
-        ssh.exec(
-            fullCommand,
-            {
-                env: params.env,
-                pty: true
-            },
-            (err, stream) => {
-                if (err) {
-                    reject(err)
-                    ssh.end()
-                    return
-                }
-
-                stream
-                    .on('data', (data: Buffer) => {
-                        output += data.toString()
-                        params.onProgress?.(data.toString())
-                    })
-                    .on('end', () => {
-                        resolve(output)
-                        ssh.end()
-                    })
-            }
-        )
-
-        ssh.on('error', (err) => {
-            reject(err)
-        })
+    // TODO: this code is vulnerable to shell injection, fix it @thelonewolf123
+    const resultPromise = ssh.exec(params.command, params.args, {
+        cwd: params.cwd,
+        onStdout: (data) => {
+            output += data.toString()
+            params.onProgress?.(data.toString())
+        },
+        onStderr: (data) => {
+            output += data.toString()
+            params.onProgress?.(data.toString())
+        },
+        execOptions: {
+            env
+        }
     })
 
     return [
         () => {
-            ssh.end()
+            ssh.dispose()
         },
         resultPromise
     ] as const

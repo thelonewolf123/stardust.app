@@ -1,9 +1,9 @@
 'use client'
 
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
-import { Button } from '../ui/button';
+import { Button } from '../../ui/button'
 
 export function LogoutBtn() {
     const [loading, setLoading] = useState(false)

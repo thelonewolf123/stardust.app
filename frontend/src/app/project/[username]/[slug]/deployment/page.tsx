@@ -1,6 +1,6 @@
-import { CurrentBadge } from '@/components/internal/current'
-import { RollbackForm } from '@/components/internal/rollback'
-import { StatusIcon } from '@/components/internal/status'
+import { CurrentBadge } from '@/components/internal/project/current'
+import { RollbackForm } from '@/components/internal/project/rollback'
+import { StatusIcon } from '@/components/internal/project/status'
 import {
     GetDeploymentHistoryDocument,
     GetDeploymentHistoryQuery

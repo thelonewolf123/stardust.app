@@ -1,4 +1,4 @@
-import { ProjectNavLink } from '@/components/internal/project-navlink'
+import { ProjectNavLink } from '@/components/internal/project/project-navlink'
 import { Separator } from '@/components/ui/separator'
 
 export default function Layout({
