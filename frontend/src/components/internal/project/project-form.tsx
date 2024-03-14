@@ -23,41 +23,10 @@ import { Textarea } from '@/components/ui/textarea'
 import { parseEnv } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 
-const keyValuePair = z.object({
-    name: z.string(),
-    value: z.string()
-})
+import { ArrayFieldsSchema } from '../settings/array-forms'
+import { ProjectSchema } from '../settings/general-settings'
 
-export const ProjectInputSchema = z.object({
-    name: z
-        .string()
-        .min(2, {
-            message: 'Project name must be at least 2 characters.'
-        })
-        .regex(/^[a-z0-9-]+$/i, {
-            message: 'Invalid project name.'
-        }),
-    description: z.string().min(2, {
-        message: 'Project description must be at least 2 characters.'
-    }),
-    githubUrl: z.string().url(),
-    githubBranch: z.string().min(2, {
-        message: 'Invalid github branch.'
-    }),
-    dockerPath: z.string().min(1, {
-        message: 'Invalid docker path.'
-    }),
-    dockerContext: z.string().min(1, {
-        message: 'Invalid docker context.'
-    }),
-    port: z
-        .string()
-        .transform((v) => parseInt(v))
-        .optional(),
-    env: z.array(keyValuePair),
-    buildArgs: z.array(keyValuePair),
-    metaData: z.array(keyValuePair)
-})
+export const ProjectInputSchema = ProjectSchema.merge(ArrayFieldsSchema)
 
 type ArrayFieldsBuilderType = ReturnType<
     typeof useForm<z.infer<typeof ProjectInputSchema>>

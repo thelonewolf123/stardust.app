@@ -1,11 +1,10 @@
-import EditProject from '@/components/internal/project/edit-project'
 import {
     GetProjectBySlugForEditDocument,
     GetProjectBySlugForEditQuery
 } from '@/graphql-client'
 import { getApolloClient } from '@/lib/server-utils'
 
-async function getProjectDetails(username: string, slug: string) {
+export async function getProjectDetails(username: string, slug: string) {
     const client = await getApolloClient()
     const { data } = await client.query<GetProjectBySlugForEditQuery>({
         query: GetProjectBySlugForEditDocument,
@@ -22,17 +21,7 @@ async function getProjectDetails(username: string, slug: string) {
         dockerContext: project.dockerContext,
         env: project.current?.env || [],
         buildArgs: project.current?.buildArgs || [],
-        metaData: project.current?.metaData || []
+        metaData: project.current?.metaData || [],
+        port: project.current?.port || 3000
     }
-}
-export default async function ProjectEditPage({
-    params
-}: {
-    params: {
-        username: string
-        slug: string
-    }
-}) {
-    const project = await getProjectDetails(params.username, params.slug)
-    return <EditProject defaultValues={project} slug={project.slug} />
 }

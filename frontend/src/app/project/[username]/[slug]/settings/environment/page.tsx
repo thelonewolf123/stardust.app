@@ -1,7 +1,22 @@
-export default function EnvironmentPage() {
+import { ProjectArrayForm } from '@/components/internal/settings/array-forms'
+import { getProjectDetails } from '@/data/project'
+
+export default async function EnvironmentPage({
+    params
+}: {
+    params: {
+        username: string
+        slug: string
+    }
+}) {
+    const project = await getProjectDetails(params.username, params.slug)
     return (
-        <div>
-            <h1>Environment</h1>
-        </div>
+        <ProjectArrayForm
+            project={project}
+            slug={project.slug}
+            propertyKey="env"
+            prefix="env"
+            descriptionName="Environment Variables"
+        />
     )
 }

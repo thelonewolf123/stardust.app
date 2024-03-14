@@ -169,20 +169,24 @@ export const mutation: Resolvers['Mutation'] = {
             .lean()
         invariant(project, 'Project not found')
 
-        const current = project.current
+        const current: any = project.current
         invariant(current, 'Current container not found')
-
-        invariant(
-            current instanceof ctx.db.Container,
-            'Current container not found'
-        )
 
         const history = project.history
         const containerSlug = `${slug}:${history.length}`
         const repoWithHash = `${project.ecrRepo}:${history.length}`
 
-        const buildArgs = (input.buildArgs || current.buildArgs).reduce(
-            (acc, { name, value }) => {
+        const buildArgs = (input.buildArgs || current.buildArgs || []).reduce(
+            (
+                acc: any,
+                {
+                    name,
+                    value
+                }: {
+                    name: string
+                    value: string
+                }
+            ) => {
                 acc[name] = value
                 return acc
             },

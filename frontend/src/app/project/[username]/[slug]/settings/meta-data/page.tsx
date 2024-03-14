@@ -1,7 +1,22 @@
-export default function MetaDataPage() {
+import { ProjectArrayForm } from '@/components/internal/settings/array-forms'
+import { getProjectDetails } from '@/data/project'
+
+export default async function MetaDataPage({
+    params
+}: {
+    params: {
+        username: string
+        slug: string
+    }
+}) {
+    const project = await getProjectDetails(params.username, params.slug)
     return (
-        <div>
-            <h1>Meta Data</h1>
-        </div>
+        <ProjectArrayForm
+            project={project}
+            slug={project.slug}
+            propertyKey="metaData"
+            prefix="meta_data"
+            descriptionName="Meta Data"
+        />
     )
 }
