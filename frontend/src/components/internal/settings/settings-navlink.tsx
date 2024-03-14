@@ -1,39 +1,44 @@
 'use client'
 
 import Link from 'next/link'
-import { useParams, usePathname } from 'next/navigation'
+import {
+    useParams,
+    usePathname,
+    useSelectedLayoutSegment,
+    useSelectedLayoutSegments
+} from 'next/navigation'
 
 const SETTINGS_LINKS = [
-    { label: 'General', href: '/settings' },
-    { label: 'Environment', href: '/settings/environment' },
+    { label: 'General', href: '/' },
+    { label: 'Environment', href: '/environment' },
     {
         label: 'Build Args',
-        href: '/settings/build-args'
+        href: '/build-args'
     },
     {
         label: 'Meta Data',
-        href: '/settings/meta-data'
+        href: '/meta-data'
     },
     {
         label: 'Webhooks',
-        href: '/settings/webhooks'
+        href: '/webhooks'
     },
-    { label: 'Billing', href: '/settings/billing' }
+    { label: 'Billing', href: '/billing' }
 ]
 
 export function SettingsNavLink() {
     const params = useParams()
-    const path = usePathname()
+    const segment = useSelectedLayoutSegment()
 
-    const projectPath = `/project/${params.username}/${params.slug}`
+    const projectPath = `/project/${params.username}/${params.slug}/settings`
 
     return (
-        <div className="font-semibold flex gap-4 flex-col p-4">
+        <div className="font-semibold flex gap-4 flex-col pr-4">
             {SETTINGS_LINKS.map((link) => (
                 <Link key={link.label} href={`${projectPath}${link.href}`}>
                     <h4
                         className={`${
-                            path === `${projectPath}${link.href}`
+                            link.href === `/${segment || ''}`
                                 ? 'border-1 border-primary rounded'
                                 : 'text-muted-foreground'
                         }`}

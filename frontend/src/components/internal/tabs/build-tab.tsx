@@ -29,7 +29,8 @@ export default function BuildLogsTab({
                 .map((log) => DomPurify.sanitize(log))
 
             setLogs(logs)
-        }
+        },
+        skip: !show
     })
 
     return (
