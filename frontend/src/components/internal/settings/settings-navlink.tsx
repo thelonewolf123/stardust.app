@@ -33,7 +33,7 @@ export function SettingsNavLink() {
     const projectPath = `/project/${params.username}/${params.slug}/settings`
 
     return (
-        <div className="font-semibold flex gap-4 flex-col pr-4">
+        <div className="font-semibold flex gap-4 flex-col pr-4 w-1/4">
             {SETTINGS_LINKS.map((link) => (
                 <Link key={link.label} href={`${projectPath}${link.href}`}>
                     <h4
