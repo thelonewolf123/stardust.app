@@ -4,8 +4,6 @@ export default async function BuildArgsPage() {
     return (
         <ProjectArrayForm
             project={{
-                name: '',
-                description: '',
                 env: [],
                 buildArgs: [],
                 metaData: []
@@ -14,7 +12,7 @@ export default async function BuildArgsPage() {
             prefix="build_args"
             propertyKey="buildArgs"
             descriptionName="Build Args"
-            redirectTo="/new/meta-data"
+            redirectTo="/new/environment"
             type="new"
             start={false}
         />

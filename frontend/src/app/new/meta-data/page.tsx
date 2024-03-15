@@ -4,8 +4,6 @@ export default async function MetaDataPage() {
     return (
         <ProjectArrayForm
             project={{
-                name: '',
-                description: '',
                 env: [],
                 buildArgs: [],
                 metaData: []

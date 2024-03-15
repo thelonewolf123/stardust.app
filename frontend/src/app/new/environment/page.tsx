@@ -4,8 +4,6 @@ export default async function EnvironmentPage() {
     return (
         <ProjectArrayForm
             project={{
-                name: '',
-                description: '',
                 env: [],
                 buildArgs: [],
                 metaData: []
@@ -14,7 +12,7 @@ export default async function EnvironmentPage() {
             propertyKey="env"
             prefix="env"
             descriptionName="Environment Variables"
-            redirectTo="/new/build-args"
+            redirectTo="/new/meta-data"
             type="new"
             start={false}
         />

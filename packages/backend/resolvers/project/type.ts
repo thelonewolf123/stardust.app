@@ -20,8 +20,8 @@ export const typeDefs = gql`
     }
 
     input RefreshProjectInput {
-        name: String!
-        description: String!
+        name: String
+        description: String
         githubUrl: String
         githubBranch: String
         dockerPath: String

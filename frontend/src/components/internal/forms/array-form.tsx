@@ -169,10 +169,7 @@ export function ProjectArrayForm({
     start?: boolean
     type?: 'new' | 'edit'
     descriptionName: string
-    project: z.infer<typeof ArrayFieldsSchema> & {
-        name: string
-        description: string
-    }
+    project: z.infer<typeof ArrayFieldsSchema>
     propertyKey: 'env' | 'buildArgs' | 'metaData'
 
     redirectTo?: string
@@ -200,8 +197,6 @@ export function ProjectArrayForm({
                 type,
                 start,
                 input: {
-                    name: project.name,
-                    description: project.description,
                     [propertyKey]: values[propertyKey]
                 }
             }

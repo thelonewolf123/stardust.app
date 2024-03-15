@@ -214,14 +214,14 @@ export type QueryLoginArgs = {
 
 export type RefreshProjectInput = {
   buildArgs?: InputMaybe<Array<BuildArgsInput>>;
-  description: Scalars['String'];
+  description?: InputMaybe<Scalars['String']>;
   dockerContext?: InputMaybe<Scalars['String']>;
   dockerPath?: InputMaybe<Scalars['String']>;
   env?: InputMaybe<Array<EnvInput>>;
   githubBranch?: InputMaybe<Scalars['String']>;
   githubUrl?: InputMaybe<Scalars['String']>;
   metaData?: InputMaybe<Array<MetaDataInput>>;
-  name: Scalars['String'];
+  name?: InputMaybe<Scalars['String']>;
   port?: InputMaybe<Scalars['Int']>;
 };
 

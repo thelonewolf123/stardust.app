@@ -5,11 +5,11 @@ import { useSelectedLayoutSegment } from 'next/navigation'
 
 const NEW_PROJECT_STEPS = [
     { label: 'General', href: '/' },
-    { label: 'Environment', href: '/environment' },
     {
         label: 'Build Args',
         href: '/build-args'
     },
+    { label: 'Environment', href: '/environment' },
     {
         label: 'Meta Data',
         href: '/meta-data'

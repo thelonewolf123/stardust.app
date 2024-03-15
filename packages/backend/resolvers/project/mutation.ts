@@ -213,12 +213,15 @@ export const mutation: Resolvers['Mutation'] = {
             version: history.length,
             createdBy: user
         })
+
         await newContainer.save()
         await ctx.db.Project.updateOne(
             { slug, user: user._id },
             {
                 $push: { history: newContainer },
                 $set: {
+                    name: input.name || project.name,
+                    description: input.description || project.description,
                     current: newContainer,
                     githubUrl: input.githubUrl || project.githubUrl,
                     githubBranch: input.githubBranch || project.githubBranch,
