@@ -176,7 +176,11 @@ export function ProjectArrayForm({
     const [saveEnvOptions, { loading }] = useRefreshProjectMutation()
 
     function onSubmit(values: z.infer<typeof ArrayFieldsSchema>) {
-        console.log(values)
+        const formValues = values[propertyKey] || []
+
+        values[propertyKey] = formValues.filter(
+            (item) => item.name !== '' && item.value !== ''
+        )
         saveEnvOptions({
             variables: {
                 slug,

@@ -50,6 +50,7 @@ export function Autocomplete({
                     role="combobox"
                     aria-expanded={open}
                     className="justify-between"
+                    disabled={disabled}
                 >
                     {value
                         ? options.find((item) => item.value === value)?.label
@@ -58,14 +59,13 @@ export function Autocomplete({
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="p-0">
-                <Command aria-disabled={disabled} className="w-full">
+                <Command aria-disabled={disabled}>
                     <CommandInput
                         placeholder={`Search ${placeholder || 'item'}...`}
                         className="h-9"
                     />
-                    <CommandEmpty className="flex items-center gap-2">
-                        <FaSpinner className="h-4 w-4 animate-spin" />
-                        <span>Loading...</span>
+                    <CommandEmpty>
+                        No {placeholder || 'items'} found
                     </CommandEmpty>
                     <CommandGroup>
                         <CommandList>
