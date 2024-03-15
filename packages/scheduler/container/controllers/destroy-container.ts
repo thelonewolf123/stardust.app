@@ -51,6 +51,14 @@ export class DestroyContainerStrategy {
                 this.#data.containerId
             )
 
+            const container = await models.Container.findOne({
+                containerId: this.#data.containerId
+            }).lean()
+            invariant(container, 'Container not found')
+            invariant(this.#docker, 'Docker client not found')
+
+            await this.#docker.getImage(container.image).remove()
+
             await models.Container.updateOne(
                 {
                     containerId: this.#data.containerId

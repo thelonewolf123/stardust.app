@@ -21,6 +21,7 @@ export class NewContainerStrategy {
     #docker: Dockerode | null = null
     #container: Dockerode.Container | null = null
     #publisher: ReturnType<typeof getPublisher>
+    #instanceId: string | null | undefined = null
 
     constructor(
         data: z.infer<typeof ContainerSchedulerSchema>,
@@ -98,11 +99,19 @@ export class NewContainerStrategy {
     async #updateContainerStatus() {
         console.log('Updating container status...', this.#data.containerSlug)
         invariant(this.#container, 'Container not initialized')
+        invariant(this.#instanceId, 'Instance not found')
+
         const info = await this.#container.inspect()
         await updateContainer(this.#data.containerSlug, {
             containerId: info.Id,
             status: 'running'
         })
+
+        const instance = await models.Instance.findOne({
+            instanceId: this.#instanceId
+        }).lean()
+
+        invariant(instance, 'Instance not found')
 
         await models.Container.updateOne(
             { containerSlug: this.#data.containerSlug },
@@ -110,6 +119,7 @@ export class NewContainerStrategy {
                 $set: {
                     containerId: info.Id,
                     status: 'running',
+                    instanceId: instance,
                     updatedAt: new Date()
                 }
             }
@@ -195,6 +205,7 @@ export class NewContainerStrategy {
         return this.#instance
             .getInstanceForNewContainer(this.#data.containerSlug)
             .then(() => this.#instance.waitTillInstanceReady())
+            .then((instance) => (this.#instanceId = instance.InstanceId))
             .then(() => this.#instance.getDockerClient())
             .then((docker) => (this.#docker = docker))
             .then(() => this.#pullImageIfNeeded())

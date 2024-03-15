@@ -83,9 +83,15 @@ async function purgeEcr() {
 
 async function purgeMongo() {
     Promise.all([
-        mongoose.connection.db.collection('containers').drop(),
-        mongoose.connection.db.collection('projects').drop(),
-        mongoose.connection.db.collection('instances').drop()
+        mongoose.connection.db
+            .collection('containers')
+            .deleteMany({ _id: { $exists: true } }),
+        mongoose.connection.db
+            .collection('projects')
+            .deleteMany({ _id: { $exists: true } }),
+        mongoose.connection.db
+            .collection('instances')
+            .deleteMany({ _id: { $exists: true } })
     ])
         .then(() => {
             console.log('MongoDB purged')

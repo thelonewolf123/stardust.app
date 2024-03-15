@@ -58,7 +58,7 @@ export class BuildImageStrategy {
                 this.#data.ecrRepo,
                 ...dockerPathArgs,
                 ...buildArgs,
-                '.'
+                this.#data.dockerContext
             ],
             cwd: this.#githubRepoPath,
             sudo: true,
@@ -144,6 +144,13 @@ export class BuildImageStrategy {
         this.#publisher.publish('Image pushed to ECR successfully.')
     }
 
+    async #removeDockerImage() {
+        invariant(this.#docker, 'Docker client not found')
+        this.#publisher.publish('Removing docker image...')
+        await this.#docker.getImage(this.#data.ecrRepo).remove()
+        console.log('Image removed successfully.')
+    }
+
     async #freeContainer() {
         invariant(this.#instance, 'Instance not found')
         return this.#instance.freeContainerInstance(this.#data.containerSlug)
@@ -203,6 +210,7 @@ export class BuildImageStrategy {
             .then(() => this.#buildDockerImage())
             .then(() => this.#pushDockerImage())
             .then(() => this.#removeRepo())
+            .then(() => this.#removeDockerImage())
             .then(() => this.#freeContainer())
             .then(() => this.#scheduleNewContainer())
             .catch((err) => this.#handleError(err))
