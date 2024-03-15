@@ -1,7 +1,9 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
+import { FaArrowRight, FaCloud } from 'react-icons/fa'
 import {
     MdOutlineAddCircleOutline,
     MdOutlineRemoveCircleOutline
@@ -24,7 +26,7 @@ import { useRefreshProjectMutation } from '@/graphql-client'
 import { parseEnv } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 
-import { ProjectInputSchema } from '../project/project-form'
+import { ProjectSchema } from './general-form'
 
 const keyValuePair = z.object({
     name: z.string(),
@@ -153,17 +155,27 @@ function ArrayFieldsBuilder<T extends ArrayFieldsBuilderType>({
 }
 
 export function ProjectArrayForm({
-    project,
     slug,
     prefix,
+    start = true,
+    type = 'edit',
+    project,
+    redirectTo,
     propertyKey,
     descriptionName
 }: {
-    project: z.infer<typeof ProjectInputSchema>
     slug: string
     prefix: string
-    propertyKey: 'env' | 'buildArgs' | 'metaData'
+    start?: boolean
+    type?: 'new' | 'edit'
     descriptionName: string
+    project: z.infer<typeof ArrayFieldsSchema> & {
+        name: string
+        description: string
+    }
+    propertyKey: 'env' | 'buildArgs' | 'metaData'
+
+    redirectTo?: string
 }) {
     const form = useForm<z.infer<typeof ArrayFieldsSchema>>({
         resolver: zodResolver(ArrayFieldsSchema),
@@ -174,6 +186,7 @@ export function ProjectArrayForm({
 
     const { toast } = useToast()
     const [saveEnvOptions, { loading }] = useRefreshProjectMutation()
+    const router = useRouter()
 
     function onSubmit(values: z.infer<typeof ArrayFieldsSchema>) {
         const formValues = values[propertyKey] || []
@@ -184,6 +197,8 @@ export function ProjectArrayForm({
         saveEnvOptions({
             variables: {
                 slug,
+                type,
+                start,
                 input: {
                     name: project.name,
                     description: project.description,
@@ -191,6 +206,11 @@ export function ProjectArrayForm({
                 }
             }
         }).then(() => {
+            if (redirectTo) {
+                router.push(redirectTo)
+                return
+            }
+
             toast({
                 title: 'Project updated',
                 description: 'Your project has been updated.'
@@ -213,7 +233,14 @@ export function ProjectArrayForm({
                 />
 
                 <Button type="submit" loading={loading}>
-                    Save
+                    {type === 'new' && !start ? (
+                        <div className="flex gap-1 items-center">
+                            <FaArrowRight />
+                            <span>Next</span>
+                        </div>
+                    ) : (
+                        <>Save</>
+                    )}
                 </Button>
             </form>
         </Form>

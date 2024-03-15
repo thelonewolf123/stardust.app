@@ -97,6 +97,7 @@ export type MutationCreateContainerArgs = {
 
 export type MutationCreateProjectArgs = {
   input: ProjectInput;
+  start: Scalars['Boolean'];
 };
 
 
@@ -108,6 +109,8 @@ export type MutationDeleteProjectArgs = {
 export type MutationRefreshProjectArgs = {
   input: RefreshProjectInput;
   slug: Scalars['String'];
+  start: Scalars['Boolean'];
+  type: Scalars['String'];
 };
 
 
@@ -256,6 +259,7 @@ export type LoginQueryQuery = { __typename?: 'Query', login: string };
 
 export type CreateProjectMutationVariables = Exact<{
   input: ProjectInput;
+  start: Scalars['Boolean'];
 }>;
 
 
@@ -300,6 +304,8 @@ export type SignupMutaionMutation = { __typename?: 'Mutation', signup: string };
 export type RefreshProjectMutationVariables = Exact<{
   slug: Scalars['String'];
   input: RefreshProjectInput;
+  start: Scalars['Boolean'];
+  type: Scalars['String'];
 }>;
 
 
@@ -375,8 +381,8 @@ export type LoginQueryQueryHookResult = ReturnType<typeof useLoginQueryQuery>;
 export type LoginQueryLazyQueryHookResult = ReturnType<typeof useLoginQueryLazyQuery>;
 export type LoginQueryQueryResult = Apollo.QueryResult<LoginQueryQuery, LoginQueryQueryVariables>;
 export const CreateProjectDocument = gql`
-    mutation CreateProject($input: ProjectInput!) {
-  createProject(input: $input)
+    mutation CreateProject($input: ProjectInput!, $start: Boolean!) {
+  createProject(input: $input, start: $start)
 }
     `;
 export type CreateProjectMutationFn = Apollo.MutationFunction<CreateProjectMutation, CreateProjectMutationVariables>;
@@ -395,6 +401,7 @@ export type CreateProjectMutationFn = Apollo.MutationFunction<CreateProjectMutat
  * const [createProjectMutation, { data, loading, error }] = useCreateProjectMutation({
  *   variables: {
  *      input: // value for 'input'
+ *      start: // value for 'start'
  *   },
  * });
  */
@@ -636,8 +643,8 @@ export type SignupMutaionMutationHookResult = ReturnType<typeof useSignupMutaion
 export type SignupMutaionMutationResult = Apollo.MutationResult<SignupMutaionMutation>;
 export type SignupMutaionMutationOptions = Apollo.BaseMutationOptions<SignupMutaionMutation, SignupMutaionMutationVariables>;
 export const RefreshProjectDocument = gql`
-    mutation RefreshProject($slug: String!, $input: RefreshProjectInput!) {
-  refreshProject(slug: $slug, input: $input)
+    mutation RefreshProject($slug: String!, $input: RefreshProjectInput!, $start: Boolean!, $type: String!) {
+  refreshProject(slug: $slug, input: $input, start: $start, type: $type)
 }
     `;
 export type RefreshProjectMutationFn = Apollo.MutationFunction<RefreshProjectMutation, RefreshProjectMutationVariables>;
@@ -657,6 +664,8 @@ export type RefreshProjectMutationFn = Apollo.MutationFunction<RefreshProjectMut
  *   variables: {
  *      slug: // value for 'slug'
  *      input: // value for 'input'
+ *      start: // value for 'start'
+ *      type: // value for 'type'
  *   },
  * });
  */

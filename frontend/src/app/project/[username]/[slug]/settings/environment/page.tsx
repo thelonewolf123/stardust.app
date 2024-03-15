@@ -1,4 +1,4 @@
-import { ProjectArrayForm } from '@/components/internal/settings/array-forms'
+import { ProjectArrayForm } from '@/components/internal/forms/array-form'
 import { getProjectDetails } from '@/data/project'
 
 export default async function EnvironmentPage({

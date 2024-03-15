@@ -8,7 +8,7 @@ import { env } from '@/env'
 import { Resolvers } from '@/types/graphql-server'
 
 export const mutation: Resolvers['Mutation'] = {
-    async createProject(_, { input }, ctx) {
+    async createProject(_, { input, start }, ctx) {
         const user = getRegularUser(ctx)
         const version = 0
         const projectSlug = user.username + '/' + input.name
@@ -30,17 +30,19 @@ export const mutation: Resolvers['Mutation'] = {
             {} as Record<string, string>
         )
 
-        ctx.queue.buildContainer.publish({
-            containerSlug,
-            projectSlug: projectSlug,
-            githubRepoUrl: input.githubUrl,
-            githubRepoBranch: input.githubBranch,
-            dockerPath: input.dockerPath,
-            dockerContext: input.dockerContext,
-            ecrRepo: repoWithHash,
-            buildArgs,
-            version
-        })
+        if (start) {
+            ctx.queue.buildContainer.publish({
+                containerSlug,
+                projectSlug: projectSlug,
+                githubRepoUrl: input.githubUrl,
+                githubRepoBranch: input.githubBranch,
+                dockerPath: input.dockerPath,
+                dockerContext: input.dockerContext,
+                ecrRepo: repoWithHash,
+                buildArgs,
+                version
+            })
+        }
 
         const container = new ctx.db.Container({
             containerSlug,
@@ -161,7 +163,7 @@ export const mutation: Resolvers['Mutation'] = {
 
         return true
     },
-    refreshProject: async (_, { slug, input }, ctx) => {
+    refreshProject: async (_, { slug, input, start, type }, ctx) => {
         const user = getRegularUser(ctx)
 
         const project = await ctx.db.Project.findOne({ slug, user: user._id })
@@ -193,10 +195,12 @@ export const mutation: Resolvers['Mutation'] = {
             {} as Record<string, string>
         )
 
-        ctx.queue.destroyContainer.publish({
-            containerId: current.containerId,
-            containerSlug: current.containerSlug
-        })
+        if (type === 'edit') {
+            ctx.queue.destroyContainer.publish({
+                containerId: current.containerId,
+                containerSlug: current.containerSlug
+            })
+        }
 
         const newContainer = new ctx.db.Container({
             containerSlug: containerSlug,
@@ -225,17 +229,19 @@ export const mutation: Resolvers['Mutation'] = {
             }
         )
 
-        ctx.queue.buildContainer.publish({
-            containerSlug,
-            projectSlug: slug,
-            githubRepoUrl: input.githubUrl || project.githubUrl,
-            githubRepoBranch: input.githubBranch || project.githubBranch,
-            dockerPath: input.dockerPath || project.dockerPath,
-            dockerContext: input.dockerContext || project.dockerContext,
-            ecrRepo: repoWithHash,
-            buildArgs,
-            version: history.length
-        })
+        if (start) {
+            ctx.queue.buildContainer.publish({
+                containerSlug,
+                projectSlug: slug,
+                githubRepoUrl: input.githubUrl || project.githubUrl,
+                githubRepoBranch: input.githubBranch || project.githubBranch,
+                dockerPath: input.dockerPath || project.dockerPath,
+                dockerContext: input.dockerContext || project.dockerContext,
+                ecrRepo: repoWithHash,
+                buildArgs,
+                version: history.length
+            })
+        }
 
         return true
     },
@@ -261,10 +267,15 @@ export const mutation: Resolvers['Mutation'] = {
 
 export const mutationType = gql`
     type Mutation {
-        createProject(input: ProjectInput!): String!
+        createProject(input: ProjectInput!, start: Boolean!): String!
         deleteProject(slug: String!): Boolean!
         roleBackProject(slug: String!, version: Int!): Boolean!
-        refreshProject(slug: String!, input: RefreshProjectInput!): Boolean!
+        refreshProject(
+            slug: String!
+            input: RefreshProjectInput!
+            start: Boolean!
+            type: String!
+        ): Boolean!
         addDomain(slug: String!, domain: String!): Boolean!
         removeDomain(slug: String!, domain: String!): Boolean!
     }

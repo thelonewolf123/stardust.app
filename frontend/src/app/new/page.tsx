@@ -1,12 +1,10 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-import { z } from 'zod'
+import { useRouter } from 'next/navigation';
+import { z } from 'zod';
 
-import ProjectForm, {
-    ProjectInputSchema
-} from '@/components/internal/project/project-form'
-import { useCreateProjectMutation } from '@/graphql-client'
+import { ProjectGeneralInfoForm, ProjectSchema } from '@/components/internal/forms/general-form';
+import { useCreateProjectMutation } from '@/graphql-client';
 
 const defaultFormValues = {
     name: '',
@@ -15,35 +13,18 @@ const defaultFormValues = {
     githubBranch: 'main',
     dockerPath: 'Dockerfile',
     dockerContext: '.',
-    buildArgs: [
-        {
-            name: '',
-            value: ''
-        }
-    ],
-    port: undefined,
-    env: [
-        {
-            name: '',
-            value: ''
-        }
-    ],
-    metaData: [
-        {
-            name: '',
-            value: ''
-        }
-    ]
+    port: undefined
 }
 
 export default function NewProjectPage() {
     const [createProject, { data, loading, error }] = useCreateProjectMutation()
     const router = useRouter()
 
-    async function onSubmit(values: z.infer<typeof ProjectInputSchema>) {
+    async function onSubmit(values: z.infer<typeof ProjectSchema>) {
         try {
             const result = await createProject({
                 variables: {
+                    start: false,
                     input: {
                         name: values.name,
                         description: values.description,
@@ -51,10 +32,7 @@ export default function NewProjectPage() {
                         githubBranch: values.githubBranch,
                         dockerPath: values.dockerPath,
                         dockerContext: values.dockerContext,
-                        buildArgs: values.buildArgs,
-                        port: values.port,
-                        env: values.env,
-                        metaData: values.metaData
+                        port: values.port
                     }
                 }
             })
@@ -63,17 +41,20 @@ export default function NewProjectPage() {
 
             const projectSlug = containerSlug.split(':')[0]
             console.log('Project created', containerSlug)
-            router.push(`/project/${projectSlug}`)
+            router.push(`/new/environment`, {
+                
+            })
         } catch (error) {
             console.error(error)
         }
     }
 
     return (
-        <ProjectForm
+        <ProjectGeneralInfoForm
+            defaultValues={defaultFormValues}
             loading={loading}
             onSubmit={onSubmit}
-            defaultValues={defaultFormValues}
+            type="new"
         />
     )
 }
