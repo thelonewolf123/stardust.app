@@ -65,6 +65,7 @@ export type EnvInput = {
 export type Mutation = {
   __typename?: 'Mutation';
   addDomain: Scalars['Boolean'];
+  addGithubToken: Scalars['Boolean'];
   createContainer: Scalars['Boolean'];
   createProject: Scalars['String'];
   deleteProject: Scalars['Boolean'];
@@ -80,6 +81,12 @@ export type Mutation = {
 export type MutationAddDomainArgs = {
   domain: Scalars['String'];
   slug: Scalars['String'];
+};
+
+
+export type MutationAddGithubTokenArgs = {
+  token: Scalars['String'];
+  username: Scalars['String'];
 };
 
 
@@ -163,14 +170,22 @@ export type ProjectInput = {
 export type Query = {
   __typename?: 'Query';
   getAllContainers: Array<Container>;
+  getAllGithubBranches: Array<Scalars['String']>;
+  getAllGithubRepos: Array<Scalars['String']>;
   getAllProjects: Array<Project>;
   getBuildLogs: Array<Scalars['String']>;
   getContainerInfo: Container;
+  getGithubUsername: Scalars['String'];
   getNotRunningProjects: Array<Project>;
   getProjectBySlug: Project;
   getRunningProjects: Array<Project>;
   login: Scalars['String'];
   logout: Scalars['Boolean'];
+};
+
+
+export type QueryGetAllGithubBranchesArgs = {
+  repo: Scalars['String'];
 };
 
 
@@ -261,13 +276,6 @@ export type GetDeploymentHistoryQueryVariables = Exact<{
 
 export type GetDeploymentHistoryQuery = { __typename?: 'Query', getProjectBySlug: { __typename?: 'Project', slug: string, name: string, history?: Array<{ __typename?: 'Container', containerSlug: string, createdAt: number, status: ContainerStatus }> | null, current?: { __typename?: 'Container', containerSlug: string, status: ContainerStatus } | null } };
 
-export type GetProjectBySlugForEditQueryVariables = Exact<{
-  slug: Scalars['String'];
-}>;
-
-
-export type GetProjectBySlugForEditQuery = { __typename?: 'Query', getProjectBySlug: { __typename?: 'Project', createdAt: number, description: string, dockerContext: string, dockerPath: string, githubBranch: string, githubUrl: string, slug: string, name: string, current?: { __typename?: 'Container', command?: Array<string> | null, containerSlug: string, image: string, port?: number | null, status: ContainerStatus, env?: Array<{ __typename?: 'Env', name: string, value: string }> | null, metaData?: Array<{ __typename?: 'metaData', name: string, value: string }> | null, buildArgs?: Array<{ __typename?: 'buildArgs', name: string, value: string }> | null } | null, history?: Array<{ __typename?: 'Container', containerSlug: string }> | null } };
-
 export type GetProjectBySlugQueryVariables = Exact<{
   slug: Scalars['String'];
 }>;
@@ -303,6 +311,33 @@ export type GetBuildLogsQueryVariables = Exact<{
 
 
 export type GetBuildLogsQuery = { __typename?: 'Query', getBuildLogs: Array<string> };
+
+export type GetAllGithubReposQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetAllGithubReposQuery = { __typename?: 'Query', getAllGithubRepos: Array<string> };
+
+export type GetAllGithubBranchesQueryVariables = Exact<{
+  repo: Scalars['String'];
+}>;
+
+
+export type GetAllGithubBranchesQuery = { __typename?: 'Query', getAllGithubBranches: Array<string> };
+
+export type GetProjectBySlugForEditQueryVariables = Exact<{
+  slug: Scalars['String'];
+}>;
+
+
+export type GetProjectBySlugForEditQuery = { __typename?: 'Query', getProjectBySlug: { __typename?: 'Project', createdAt: number, description: string, dockerContext: string, dockerPath: string, githubBranch: string, githubUrl: string, slug: string, name: string, current?: { __typename?: 'Container', command?: Array<string> | null, containerSlug: string, image: string, port?: number | null, status: ContainerStatus, env?: Array<{ __typename?: 'Env', name: string, value: string }> | null, metaData?: Array<{ __typename?: 'metaData', name: string, value: string }> | null, buildArgs?: Array<{ __typename?: 'buildArgs', name: string, value: string }> | null } | null, history?: Array<{ __typename?: 'Container', containerSlug: string }> | null } };
+
+export type AddGithubTokenMutationVariables = Exact<{
+  token: Scalars['String'];
+  username: Scalars['String'];
+}>;
+
+
+export type AddGithubTokenMutation = { __typename?: 'Mutation', addGithubToken: boolean };
 
 
 export const LoginQueryDocument = gql`
@@ -447,70 +482,6 @@ export function useGetDeploymentHistoryLazyQuery(baseOptions?: Apollo.LazyQueryH
 export type GetDeploymentHistoryQueryHookResult = ReturnType<typeof useGetDeploymentHistoryQuery>;
 export type GetDeploymentHistoryLazyQueryHookResult = ReturnType<typeof useGetDeploymentHistoryLazyQuery>;
 export type GetDeploymentHistoryQueryResult = Apollo.QueryResult<GetDeploymentHistoryQuery, GetDeploymentHistoryQueryVariables>;
-export const GetProjectBySlugForEditDocument = gql`
-    query GetProjectBySlugForEdit($slug: String!) {
-  getProjectBySlug(slug: $slug) {
-    createdAt
-    current {
-      command
-      containerSlug
-      env {
-        name
-        value
-      }
-      image
-      metaData {
-        name
-        value
-      }
-      buildArgs {
-        name
-        value
-      }
-      port
-      status
-    }
-    description
-    dockerContext
-    dockerPath
-    githubBranch
-    githubUrl
-    history {
-      containerSlug
-    }
-    slug
-    name
-  }
-}
-    `;
-
-/**
- * __useGetProjectBySlugForEditQuery__
- *
- * To run a query within a React component, call `useGetProjectBySlugForEditQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetProjectBySlugForEditQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetProjectBySlugForEditQuery({
- *   variables: {
- *      slug: // value for 'slug'
- *   },
- * });
- */
-export function useGetProjectBySlugForEditQuery(baseOptions: Apollo.QueryHookOptions<GetProjectBySlugForEditQuery, GetProjectBySlugForEditQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetProjectBySlugForEditQuery, GetProjectBySlugForEditQueryVariables>(GetProjectBySlugForEditDocument, options);
-      }
-export function useGetProjectBySlugForEditLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetProjectBySlugForEditQuery, GetProjectBySlugForEditQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetProjectBySlugForEditQuery, GetProjectBySlugForEditQueryVariables>(GetProjectBySlugForEditDocument, options);
-        }
-export type GetProjectBySlugForEditQueryHookResult = ReturnType<typeof useGetProjectBySlugForEditQuery>;
-export type GetProjectBySlugForEditLazyQueryHookResult = ReturnType<typeof useGetProjectBySlugForEditLazyQuery>;
-export type GetProjectBySlugForEditQueryResult = Apollo.QueryResult<GetProjectBySlugForEditQuery, GetProjectBySlugForEditQueryVariables>;
 export const GetProjectBySlugDocument = gql`
     query GetProjectBySlug($slug: String!) {
   getProjectBySlug(slug: $slug) {
@@ -729,3 +700,164 @@ export function useGetBuildLogsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
 export type GetBuildLogsQueryHookResult = ReturnType<typeof useGetBuildLogsQuery>;
 export type GetBuildLogsLazyQueryHookResult = ReturnType<typeof useGetBuildLogsLazyQuery>;
 export type GetBuildLogsQueryResult = Apollo.QueryResult<GetBuildLogsQuery, GetBuildLogsQueryVariables>;
+export const GetAllGithubReposDocument = gql`
+    query GetAllGithubRepos {
+  getAllGithubRepos
+}
+    `;
+
+/**
+ * __useGetAllGithubReposQuery__
+ *
+ * To run a query within a React component, call `useGetAllGithubReposQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllGithubReposQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllGithubReposQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetAllGithubReposQuery(baseOptions?: Apollo.QueryHookOptions<GetAllGithubReposQuery, GetAllGithubReposQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAllGithubReposQuery, GetAllGithubReposQueryVariables>(GetAllGithubReposDocument, options);
+      }
+export function useGetAllGithubReposLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllGithubReposQuery, GetAllGithubReposQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAllGithubReposQuery, GetAllGithubReposQueryVariables>(GetAllGithubReposDocument, options);
+        }
+export type GetAllGithubReposQueryHookResult = ReturnType<typeof useGetAllGithubReposQuery>;
+export type GetAllGithubReposLazyQueryHookResult = ReturnType<typeof useGetAllGithubReposLazyQuery>;
+export type GetAllGithubReposQueryResult = Apollo.QueryResult<GetAllGithubReposQuery, GetAllGithubReposQueryVariables>;
+export const GetAllGithubBranchesDocument = gql`
+    query GetAllGithubBranches($repo: String!) {
+  getAllGithubBranches(repo: $repo)
+}
+    `;
+
+/**
+ * __useGetAllGithubBranchesQuery__
+ *
+ * To run a query within a React component, call `useGetAllGithubBranchesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllGithubBranchesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllGithubBranchesQuery({
+ *   variables: {
+ *      repo: // value for 'repo'
+ *   },
+ * });
+ */
+export function useGetAllGithubBranchesQuery(baseOptions: Apollo.QueryHookOptions<GetAllGithubBranchesQuery, GetAllGithubBranchesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAllGithubBranchesQuery, GetAllGithubBranchesQueryVariables>(GetAllGithubBranchesDocument, options);
+      }
+export function useGetAllGithubBranchesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllGithubBranchesQuery, GetAllGithubBranchesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAllGithubBranchesQuery, GetAllGithubBranchesQueryVariables>(GetAllGithubBranchesDocument, options);
+        }
+export type GetAllGithubBranchesQueryHookResult = ReturnType<typeof useGetAllGithubBranchesQuery>;
+export type GetAllGithubBranchesLazyQueryHookResult = ReturnType<typeof useGetAllGithubBranchesLazyQuery>;
+export type GetAllGithubBranchesQueryResult = Apollo.QueryResult<GetAllGithubBranchesQuery, GetAllGithubBranchesQueryVariables>;
+export const GetProjectBySlugForEditDocument = gql`
+    query GetProjectBySlugForEdit($slug: String!) {
+  getProjectBySlug(slug: $slug) {
+    createdAt
+    current {
+      command
+      containerSlug
+      env {
+        name
+        value
+      }
+      image
+      metaData {
+        name
+        value
+      }
+      buildArgs {
+        name
+        value
+      }
+      port
+      status
+    }
+    description
+    dockerContext
+    dockerPath
+    githubBranch
+    githubUrl
+    history {
+      containerSlug
+    }
+    slug
+    name
+  }
+}
+    `;
+
+/**
+ * __useGetProjectBySlugForEditQuery__
+ *
+ * To run a query within a React component, call `useGetProjectBySlugForEditQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetProjectBySlugForEditQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetProjectBySlugForEditQuery({
+ *   variables: {
+ *      slug: // value for 'slug'
+ *   },
+ * });
+ */
+export function useGetProjectBySlugForEditQuery(baseOptions: Apollo.QueryHookOptions<GetProjectBySlugForEditQuery, GetProjectBySlugForEditQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetProjectBySlugForEditQuery, GetProjectBySlugForEditQueryVariables>(GetProjectBySlugForEditDocument, options);
+      }
+export function useGetProjectBySlugForEditLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetProjectBySlugForEditQuery, GetProjectBySlugForEditQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetProjectBySlugForEditQuery, GetProjectBySlugForEditQueryVariables>(GetProjectBySlugForEditDocument, options);
+        }
+export type GetProjectBySlugForEditQueryHookResult = ReturnType<typeof useGetProjectBySlugForEditQuery>;
+export type GetProjectBySlugForEditLazyQueryHookResult = ReturnType<typeof useGetProjectBySlugForEditLazyQuery>;
+export type GetProjectBySlugForEditQueryResult = Apollo.QueryResult<GetProjectBySlugForEditQuery, GetProjectBySlugForEditQueryVariables>;
+export const AddGithubTokenDocument = gql`
+    mutation AddGithubToken($token: String!, $username: String!) {
+  addGithubToken(token: $token, username: $username)
+}
+    `;
+export type AddGithubTokenMutationFn = Apollo.MutationFunction<AddGithubTokenMutation, AddGithubTokenMutationVariables>;
+
+/**
+ * __useAddGithubTokenMutation__
+ *
+ * To run a mutation, you first call `useAddGithubTokenMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddGithubTokenMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addGithubTokenMutation, { data, loading, error }] = useAddGithubTokenMutation({
+ *   variables: {
+ *      token: // value for 'token'
+ *      username: // value for 'username'
+ *   },
+ * });
+ */
+export function useAddGithubTokenMutation(baseOptions?: Apollo.MutationHookOptions<AddGithubTokenMutation, AddGithubTokenMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddGithubTokenMutation, AddGithubTokenMutationVariables>(AddGithubTokenDocument, options);
+      }
+export type AddGithubTokenMutationHookResult = ReturnType<typeof useAddGithubTokenMutation>;
+export type AddGithubTokenMutationResult = Apollo.MutationResult<AddGithubTokenMutation>;
+export type AddGithubTokenMutationOptions = Apollo.BaseMutationOptions<AddGithubTokenMutation, AddGithubTokenMutationVariables>;

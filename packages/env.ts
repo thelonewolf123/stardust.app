@@ -33,9 +33,7 @@ export const serverEnvSchema = {
     EC2_PUBLIC_KEY: z.string().min(1).optional(),
     CLOUDFLARE_ZONE_ID: z.string().min(1),
     CLOUDFLARE_API_TOKEN: z.string().min(1),
-    DOMAIN_NAME: z.string().min(1),
-    GITHUB_CLIENT_ID: z.string().min(1),
-    GITHUB_CLIENT_SECRET: z.string().min(1)
+    DOMAIN_NAME: z.string().min(1)
 }
 
 export const env = createEnv({
@@ -60,8 +58,6 @@ export const env = createEnv({
         EC2_PUBLIC_KEY: process.env.EC2_PUBLIC_KEY,
         CLOUDFLARE_ZONE_ID: process.env.CLOUDFLARE_ZONE_ID,
         CLOUDFLARE_API_TOKEN: process.env.CLOUDFLARE_API_TOKEN,
-        DOMAIN_NAME: process.env.DOMAIN_NAME,
-        GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
-        GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET
+        DOMAIN_NAME: process.env.DOMAIN_NAME
     }
 })

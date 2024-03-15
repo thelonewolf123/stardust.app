@@ -2,6 +2,10 @@
 
 import { cookies } from 'next/headers'
 
+import {
+    AddGithubTokenDocument,
+    AddGithubTokenMutation
+} from '@/graphql-client'
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 
@@ -39,4 +43,17 @@ export async function getApolloClient() {
     })
 
     return client
+}
+
+export async function addGithubToken(token: string, username: string) {
+    const client = await getApolloClient()
+    const result = await client.mutate<AddGithubTokenMutation>({
+        mutation: AddGithubTokenDocument,
+        variables: {
+            token,
+            username
+        }
+    })
+
+    return result.data?.addGithubToken
 }

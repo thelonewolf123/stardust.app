@@ -65,6 +65,7 @@ export type EnvInput = {
 export type Mutation = {
   __typename?: 'Mutation';
   addDomain: Scalars['Boolean'];
+  addGithubToken: Scalars['Boolean'];
   createContainer: Scalars['Boolean'];
   createProject: Scalars['String'];
   deleteProject: Scalars['Boolean'];
@@ -80,6 +81,12 @@ export type Mutation = {
 export type MutationAddDomainArgs = {
   domain: Scalars['String'];
   slug: Scalars['String'];
+};
+
+
+export type MutationAddGithubTokenArgs = {
+  token: Scalars['String'];
+  username: Scalars['String'];
 };
 
 
@@ -163,14 +170,22 @@ export type ProjectInput = {
 export type Query = {
   __typename?: 'Query';
   getAllContainers: Array<Container>;
+  getAllGithubBranches: Array<Scalars['String']>;
+  getAllGithubRepos: Array<Scalars['String']>;
   getAllProjects: Array<Project>;
   getBuildLogs: Array<Scalars['String']>;
   getContainerInfo: Container;
+  getGithubUsername: Scalars['String'];
   getNotRunningProjects: Array<Project>;
   getProjectBySlug: Project;
   getRunningProjects: Array<Project>;
   login: Scalars['String'];
   logout: Scalars['Boolean'];
+};
+
+
+export type QueryGetAllGithubBranchesArgs = {
+  repo: Scalars['String'];
 };
 
 
@@ -368,6 +383,7 @@ export type EnvResolvers<ContextType = Context, ParentType extends ResolversPare
 
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   addDomain?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationAddDomainArgs, 'domain' | 'slug'>>;
+  addGithubToken?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationAddGithubTokenArgs, 'token' | 'username'>>;
   createContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationCreateContainerArgs, 'input'>>;
   createProject?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'input'>>;
   deleteProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteProjectArgs, 'slug'>>;
@@ -396,9 +412,12 @@ export type ProjectResolvers<ContextType = Context, ParentType extends Resolvers
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   getAllContainers?: Resolver<Array<ResolversTypes['Container']>, ParentType, ContextType>;
+  getAllGithubBranches?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType, RequireFields<QueryGetAllGithubBranchesArgs, 'repo'>>;
+  getAllGithubRepos?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
   getAllProjects?: Resolver<Array<ResolversTypes['Project']>, ParentType, ContextType>;
   getBuildLogs?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType, RequireFields<QueryGetBuildLogsArgs, 'containerSlug'>>;
   getContainerInfo?: Resolver<ResolversTypes['Container'], ParentType, ContextType, RequireFields<QueryGetContainerInfoArgs, 'slug'>>;
+  getGithubUsername?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   getNotRunningProjects?: Resolver<Array<ResolversTypes['Project']>, ParentType, ContextType>;
   getProjectBySlug?: Resolver<ResolversTypes['Project'], ParentType, ContextType, RequireFields<QueryGetProjectBySlugArgs, 'slug'>>;
   getRunningProjects?: Resolver<Array<ResolversTypes['Project']>, ParentType, ContextType>;

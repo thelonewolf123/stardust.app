@@ -33,12 +33,12 @@ export default async function ProjectDeploymentPage({
 
     return (
         <div className="container">
-            <h1 className="text-3xl space-y-2 capitalize my-8">{name}</h1>
-            <div className="flex flex-col gap-4">
+            <h1 className="my-8 space-y-2 text-3xl capitalize">{name}</h1>
+            <div className="mb-8 flex flex-col gap-4">
                 {history.map((deploy, idx) => (
                     <div
                         key={idx}
-                        className="border flex justify-between rounded p-4"
+                        className="flex justify-between rounded border p-4"
                     >
                         <div className="flex flex-col gap-2">
                             <div className="flex gap-2">

@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -15,8 +16,15 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { useRefreshProjectMutation } from '@/graphql-client'
+import { useToast } from '@/components/ui/use-toast'
+import {
+    useGetAllGithubBranchesQuery,
+    useGetAllGithubReposQuery,
+    useRefreshProjectMutation
+} from '@/graphql-client'
 import { zodResolver } from '@hookform/resolvers/zod'
+
+import { Autocomplete } from '../common/auto-complete'
 
 export const ProjectSchema = z.object({
     name: z
@@ -42,9 +50,104 @@ export const ProjectSchema = z.object({
     }),
     port: z
         .string()
-        .transform((v) => parseInt(v))
+        .or(z.number())
+        .transform((v) => parseInt(`${v}`))
         .optional()
 })
+
+const GithubRepoForm = ({
+    form
+}: {
+    form: ReturnType<typeof useForm<z.infer<typeof ProjectSchema>>>
+}) => {
+    const { data } = useGetAllGithubReposQuery()
+
+    const items = useMemo(() => {
+        if (!data) return []
+        return data.getAllGithubRepos.map((repo) => ({
+            value: repo,
+            label: repo
+        }))
+    }, [data])
+
+    return (
+        <FormField
+            control={form.control}
+            name={'githubUrl'}
+            render={({ field }) => (
+                <FormItem className="flex flex-col">
+                    <FormLabel className="block">GitHub Repo</FormLabel>
+                    <FormControl>
+                        <Autocomplete
+                            options={items}
+                            placeholder="repo"
+                            disabled
+                            value={field.value.replace(
+                                'https://github.com/',
+                                ''
+                            )}
+                            onChange={(v) => {
+                                const fullUrl = `https://github.com/${v}`
+                                form.setValue('githubUrl', fullUrl)
+                            }}
+                        />
+                    </FormControl>
+                    <FormDescription>
+                        This is your project&apos;s GitHub URL.
+                    </FormDescription>
+                    <FormMessage />
+                </FormItem>
+            )}
+        />
+    )
+}
+
+const GithubBranchForm = ({
+    form
+}: {
+    form: ReturnType<typeof useForm<z.infer<typeof ProjectSchema>>>
+}) => {
+    const repo = form.watch('githubUrl')
+    const { data } = useGetAllGithubBranchesQuery({
+        variables: {
+            repo
+        }
+    })
+
+    const items = useMemo(() => {
+        if (!data) return []
+        return data.getAllGithubBranches.map((branch) => ({
+            value: branch,
+            label: branch
+        }))
+    }, [data])
+
+    return (
+        <FormField
+            control={form.control}
+            name={'githubBranch'}
+            render={({ field }) => (
+                <FormItem className="flex flex-col">
+                    <FormLabel className="block">GitHub Branch</FormLabel>
+                    <FormControl>
+                        <Autocomplete
+                            options={items}
+                            placeholder="repo"
+                            value={field.value}
+                            onChange={(v) => {
+                                form.setValue('githubBranch', v)
+                            }}
+                        />
+                    </FormControl>
+                    <FormDescription>
+                        This is your project&apos;s GitHub branch.
+                    </FormDescription>
+                    <FormMessage />
+                </FormItem>
+            )}
+        />
+    )
+}
 
 export default function GeneralSettings({
     project,
@@ -61,9 +164,9 @@ export default function GeneralSettings({
     })
 
     const [saveGeneralSettings, { loading }] = useRefreshProjectMutation()
+    const { toast } = useToast()
 
     function onSubmit(values: z.infer<typeof ProjectSchema>) {
-        console.log(values)
         saveGeneralSettings({
             variables: {
                 slug,
@@ -72,7 +175,10 @@ export default function GeneralSettings({
                 }
             }
         }).then(() => {
-            console.log('Saved')
+            toast({
+                title: 'Project updated',
+                description: 'Your project has been updated.'
+            })
         })
     }
 
@@ -82,7 +188,7 @@ export default function GeneralSettings({
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="mx-auto space-y-8"
             >
-                <div className="grid gap-4 md:grid-cols-2 grid-cols-1">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <FormField
                         control={form.control}
                         name="name"
@@ -122,39 +228,8 @@ export default function GeneralSettings({
                         )}
                     />
 
-                    <FormField
-                        control={form.control}
-                        name="githubUrl"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>GitHub URL</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="" {...field} />
-                                </FormControl>
-                                <FormDescription>
-                                    This is your project&apos;s GitHub URL.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="githubBranch"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>GitHub Branch</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="" {...field} />
-                                </FormControl>
-                                <FormDescription>
-                                    This is your project&apos;s GitHub branch.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                    <GithubRepoForm form={form} />
+                    <GithubBranchForm form={form} />
 
                     <FormField
                         control={form.control}
@@ -198,7 +273,7 @@ export default function GeneralSettings({
                                 <FormLabel>Port</FormLabel>
                                 <FormControl>
                                     <Input
-                                        placeholder=""
+                                        placeholder="9000"
                                         inputMode="numeric"
                                         type="number"
                                         min={'0'}

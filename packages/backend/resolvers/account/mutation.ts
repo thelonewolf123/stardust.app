@@ -37,11 +37,29 @@ export const mutation: Resolvers['Mutation'] = {
             expiresIn: '60h'
         })
         return token
+    },
+    addGithubToken: async (_, { token, username }, ctx) => {
+        const user = await ctx.db.User.findOne({ username })
+        if (!user) {
+            throw new Error('User not found')
+        }
+
+        await ctx.db.User.updateOne(
+            { username },
+            {
+                github_access_token: token,
+                github_username: username,
+                updatedAt: new Date()
+            }
+        )
+
+        return true
     }
 }
 
 export const mutationType = gql`
     type Mutation {
         signup(username: String!, email: String!, password: String!): String!
+        addGithubToken(token: String!, username: String!): Boolean!
     }
 `

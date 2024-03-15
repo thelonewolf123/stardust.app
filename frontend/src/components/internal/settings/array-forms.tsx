@@ -19,6 +19,7 @@ import {
     FormMessage
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { useToast } from '@/components/ui/use-toast'
 import { useRefreshProjectMutation } from '@/graphql-client'
 import { parseEnv } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -80,7 +81,7 @@ function ArrayFieldsBuilder<T extends ArrayFieldsBuilderType>({
         <div className="col-span-2">
             <div className="space-y-4">
                 {fields.map((field, index) => (
-                    <div key={field.id} className="grid gap-4 grid-cols-2">
+                    <div key={field.id} className="grid grid-cols-2 gap-4">
                         <FormField
                             control={form.control}
                             name={`${propertyName}.${index}.name`}
@@ -131,7 +132,7 @@ function ArrayFieldsBuilder<T extends ArrayFieldsBuilderType>({
                             />
                             {index === fields.length - 1 ? (
                                 <MdOutlineAddCircleOutline
-                                    className="text-green-500 hover:text-green-700 cursor-pointer"
+                                    className="cursor-pointer text-green-500 hover:text-green-700"
                                     size={22}
                                     onClick={() =>
                                         append({ name: '', value: '' })
@@ -139,7 +140,7 @@ function ArrayFieldsBuilder<T extends ArrayFieldsBuilderType>({
                                 />
                             ) : null}
                             <MdOutlineRemoveCircleOutline
-                                className="text-red-500 hover:text-red-700 cursor-pointer"
+                                className="cursor-pointer text-red-500 hover:text-red-700"
                                 size={22}
                                 onClick={() => remove(index)}
                             />
@@ -171,6 +172,7 @@ export function ProjectArrayForm({
         }
     })
 
+    const { toast } = useToast()
     const [saveEnvOptions, { loading }] = useRefreshProjectMutation()
 
     function onSubmit(values: z.infer<typeof ArrayFieldsSchema>) {
@@ -185,7 +187,10 @@ export function ProjectArrayForm({
                 }
             }
         }).then(() => {
-            console.log('Saved')
+            toast({
+                title: 'Project updated',
+                description: 'Your project has been updated.'
+            })
         })
     }
 

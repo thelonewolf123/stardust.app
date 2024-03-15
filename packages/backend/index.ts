@@ -16,7 +16,6 @@ import {
 import redis from '@core/redis'
 import { mergeResolvers, mergeTypeDefs } from '@graphql-tools/merge'
 
-import passport from './auth'
 import models from './database'
 import { connect } from './database/mongoose'
 import {

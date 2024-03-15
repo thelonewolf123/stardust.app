@@ -16,6 +16,15 @@ export class User {
 
     @prop({ type: Date, default: Date.now(), required: false })
     public createdAt!: Date
+
+    @prop({ type: Date, default: Date.now(), required: false })
+    public updatedAt!: Date
+
+    @prop({ type: String, required: false })
+    github_access_token?: string
+
+    @prop({ type: String, required: false })
+    github_username?: string
 }
 
 export const UserModel = getModelForClass(User)

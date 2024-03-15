@@ -1,7 +1,9 @@
 import crypto from 'crypto'
 import gql from 'graphql-tag'
+import invariant from 'invariant'
 import jwt from 'jsonwebtoken'
 
+import { getRegularUser } from '@/core/utils'
 import { env } from '@/env'
 import { Resolvers } from '@/types/graphql-server'
 
@@ -70,6 +72,12 @@ export const query: Resolvers['Query'] = {
         )
 
         return true
+    },
+    async getGithubUsername(_, __, ctx) {
+        const user = getRegularUser(ctx)
+        invariant(user.github_access_token, "github wasn't connected!")
+
+        return user.github_access_token
     }
 }
 
@@ -77,5 +85,6 @@ export const queryType = gql`
     type Query {
         login(username: String!, password: String!): String!
         logout: Boolean!
+        getGithubUsername: String!
     }
 `

@@ -1,0 +1,7 @@
+query GetAllGithubRepos {
+    getAllGithubRepos 
+}
+
+query GetAllGithubBranches($repo: String!) {
+    getAllGithubBranches(repo: $repo) 
+}

@@ -1,6 +1,8 @@
 import NextAuth from 'next-auth'
 import GithubProvider from 'next-auth/providers/github'
 
+import { addGithubToken } from '@/lib/server-utils'
+
 const handler = NextAuth({
     providers: [
         GithubProvider({
@@ -14,10 +16,18 @@ const handler = NextAuth({
         })
     ],
     callbacks: {
-        async jwt({ token, account, user }) {
-            // Persist the OAuth access_token to the token right after signin
-            if (account) {
-                console.log('jwt-sign in', account, user)
+        async jwt({ token, account, user, profile }) {
+            if (!account || !profile) return token
+
+            const accessToken = account.access_token as string
+            let username = ''
+            if (profile && 'login' in profile) {
+                username = profile.login as string
+            }
+
+            if (accessToken && username) {
+                await addGithubToken(accessToken, username)
+                console.log('Added github token')
             }
             return token
         }

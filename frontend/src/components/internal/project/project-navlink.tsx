@@ -1,11 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import {
-    useParams,
-    usePathname,
-    useSelectedLayoutSegment
-} from 'next/navigation'
+import { useParams, useSelectedLayoutSegment } from 'next/navigation'
 
 const PROJECT_LINKS = [
     { label: 'Project', href: '/' },
@@ -23,13 +19,13 @@ export function ProjectNavLink() {
     const projectPath = `/project/${params.username}/${params.slug}`
 
     return (
-        <div className="font-semibold flex gap-4 items-center p-4">
+        <div className="flex items-center gap-4 p-4 font-semibold">
             {PROJECT_LINKS.map((link) => (
                 <Link key={link.label} href={`${projectPath}${link.href}`}>
                     <h4
                         className={`${
                             link.href === `/${segment || ''}`
-                                ? 'border-b-2 border-primary'
+                                ? 'border-primary border-b-2'
                                 : 'text-muted-foreground'
                         }`}
                     >
