@@ -4,9 +4,9 @@ import { getProjectDetails } from '@/data/project'
 export default async function BuildArgsPage({
     searchParams
 }: {
-    searchParams?: { [key: string]: string | string[] | undefined }
+    searchParams?: { [key: string]: string | undefined }
 }) {
-    const slug = searchParams?.slug as string
+    const slug = searchParams?.slug
     if (!slug) {
         throw new Error('Slug not found')
     }
