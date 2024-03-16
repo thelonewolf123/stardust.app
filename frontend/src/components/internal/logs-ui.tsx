@@ -37,13 +37,7 @@ enum TABS {
     terminal = 'terminal'
 }
 
-export default function TerminalTab({
-    slug,
-    show
-}: {
-    slug: string
-    show: boolean
-}) {
+function TerminalTab({ slug, show }: { slug: string; show: boolean }) {
     const [start, setStart] = useState(false)
 
     if (!start) {
