@@ -22,10 +22,12 @@ export default async function MetaDataPage({
             propertyKey="metaData"
             prefix="meta_data"
             descriptionName="Meta Data"
-            redirectTo={`/project/${slugEncoded}`}
+            redirectTo={`/project/${slug}?tab=build`}
             backTo={`/new/environment?slug=${slugEncoded}`}
             type="new"
             start={true}
         />
     )
 }
+
+export const dynamic = 'force-dynamic'

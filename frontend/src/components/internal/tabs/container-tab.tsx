@@ -10,14 +10,23 @@ import { getClientAccessToken } from '@/lib/utils'
 
 type ContainerLogsType = { message: string; timestamp: number }
 
-function ContainerLogsComp({ slug, show }: { slug: string; show: boolean }) {
+function LiveLogsComponent({
+    slug,
+    show,
+    type
+}: {
+    slug: string
+    show: boolean
+    type: 'container' | 'build'
+}) {
     const [logs, setLogs] = useState<ContainerLogsType[]>([])
     const logsRef = useRef<HTMLDivElement>(null)
 
     const BASE_URL = getBackendServerUrl()
     const token = getClientAccessToken()
+    const fullUrl = `${BASE_URL}/api/${type}/${slug}/logs?token=${token}`
 
-    useEventSource(`${BASE_URL}/api/container/${slug}/logs?token=${token}`, {
+    useEventSource(fullUrl, {
         onMessage: (e) => {
             setLogs((prevLogs) => {
                 const msgObject = JSON.parse(e.data)
@@ -66,14 +75,18 @@ function ContainerLogsComp({ slug, show }: { slug: string; show: boolean }) {
     )
 }
 
-export default function BuildLogsTab({
+export default function LiveLogsTab({
     slug,
-    show
+    show,
+    type,
+    auto = false
 }: {
     slug: string
     show: boolean
+    type: 'container' | 'build'
+    auto?: boolean
 }) {
-    const [start, setStart] = useState(false)
+    const [start, setStart] = useState(auto)
 
     if (!start) {
         return (
@@ -94,5 +107,5 @@ export default function BuildLogsTab({
         )
     }
 
-    return <ContainerLogsComp slug={slug} show={show} />
+    return <LiveLogsComponent slug={slug} show={show} type={type} />
 }

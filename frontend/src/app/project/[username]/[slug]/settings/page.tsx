@@ -13,3 +13,5 @@ export default async function SettingsPage({
 
     return <GeneralSettings project={project} slug={project.slug} />
 }
+
+export const dynamic = 'force-dynamic'

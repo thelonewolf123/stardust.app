@@ -285,7 +285,7 @@ export type GetProjectBySlugQueryVariables = Exact<{
 }>;
 
 
-export type GetProjectBySlugQuery = { __typename?: 'Query', getProjectBySlug: { __typename?: 'Project', createdAt: number, description: string, dockerContext: string, dockerPath: string, githubBranch: string, githubUrl: string, domains?: Array<string> | null, slug: string, name: string, current?: { __typename?: 'Container', command?: Array<string> | null, containerSlug: string, image: string, port?: number | null, status: ContainerStatus, env?: Array<{ __typename?: 'Env', name: string, value: string }> | null, metaData?: Array<{ __typename?: 'metaData', name: string, value: string }> | null } | null, history?: Array<{ __typename?: 'Container', containerSlug: string }> | null } };
+export type GetProjectBySlugQuery = { __typename?: 'Query', getProjectBySlug: { __typename?: 'Project', createdAt: number, description: string, dockerContext: string, dockerPath: string, githubBranch: string, githubUrl: string, domains?: Array<string> | null, slug: string, name: string, current?: { __typename?: 'Container', command?: Array<string> | null, containerSlug: string, image: string, port?: number | null, status: ContainerStatus, env?: Array<{ __typename?: 'Env', name: string, value: string }> | null, metaData?: Array<{ __typename?: 'metaData', name: string, value: string }> | null } | null, history?: Array<{ __typename?: 'Container', containerSlug: string, status: ContainerStatus }> | null } };
 
 export type GetAllProjectsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -515,6 +515,7 @@ export const GetProjectBySlugDocument = gql`
     githubUrl
     history {
       containerSlug
+      status
     }
     domains
     slug

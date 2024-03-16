@@ -20,3 +20,5 @@ export default async function BuildArgsPage({
         />
     )
 }
+
+export const dynamic = 'force-dynamic'

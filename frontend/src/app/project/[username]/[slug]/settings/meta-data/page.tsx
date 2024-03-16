@@ -20,3 +20,5 @@ export default async function MetaDataPage({
         />
     )
 }
+
+export const dynamic = 'force-dynamic'

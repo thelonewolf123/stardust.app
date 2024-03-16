@@ -1,19 +1,30 @@
 'use client'
 
-import 'xterm/css/xterm.css';
+import 'xterm/css/xterm.css'
 
-import dynamic from 'next/dynamic';
-import { useState } from 'react';
+import dynamic from 'next/dynamic'
+import { useSearchParams } from 'next/navigation'
+import { useMemo, useState } from 'react'
 
-import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Container, GetProjectBySlugForEditQuery } from '@/graphql-client';
+import { Card, CardContent } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
+import {
+    Container,
+    ContainerStatus,
+    GetProjectBySlugForEditQuery
+} from '@/graphql-client'
 
-import { Button } from '../ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import BuildLogsTab from './tabs/build-tab';
-import ContainerLogsTab from './tabs/container-tab';
-import LoaderUi from './tabs/loader-ui';
+import { Button } from '../ui/button'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from '../ui/select'
+import BuildLogsTab from './tabs/build-tab'
+import LiveLogsTab from './tabs/container-tab'
+import LoaderUi from './tabs/loader-ui'
 
 const TerminalComp = dynamic(() => import('./tabs/terminal-tab'), {
     loading: () => <LoaderUi />,
@@ -59,9 +70,10 @@ export default function TerminalTab({
 
 export const LogsUi: React.FC<{
     current?: GetProjectBySlugForEditQuery['getProjectBySlug']['current'] | null
-    history?: Pick<Container, 'containerSlug'>[] | null
+    history?: Pick<Container, 'containerSlug' | 'status'>[] | null
 }> = ({ current, history }) => {
-    const [activeTab, setActiveTab] = useState<TABS>(TABS.container)
+    const tabQuery = useSearchParams().get('tab') as TABS | null
+    const [activeTab, setActiveTab] = useState<TABS>(tabQuery || TABS.container)
     const [selectedContainerSlug, setSelectedContainerSlug] = useState<string>(
         () => {
             if (current) {
@@ -70,6 +82,12 @@ export const LogsUi: React.FC<{
             return history?.at(-1)?.containerSlug || ''
         }
     )
+    const status = useMemo(() => {
+        return (
+            history?.find((c) => c.containerSlug === selectedContainerSlug)
+                ?.status || ContainerStatus.Pending
+        )
+    }, [history, selectedContainerSlug])
 
     return (
         <Card className="h-full">
@@ -110,14 +128,25 @@ export const LogsUi: React.FC<{
             </div>
 
             <Separator className="w-full" />
-            <ContainerLogsTab
+            <LiveLogsTab
                 slug={selectedContainerSlug}
                 show={activeTab === TABS.container}
+                type="container"
             />
-            <BuildLogsTab
-                slug={selectedContainerSlug}
-                show={activeTab === TABS.build}
-            />
+            {status === ContainerStatus.Pending ? (
+                <LiveLogsTab
+                    slug={selectedContainerSlug}
+                    show={activeTab === TABS.build}
+                    auto={true}
+                    type="build"
+                />
+            ) : (
+                <BuildLogsTab
+                    slug={selectedContainerSlug}
+                    show={activeTab === TABS.build}
+                />
+            )}
+
             <TerminalTab
                 slug={selectedContainerSlug}
                 show={activeTab === TABS.terminal}

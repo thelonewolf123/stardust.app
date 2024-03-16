@@ -23,6 +23,7 @@ query GetProjectBySlug($slug: String!) {
         githubUrl
         history {
             containerSlug
+            status
         }
         domains
         slug
