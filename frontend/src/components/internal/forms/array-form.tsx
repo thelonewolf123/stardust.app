@@ -1,9 +1,10 @@
 'use client'
 
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import { FaArrowRight, FaCloud } from 'react-icons/fa'
+import { FaArrowLeft, FaArrowRight, FaCloud } from 'react-icons/fa'
 import {
     MdOutlineAddCircleOutline,
     MdOutlineRemoveCircleOutline
@@ -25,8 +26,6 @@ import { useToast } from '@/components/ui/use-toast'
 import { useRefreshProjectMutation } from '@/graphql-client'
 import { parseEnv } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
-
-import { ProjectSchema } from './general-form'
 
 const keyValuePair = z.object({
     name: z.string(),
@@ -161,6 +160,7 @@ export function ProjectArrayForm({
     type = 'edit',
     project,
     redirectTo,
+    backTo,
     propertyKey,
     descriptionName
 }: {
@@ -173,6 +173,7 @@ export function ProjectArrayForm({
     propertyKey: 'env' | 'buildArgs' | 'metaData'
 
     redirectTo?: string
+    backTo?: string
 }) {
     const form = useForm<z.infer<typeof ArrayFieldsSchema>>({
         resolver: zodResolver(ArrayFieldsSchema),
@@ -227,16 +228,39 @@ export function ProjectArrayForm({
                     inputType={propertyKey === 'metaData' ? 'text' : 'password'}
                 />
 
-                <Button type="submit" loading={loading}>
-                    {type === 'new' && !start ? (
-                        <div className="flex gap-1 items-center">
-                            <FaArrowRight />
-                            <span>Next</span>
-                        </div>
-                    ) : (
-                        <>Save</>
-                    )}
-                </Button>
+                <div className="flex justify-between items-center">
+                    <Button
+                        type="submit"
+                        loading={loading}
+                        className="flex gap-1 items-center"
+                    >
+                        {type === 'new' && start ? (
+                            <>
+                                <FaCloud />
+                                <span>Deploy</span>
+                            </>
+                        ) : type == 'new' ? (
+                            <>
+                                <FaArrowRight />
+                                <span>Next</span>
+                            </>
+                        ) : (
+                            <>Save</>
+                        )}
+                    </Button>
+                    {backTo ? (
+                        <Link href={backTo}>
+                            <Button
+                                type="button"
+                                variant={'outline'}
+                                className="flex gap-1 items-center"
+                            >
+                                <FaArrowLeft />
+                                <span>Back</span>
+                            </Button>
+                        </Link>
+                    ) : null}
+                </div>
             </form>
         </Form>
     )

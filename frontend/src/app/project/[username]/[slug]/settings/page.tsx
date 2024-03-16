@@ -1,4 +1,4 @@
-import GeneralSettings from '@/components/internal/settings/general-settings'
+import { GeneralSettings } from '@/components/internal/settings/general-settings'
 import { getProjectDetails } from '@/data/project'
 
 export default async function SettingsPage({

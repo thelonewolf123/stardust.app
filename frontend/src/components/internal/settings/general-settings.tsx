@@ -1,3 +1,5 @@
+'use client'
+
 import { z } from 'zod'
 
 import { useToast } from '@/components/ui/use-toast'

@@ -173,11 +173,6 @@ export const mutation: Resolvers['Mutation'] = {
 
         const current: any = project.current
         invariant(current, 'Current container not found')
-
-        const history = project.history
-        const containerSlug = `${slug}:${history.length}`
-        const repoWithHash = `${project.ecrRepo}:${history.length}`
-
         const buildArgs = (input.buildArgs || current.buildArgs || []).reduce(
             (
                 acc: any,
@@ -195,42 +190,74 @@ export const mutation: Resolvers['Mutation'] = {
             {} as Record<string, string>
         )
 
+        const history = project.history
+        const containerSlug = `${slug}:${history.length}`
+        const repoWithHash = `${project.ecrRepo}:${history.length}`
+
         if (type === 'edit') {
             ctx.queue.destroyContainer.publish({
                 containerId: current.containerId,
                 containerSlug: current.containerSlug
             })
-        }
 
-        const newContainer = new ctx.db.Container({
-            containerSlug: containerSlug,
-            env: input.env ? input.env : current.env,
-            buildArgs: input.buildArgs || current.buildArgs,
-            metaData: input.metaData ? input.metaData : current.metaData,
-            port: input.port || current.port,
-            status: 'pending',
-            image: repoWithHash,
-            version: history.length,
-            createdBy: user
-        })
+            const newContainer = new ctx.db.Container({
+                containerSlug: containerSlug,
+                env: input.env ? input.env : current.env,
+                buildArgs: input.buildArgs || current.buildArgs,
+                metaData: input.metaData ? input.metaData : current.metaData,
+                port: input.port || current.port,
+                status: 'pending',
+                image: repoWithHash,
+                version: history.length,
+                createdBy: user
+            })
 
-        await newContainer.save()
-        await ctx.db.Project.updateOne(
-            { slug, user: user._id },
-            {
-                $push: { history: newContainer },
-                $set: {
-                    name: input.name || project.name,
-                    description: input.description || project.description,
-                    current: newContainer,
-                    githubUrl: input.githubUrl || project.githubUrl,
-                    githubBranch: input.githubBranch || project.githubBranch,
-                    dockerPath: input.dockerPath || project.dockerPath,
-                    dockerContext: input.dockerContext || project.dockerContext,
-                    ecrRepo: project.ecrRepo
+            await newContainer.save()
+            await ctx.db.Project.updateOne(
+                { slug, user: user._id },
+                {
+                    $push: { history: newContainer },
+                    $set: {
+                        name: input.name || project.name,
+                        description: input.description || project.description,
+                        current: newContainer,
+                        githubUrl: input.githubUrl || project.githubUrl,
+                        githubBranch:
+                            input.githubBranch || project.githubBranch,
+                        dockerPath: input.dockerPath || project.dockerPath,
+                        dockerContext:
+                            input.dockerContext || project.dockerContext,
+                        ecrRepo: project.ecrRepo
+                    }
                 }
-            }
-        )
+            )
+        } else {
+            await ctx.db.Project.updateOne(
+                { slug, user: user._id },
+                {
+                    $set: {
+                        name: input.name || project.name,
+                        description: input.description || project.description,
+                        githubUrl: input.githubUrl || project.githubUrl,
+                        githubBranch:
+                            input.githubBranch || project.githubBranch,
+                        dockerPath: input.dockerPath || project.dockerPath,
+                        dockerContext:
+                            input.dockerContext || project.dockerContext
+                    }
+                }
+            )
+
+            const current = await ctx.db.Container.findOne({
+                _id: project.current._id
+            })
+            invariant(current, 'Current container not found')
+            current.env = input.env || current.env
+            current.metaData = input.metaData || current.metaData
+            current.port = input.port || current.port
+            current.buildArgs = input.buildArgs || current.buildArgs
+            await current.save()
+        }
 
         if (start) {
             ctx.queue.buildContainer.publish({
