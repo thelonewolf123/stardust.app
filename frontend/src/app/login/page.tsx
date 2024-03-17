@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+import { authenticateAction } from '@/action/auth'
 import { Button } from '@/components/ui/button'
 import {
     Form,
@@ -37,7 +38,7 @@ export default function LoginPage() {
         }
     })
 
-    const [login, { data, loading, error }] = useLoginQueryLazyQuery()
+    const [login, { loading }] = useLoginQueryLazyQuery()
     const router = useRouter()
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -54,13 +55,7 @@ export default function LoginPage() {
             const token = result.data?.login
             invariant(token, 'Expected token to be defined')
             localStorage.setItem('token', token)
-            await fetch('/api/authenticate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ token })
-            }).then((res) => res.json())
+            await authenticateAction(token)
             router.push('/projects')
         } catch (error) {
             console.error(error)

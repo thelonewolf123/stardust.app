@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+import { logoutAction } from '@/action/auth'
+
 import { Button } from '../../ui/button'
 
 export function LogoutBtn() {
@@ -14,13 +16,9 @@ export function LogoutBtn() {
             loading={loading}
             onClick={async () => {
                 setLoading(true)
-                const res = await fetch('/api/logout', {
-                    method: 'GET'
-                })
+                await logoutAction()
+                router.push('/login')
                 setLoading(false)
-                if (res.status === 201) {
-                    router.push('/login')
-                }
             }}
         >
             Logout
