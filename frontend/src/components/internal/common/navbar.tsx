@@ -24,6 +24,9 @@ export default async function Navbar() {
                             <Link href="/projects" className="hover:underline">
                                 Projects
                             </Link>
+                            <Link href="/settings" className="hover:underline">
+                                Settings
+                            </Link>
                             <Link href="/new" className="hover:underline">
                                 New
                             </Link>
