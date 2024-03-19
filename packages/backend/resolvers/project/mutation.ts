@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
 import invariant from 'invariant'
 
-import { generateSubdomain } from '@/backend/library'
+import { convertToObject, generateSubdomain } from '@/backend/library'
 import { git } from '@/backend/library/github'
 import { ecr } from '@/core/aws/ecr.aws'
 import { getRegularUser } from '@/core/utils'
@@ -23,13 +23,7 @@ export const mutation: Resolvers['Mutation'] = {
         const prefix = generateSubdomain()
         const subdomain = `${prefix}.${env.DOMAIN_NAME}`
 
-        const buildArgs = (input.buildArgs || []).reduce(
-            (acc, { name, value }) => {
-                acc[name] = value
-                return acc
-            },
-            {} as Record<string, string>
-        )
+        const buildArgs = convertToObject(input.buildArgs || [])
 
         if (start) {
             ctx.queue.buildContainer.publish({
@@ -54,7 +48,6 @@ export const mutation: Resolvers['Mutation'] = {
             input.githubUrl,
             `${env.DOMAIN_NAME}/api/webhook/${projectSlug}/trigger`
         )
-        console.log('Webhook', webhook)
 
         const container = new ctx.db.Container({
             containerSlug,
@@ -159,16 +152,7 @@ export const mutation: Resolvers['Mutation'] = {
 
         ctx.queue.createContainer.publish({
             containerSlug: containerSlug,
-            env: container.env.reduce(
-                (
-                    acc: Record<string, string>,
-                    { name, value }: { name: string; value: string }
-                ) => {
-                    acc[name] = value
-                    return acc
-                },
-                {} as Record<string, string>
-            ),
+            env: convertToObject(container.env),
             image: container.image,
             ports: container.port ? [container.port] : []
         })
@@ -185,21 +169,8 @@ export const mutation: Resolvers['Mutation'] = {
 
         const current: any = project.current
         invariant(current, 'Current container not found')
-        const buildArgs = (input.buildArgs || current.buildArgs || []).reduce(
-            (
-                acc: any,
-                {
-                    name,
-                    value
-                }: {
-                    name: string
-                    value: string
-                }
-            ) => {
-                acc[name] = value
-                return acc
-            },
-            {} as Record<string, string>
+        const buildArgs = convertToObject(
+            input.buildArgs || current.buildArgs || []
         )
 
         const history = project.history

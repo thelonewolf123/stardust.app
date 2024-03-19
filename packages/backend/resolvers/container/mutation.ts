@@ -2,6 +2,7 @@ import gql from 'graphql-tag'
 import invariant from 'invariant'
 import { v4 } from 'uuid'
 
+import { convertToObject } from '@/backend/library'
 import { getRegularUser } from '@/core/utils'
 import { Resolvers } from '@/types/graphql-server'
 
@@ -10,10 +11,7 @@ export const mutation: Resolvers['Mutation'] = {
         getRegularUser(ctx)
         const containerSlug = v4()
 
-        const env: Record<string, string> = {}
-        input.env?.forEach((envron) => {
-            env[envron.name] = envron.value
-        })
+        const env: Record<string, string> = convertToObject(input.env ?? [])
 
         ctx.queue.createContainer.publish({
             containerSlug,
@@ -53,10 +51,7 @@ export const mutation: Resolvers['Mutation'] = {
             }
         )
 
-        const env: Record<string, string> = {}
-        container.env.forEach((envron) => {
-            env[envron.name] = envron.value
-        })
+        const env: Record<string, string> = convertToObject(container.env)
 
         ctx.queue.createContainer.publish({
             containerSlug: container.containerSlug,
