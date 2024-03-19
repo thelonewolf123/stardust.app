@@ -1,3 +1,5 @@
+import invariant from 'invariant'
+
 import { Octokit } from '@octokit/rest'
 
 async function listRepositories(username: string, token: string) {
@@ -32,13 +34,16 @@ async function listBranches(username: string, repo: string, token: string) {
 
 async function addWebhook(
     username: string,
-    repo: string,
+    githubUrl: string,
     webhook_url: string,
     token: string
 ) {
     const octokit = new Octokit({
         auth: token
     })
+
+    const repo = githubUrl.split('github.com/').at(-1)
+    invariant(repo, 'Invalid github url')
 
     const [_, repoName] = repo.split('/')
     const response = await octokit.repos.createWebhook({
@@ -58,7 +63,7 @@ export function git(username: string, token: string) {
     return {
         listRepositories: () => listRepositories(username, token),
         listBranches: (repo: string) => listBranches(username, repo, token),
-        addWebhook: (repo: string, webhook_url: string) =>
-            addWebhook(username, repo, webhook_url, token)
+        addWebhook: (githubUrl: string, webhook_url: string) =>
+            addWebhook(username, githubUrl, webhook_url, token)
     }
 }
