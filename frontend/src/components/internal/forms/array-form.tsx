@@ -183,7 +183,7 @@ export function ProjectArrayForm({
     })
 
     const { toast } = useToast()
-    const [saveEnvOptions, { loading }] = useRefreshProjectMutation()
+    const [saveArrayOptions, { loading }] = useRefreshProjectMutation()
     const router = useRouter()
 
     function onSubmit(values: z.infer<typeof ArrayFieldsSchema>) {
@@ -192,7 +192,7 @@ export function ProjectArrayForm({
         values[propertyKey] = formValues.filter(
             (item) => item.name !== '' && item.value !== ''
         )
-        saveEnvOptions({
+        saveArrayOptions({
             variables: {
                 slug,
                 type,
@@ -202,6 +202,7 @@ export function ProjectArrayForm({
                 }
             }
         }).then(() => {
+            router.refresh()
             if (redirectTo) {
                 router.push(redirectTo)
                 return

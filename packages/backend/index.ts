@@ -152,6 +152,14 @@ const main = async () => {
         projectVerificationMiddleware,
         getLogHandler('container')
     )
+    app.all('/api/webhook/:username/:id/trigger', async (req, res) => {
+        const { username, id } = req.params
+        const slug = `${username}/${id}`
+        console.log('Webhook triggered', slug, req.method, req.body)
+
+        return res.json({ message: 'Webhook triggered' })
+    })
+
     ws.app.ws(
         '/api/container/:username/:id/ssh',
         projectVerificationMiddlewareWs,

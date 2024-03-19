@@ -7,7 +7,11 @@ async function main() {
     console.log(list)
 
     const branches = await client.listBranches(list[0])
-    console.log(branches)
+    const result = await client.addWebhook(
+        'thelonewolf123/pocketbase',
+        'https://webhook.site/a675d021-310a-44a4-9b49-b0870dd50f72'
+    )
+    console.log(result)
 }
 
 main()

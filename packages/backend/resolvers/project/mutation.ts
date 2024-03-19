@@ -2,6 +2,7 @@ import gql from 'graphql-tag'
 import invariant from 'invariant'
 
 import { generateSubdomain } from '@/backend/library'
+import { git } from '@/backend/library/github'
 import { ecr } from '@/core/aws/ecr.aws'
 import { getRegularUser } from '@/core/utils'
 import { env } from '@/env'
@@ -43,6 +44,17 @@ export const mutation: Resolvers['Mutation'] = {
                 version
             })
         }
+
+        invariant(
+            user.github_username && user.github_access_token,
+            'Github account not connected'
+        )
+        const gitClient = git(user.github_username, user.github_access_token)
+        const webhook = await gitClient.addWebhook(
+            input.githubUrl,
+            `${env.DOMAIN_NAME}/api/webhook/${projectSlug}/trigger`
+        )
+        console.log('Webhook', webhook)
 
         const container = new ctx.db.Container({
             containerSlug,

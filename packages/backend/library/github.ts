@@ -40,14 +40,15 @@ async function addWebhook(
         auth: token
     })
 
-    const [owner, repoName] = repo.split('/')
+    const [_, repoName] = repo.split('/')
     const response = await octokit.repos.createWebhook({
-        owner,
+        owner: username,
         repo: repoName,
         config: {
             url: webhook_url,
             content_type: 'json'
-        }
+        },
+        events: ['push']
     })
 
     return response.data
