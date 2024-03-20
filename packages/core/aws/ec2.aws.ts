@@ -7,8 +7,10 @@ import {
     DescribeInstancesCommand,
     DescribeInstanceStatusCommand,
     DescribeSpotFleetRequestsCommand,
+    DescribeSpotInstanceRequestsCommand,
     EC2Client,
     RequestSpotFleetCommand,
+    RequestSpotInstancesCommand,
     RunInstancesCommand,
     TerminateInstancesCommand
 } from '@aws-sdk/client-ec2'
@@ -35,34 +37,27 @@ async function requestEc2SpotInstance(count: number, pricePerHour: number) {
         ssmAws.getParameter(SSM_PARAMETER_KEYS.baseKeyParName)
     ])
 
-    const command = new RequestSpotFleetCommand({
-        SpotFleetRequestConfig: {
-            SpotPrice: pricePerHour.toString(),
-            IamFleetRole:
-                'arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetTaggingRole',
-            LaunchSpecifications: [
-                {
-                    ImageId: ami,
-                    SecurityGroups: [{ GroupId: securityGroup }],
-                    KeyName: keyPairName,
-                    InstanceRequirements: {
-                        VCpuCount: { Min: 1, Max: 2 },
-                        MemoryMiB: { Max: 8192 }
-                    }
-                }
-            ],
-            TargetCapacity: count,
-            ValidUntil: new Date(Date.now() + 600_000), // valid for 10 mins from request!
-            Type: 'one-time'
+    const command = new RequestSpotInstancesCommand({
+        SpotPrice: pricePerHour.toString(),
+        InstanceCount: count,
+        LaunchSpecification: {
+            ImageId: ami,
+            InstanceType: EC2_INSTANCE_TYPE,
+            KeyName: keyPairName,
+            SecurityGroups: [securityGroup]
         }
     })
 
-    return client.send(command)
+    const response = await client.send(command)
+
+    const requestId = response.SpotInstanceRequests?.map(
+        (f) => f.SpotInstanceRequestId
+    )?.[0]
 }
 
 async function waitForSpotInstanceRequest(requestId: string) {
     let attempts = 0
-    const maxAttempts = 10
+    const maxAttempts = 100
     const interval = 1000
 
     while (attempts < maxAttempts) {
@@ -81,6 +76,19 @@ async function waitForSpotInstanceRequest(requestId: string) {
     }
 
     throw new Error('Spot request timed out')
+}
+
+async function getProvisionedSpotInstanceIds(requestId: string) {
+    const command = new DescribeSpotInstanceRequestsCommand({
+        SpotInstanceRequestIds: [requestId]
+    })
+    const info = await client.send(command)
+
+    return info.SpotInstanceRequests?.map((request) => {
+        if (request.State === 'active' && request.InstanceId) {
+            return request.InstanceId
+        }
+    })
 }
 
 async function requestEc2OnDemandInstance(count: number) {

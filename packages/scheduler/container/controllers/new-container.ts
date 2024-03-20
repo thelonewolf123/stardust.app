@@ -3,7 +3,7 @@ import invariant from 'invariant'
 import { z } from 'zod'
 
 import models from '@/backend/database'
-import redis, { getPublisher } from '@/core/redis'
+import { getPublisher } from '@/core/redis'
 import { sleep } from '@/core/utils'
 import InstanceStrategy from '@/scheduler/library/instance'
 import {
