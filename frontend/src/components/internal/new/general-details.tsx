@@ -49,6 +49,7 @@ export default function NewProjectForm({
                         }
                     }
                 })
+                router.refresh()
                 router.push(`/new/build-args?slug=${slug}`)
                 return
             }
@@ -71,6 +72,7 @@ export default function NewProjectForm({
 
             const projectSlug = containerSlug.split(':')[0]
             console.log('Project created', containerSlug)
+            router.refresh()
             router.push(`/new/build-args?slug=${projectSlug}`)
         } catch (error) {
             console.error(error)

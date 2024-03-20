@@ -4,25 +4,12 @@ import Link from 'next/link'
 import { LogsUi } from '@/components/internal/logs-ui'
 import { StatusIcon } from '@/components/internal/project/status'
 import { Button } from '@/components/ui/button'
+import { getProject } from '@/data/project'
 import {
     GetProjectBySlugDocument,
     GetProjectBySlugQuery
 } from '@/graphql-client'
 import { getApolloClient } from '@/lib/server-utils'
-
-const getProject = async (username: string, slug: string) => {
-    try {
-        const client = await getApolloClient()
-        const { data } = await client.query<GetProjectBySlugQuery>({
-            query: GetProjectBySlugDocument,
-            variables: { slug: `${username}/${slug}` }
-        })
-
-        return data.getProjectBySlug
-    } catch (error) {
-        console.error('Error getting project by slug', error)
-    }
-}
 
 export default async function SingleProjectPage({
     params

@@ -1,6 +1,8 @@
 import {
+    GetProjectBySlugDocument,
     GetProjectBySlugForEditDocument,
-    GetProjectBySlugForEditQuery
+    GetProjectBySlugForEditQuery,
+    GetProjectBySlugQuery
 } from '@/graphql-client'
 import { getApolloClient } from '@/lib/server-utils'
 
@@ -23,5 +25,19 @@ export async function getProjectDetails(username: string, slug: string) {
         buildArgs: project.current?.buildArgs || [],
         metaData: project.current?.metaData || [],
         port: project.current?.port || 3000
+    }
+}
+
+export const getProject = async (username: string, slug: string) => {
+    try {
+        const client = await getApolloClient()
+        const { data } = await client.query<GetProjectBySlugQuery>({
+            query: GetProjectBySlugDocument,
+            variables: { slug: `${username}/${slug}` }
+        })
+
+        return data.getProjectBySlug
+    } catch (error) {
+        console.error('Error getting project by slug', error)
     }
 }

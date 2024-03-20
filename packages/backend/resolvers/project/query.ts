@@ -113,9 +113,13 @@ export const query: Resolvers['Query'] = {
             "github wasn't connected!"
         )
         const client = git(user.github_username, user.github_access_token)
-        return client.listRepositories()
+        const list = await client.listRepositories()
+
+        return list.map((pathname) =>
+            new URL(pathname, 'https://github.com').toString()
+        )
     },
-    async getAllGithubBranches(_, { repo }, ctx) {
+    getAllGithubBranches(_, { repo }, ctx) {
         const user = getRegularUser(ctx)
         invariant(
             user.github_access_token && user.github_username,

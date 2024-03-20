@@ -30,28 +30,10 @@ export const query: Resolvers['Query'] = {
             throw new Error('User not found')
         }
 
-        await ctx.db.User.updateOne(
-            {
-                username,
-                password: hashedPassword
-            },
-            {
-                $inc: {
-                    count: 1
-                }
-            }
-        )
-
-        // You might perform a database lookup to verify the username and hashed password
-
         // Generate a JWT token
-        const token = jwt.sign(
-            { username, count: user.count + 1 },
-            JWT_SECRET,
-            {
-                expiresIn: '60h'
-            }
-        )
+        const token = jwt.sign({ username, count: user.count }, JWT_SECRET, {
+            expiresIn: '60h'
+        })
         return token
     },
     logout: async (_, __, ctx) => {
@@ -75,9 +57,9 @@ export const query: Resolvers['Query'] = {
     },
     async getGithubUsername(_, __, ctx) {
         const user = getRegularUser(ctx)
-        invariant(user.github_access_token, "github wasn't connected!")
+        invariant(user.github_username, "github wasn't connected!")
 
-        return user.github_access_token
+        return user.github_username
     }
 }
 

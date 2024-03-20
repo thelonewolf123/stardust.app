@@ -20,5 +20,3 @@ export default async function EnvironmentPage({
         />
     )
 }
-
-export const dynamic = 'force-dynamic'

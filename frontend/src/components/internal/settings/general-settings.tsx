@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { z } from 'zod'
 
 import { useToast } from '@/components/ui/use-toast'
@@ -16,6 +17,7 @@ export function GeneralSettings({
 }) {
     const [saveGeneralSettings, { loading }] = useRefreshProjectMutation()
     const { toast } = useToast()
+    const router = useRouter()
 
     function onSubmit(values: z.infer<typeof ProjectSchema>) {
         saveGeneralSettings({
@@ -28,6 +30,7 @@ export function GeneralSettings({
                 }
             }
         }).then(() => {
+            router.refresh()
             toast({
                 title: 'Project updated',
                 description: 'Your project has been updated.'

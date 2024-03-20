@@ -1,5 +1,3 @@
-import invariant from 'invariant'
-
 import { Octokit } from '@octokit/rest'
 
 async function listRepositories(username: string, token: string) {
@@ -17,7 +15,7 @@ async function listRepositories(username: string, token: string) {
     return repositories
 }
 
-async function listBranches(username: string, repo: string, token: string) {
+async function listBranches(username: string, token: string, repo: string) {
     const octokit = new Octokit({
         auth: token
     })
@@ -34,36 +32,40 @@ async function listBranches(username: string, repo: string, token: string) {
 
 async function addWebhook(
     username: string,
-    githubUrl: string,
-    webhook_url: string,
-    token: string
+    token: string,
+    github_url: string,
+    webhook_url: string
 ) {
     const octokit = new Octokit({
         auth: token
     })
 
-    const repo = githubUrl.split('github.com/').at(-1)
-    invariant(repo, 'Invalid github url')
-
+    const repo = new URL(github_url).pathname
     const [_, repoName] = repo.split('/')
-    const response = await octokit.repos.createWebhook({
-        owner: username,
-        repo: repoName,
-        config: {
-            url: webhook_url,
-            content_type: 'json'
-        },
-        events: ['push']
-    })
 
-    return response.data
+    try {
+        const response = await octokit.repos.createWebhook({
+            owner: username,
+            repo: repoName,
+            config: {
+                url: webhook_url,
+                content_type: 'json'
+            },
+            events: ['push']
+        })
+
+        return response.status === 201
+    } catch (error) {
+        console.log(error)
+        return false
+    }
 }
 
 export function git(username: string, token: string) {
     return {
         listRepositories: () => listRepositories(username, token),
-        listBranches: (repo: string) => listBranches(username, repo, token),
-        addWebhook: (githubUrl: string, webhook_url: string) =>
-            addWebhook(username, githubUrl, webhook_url, token)
+        listBranches: (repo: string) => listBranches(username, token, repo),
+        addWebhook: (github_url: string, webhook_url: string) =>
+            addWebhook(username, token, github_url, webhook_url)
     }
 }

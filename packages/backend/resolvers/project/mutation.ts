@@ -43,10 +43,11 @@ export const mutation: Resolvers['Mutation'] = {
             user.github_username && user.github_access_token,
             'Github account not connected'
         )
-        const gitClient = git(user.github_username, user.github_access_token)
-        const webhook = await gitClient.addWebhook(
+
+        const client = git(user.github_username, user.github_access_token)
+        await client.addWebhook(
             input.githubUrl,
-            `${env.DOMAIN_NAME}/api/webhook/${projectSlug}/trigger`
+            `https://${env.DOMAIN_NAME}/api/webhook/${projectSlug}/trigger`
         )
 
         const container = new ctx.db.Container({

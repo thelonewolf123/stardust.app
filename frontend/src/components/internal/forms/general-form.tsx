@@ -67,7 +67,7 @@ const GithubRepoForm = ({
         if (!data) return []
         return data.getAllGithubRepos.map((repo) => ({
             value: repo,
-            label: repo
+            label: repo.split('github.com/')[1]
         }))
     }, [data])
 
@@ -83,14 +83,8 @@ const GithubRepoForm = ({
                             options={items}
                             placeholder="repo"
                             disabled={type === 'edit'}
-                            value={field.value.replace(
-                                'https://github.com/',
-                                ''
-                            )}
-                            onChange={(v) => {
-                                const fullUrl = `https://github.com/${v}`
-                                form.setValue('githubUrl', fullUrl)
-                            }}
+                            value={field.value}
+                            onChange={(v) => form.setValue('githubUrl', v)}
                         />
                     </FormControl>
                     <FormDescription>
