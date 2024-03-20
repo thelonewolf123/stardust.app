@@ -1,5 +1,4 @@
 import { NodeSSH } from 'node-ssh'
-import { Client as SSHClient } from 'ssh2'
 
 import { env } from '@/env'
 import { InstanceExecArgs } from '@/types'
@@ -9,7 +8,6 @@ import {
     DescribeSpotFleetRequestsCommand,
     DescribeSpotInstanceRequestsCommand,
     EC2Client,
-    RequestSpotFleetCommand,
     RequestSpotInstancesCommand,
     RunInstancesCommand,
     TerminateInstancesCommand
@@ -20,6 +18,7 @@ import {
     EC2_INSTANCE_USERNAME,
     SSM_PARAMETER_KEYS
 } from '../../../constants/aws-infra'
+import { sleep } from '../utils'
 import ssmAws from './ssm.aws'
 
 const client = new EC2Client({
@@ -61,17 +60,25 @@ async function waitForSpotInstanceRequest(requestId: string) {
     const interval = 1000
 
     while (attempts < maxAttempts) {
-        const command = new DescribeSpotFleetRequestsCommand({
-            SpotFleetRequestIds: [requestId]
+        const command = new DescribeSpotInstanceRequestsCommand({
+            SpotInstanceRequestIds: [requestId]
         })
         const info = await client.send(command)
-        const request = info.SpotFleetRequestConfigs?.[0]
+        const totalRequestedInstances = info.SpotInstanceRequests?.length
+        const activeInstanceIds = info.SpotInstanceRequests?.map((request) => {
+            if (request.State === 'active' && request.InstanceId) {
+                return request.InstanceId
+            }
+        }).filter(Boolean)
 
-        if (request?.SpotFleetRequestState === 'active') {
-            return request
+        if (
+            activeInstanceIds &&
+            activeInstanceIds.length === totalRequestedInstances
+        ) {
+            return activeInstanceIds
         }
 
-        await new Promise((resolve) => setTimeout(resolve, interval))
+        await sleep(interval)
         attempts++
     }
 
@@ -181,10 +188,11 @@ async function execCommand(params: InstanceExecArgs) {
 
 export default {
     execCommand,
-    requestEc2SpotInstance,
-    requestEc2OnDemandInstance,
+    terminateInstance,
     getInstanceInfoById,
     getInstanceStatusById,
+    requestEc2SpotInstance,
     waitForSpotInstanceRequest,
-    terminateInstance
+    requestEc2OnDemandInstance,
+    getProvisionedSpotInstanceIds
 }

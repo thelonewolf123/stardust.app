@@ -1,15 +1,16 @@
 import Dockerode from 'dockerode'
 import invariant from 'invariant'
 
-import { getDockerClient } from '@/core/docker'
 import { InstanceExecArgs, ProviderType } from '@/types'
 import { Instance } from '@aws-sdk/client-ec2'
+import { SPOT_INSTANCE_PRICE_PER_HOUR } from '@constants/provider'
 
 import InstanceStrategyAws from './instance.aws'
+import InstanceStrategyAwsSpot from './instance.aws.spot'
 
 class InstanceStrategy {
     provider: ProviderType
-    strategy: InstanceStrategyAws
+    strategy: InstanceStrategyAws | InstanceStrategyAwsSpot
 
     constructor(provider: ProviderType) {
         this.provider = provider
@@ -19,6 +20,8 @@ class InstanceStrategy {
     #createStrategy() {
         if (this.provider === 'aws') {
             return new InstanceStrategyAws()
+        } else if (this.provider === 'aws-spot') {
+            return new InstanceStrategyAwsSpot(SPOT_INSTANCE_PRICE_PER_HOUR)
         }
         throw new Error('Provider not supported')
     }

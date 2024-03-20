@@ -75,7 +75,7 @@ export type QueryablePromise<T> = Promise<T> & {
     isRejected: boolean
 }
 
-export type ProviderType = 'aws' | 'gcp' | 'azure'
+export type ProviderType = 'aws' | 'aws-spot'
 
 export type InstanceExecArgs = {
     command: string
