@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useLayoutEffect } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { FaArrowLeft, FaArrowRight, FaCloud } from 'react-icons/fa'
 import {
@@ -60,7 +60,7 @@ function ArrayFieldsBuilder<T extends ArrayFieldsBuilderType>({
         name: propertyName
     })
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (fields.length === 0) {
             append({ name: '', value: '' })
         }

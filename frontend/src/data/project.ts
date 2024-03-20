@@ -24,7 +24,7 @@ export async function getProjectDetails(username: string, slug: string) {
         env: project.current?.env || [],
         buildArgs: project.current?.buildArgs || [],
         metaData: project.current?.metaData || [],
-        port: project.current?.port || 3000
+        port: project.current?.port || undefined
     }
 }
 
