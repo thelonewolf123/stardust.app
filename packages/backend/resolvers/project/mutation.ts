@@ -244,8 +244,15 @@ export const mutation: Resolvers['Mutation'] = {
         }
 
         if (start) {
+            const project = await ctx.db.Project.findOne({
+                slug,
+                user: user._id
+            }).populate(['current', 'history'])
+            invariant(project, 'Project not found')
+            invariant(project.current, 'Current container not found')
+            const current: any = project.current
             ctx.queue.buildContainer.publish({
-                containerSlug,
+                containerSlug: current.containerSlug,
                 projectSlug: slug,
                 githubRepoUrl: input.githubUrl || project.githubUrl,
                 githubRepoBranch: input.githubBranch || project.githubBranch,
@@ -253,7 +260,7 @@ export const mutation: Resolvers['Mutation'] = {
                 dockerContext: input.dockerContext || project.dockerContext,
                 ecrRepo: repoWithHash,
                 buildArgs,
-                version: history.length
+                version: project.history.length
             })
         }
 
