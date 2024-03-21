@@ -38,7 +38,7 @@ function LiveLogsComponent({
                     ...prevLogs,
                     { message: purifiedMessage, timestamp }
                 ]
-                return newLogs
+                return newLogs.slice(-100)
             })
         }
     })
