@@ -1,46 +1,25 @@
 import ec2Aws from '../../packages/core/aws/ec2.aws'
 
 async function main() {
-    ec2Aws
-        .execCommand({
-            command: 'podman',
-            args: [
-                'build',
-                '-f',
-                'docker/Dockerfile',
-                '-t',
-                'test',
-                '--build-arg',
-                'BRANCH=main',
-                '--build-arg',
-                `GITHUB_TOKEN=${process.env.GITHUB_TOKEN}`,
-                '.'
-            ],
-            ipAddress: '3.90.10.7',
-            cwd: '/home/ubuntu/app',
-            sudo: true
-        })
-        .then(([close, promise]) => {
-            setTimeout(close, 1500)
-            return promise
-        })
-        .then((data) => {
+    const [close, resultPromise] = await ec2Aws.execCommand({
+        command: 'git',
+        args: [
+            'clone',
+            'https://github.com/thelonewolf123/tools.cyberkrypts.dev',
+            `/home/ubuntu/${Date.now()}`
+        ],
+        ipAddress: '52.91.100.121',
+        cwd: '/home/ubuntu',
+        sudo: true,
+        onProgress: (data) => {
             console.log(data)
-        })
+        }
+    })
 
-    ec2Aws
-        .execCommand({
-            command: 'ls',
-            args: ['-la'],
-            ipAddress: '3.90.10.7',
-            sudo: true
-        })
-        .then(([close, promise]) => {
-            return promise
-        })
-        .then((data) => {
-            console.log(data)
-        })
+    const output = await resultPromise
+    console.log(output)
+
+    close()
 }
 
 main()

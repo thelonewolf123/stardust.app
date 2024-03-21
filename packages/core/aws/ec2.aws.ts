@@ -5,7 +5,6 @@ import { InstanceExecArgs } from '@/types'
 import {
     DescribeInstancesCommand,
     DescribeInstanceStatusCommand,
-    DescribeSpotFleetRequestsCommand,
     DescribeSpotInstanceRequestsCommand,
     EC2Client,
     RequestSpotInstancesCommand,
@@ -149,8 +148,8 @@ async function execCommand(params: InstanceExecArgs) {
     const ssh = new NodeSSH()
 
     if (params.sudo) {
-        params.command = 'sudo'
         params.args = [params.command, ...params.args]
+        params.command = 'sudo'
     }
 
     await ssh.connect({
@@ -160,23 +159,33 @@ async function execCommand(params: InstanceExecArgs) {
         privateKey: privateKey
     })
 
+    ssh.connection?.on('error', (err) => {
+        console.error('SSH connection error:', err)
+    })
+
     let output = ''
 
-    // TODO: this code is vulnerable to shell injection, fix it @thelonewolf123
-    const resultPromise = ssh.exec(params.command, params.args, {
-        cwd: params.cwd,
-        onStdout: (data) => {
-            output += data.toString()
-            params.onProgress?.(data.toString())
-        },
-        onStderr: (data) => {
-            output += data.toString()
-            params.onProgress?.(data.toString())
-        },
-        execOptions: {
-            env
-        }
-    })
+    const resultPromise = ssh
+        .exec(params.command, params.args, {
+            cwd: params.cwd,
+            stream: 'both',
+            onStdout: (data) => {
+                output += data.toString()
+                params.onProgress?.(data.toString())
+            },
+            onStderr: (data) => {
+                output += data.toString()
+                params.onProgress?.(data.toString())
+            },
+            execOptions: {
+                env: params.env || {},
+                pty: true
+            }
+        })
+        .then((result) => {
+            // return result.stdout
+            return output
+        })
 
     return [
         () => {

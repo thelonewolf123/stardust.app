@@ -50,5 +50,6 @@ export function parseEnv(src: string) {
 }
 
 export function getClientAccessToken() {
+    if (typeof window === 'undefined') return ''
     return localStorage.getItem('token') || ''
 }

@@ -63,7 +63,6 @@ export class BuildImageStrategy {
             cwd: this.#githubRepoPath,
             sudo: true,
             onProgress: (progress) => {
-                console.log('Build progress: ', progress)
                 this.#publisher.publish(progress)
             }
         })

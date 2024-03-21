@@ -45,7 +45,15 @@ async function runLuaScript(
 
 const getPublisher = (type: PublisherType, id: string) => {
     const channel = getPublisherName(type, id)
-    return { publish: (msg: string) => redis.publish(channel, msg) }
+    return {
+        publish: (msg: string) => {
+            const message = JSON.stringify({
+                timestamp: Date.now(),
+                message: msg
+            })
+            redis.publish(channel, message)
+        }
+    }
 }
 
 export default {
