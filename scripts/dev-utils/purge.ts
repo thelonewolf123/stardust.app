@@ -1,18 +1,19 @@
-import mongoose from 'mongoose'
-
 import {
     BUILD_CONTAINER,
     DESTROY_CONTAINER,
     NEW_CONTAINER
 } from '../../constants/queue'
+import { connect } from '../../packages/backend/database/mongoose'
 import ec2 from '../../packages/core/aws/ec2.aws'
 import { ecr } from '../../packages/core/aws/ecr.aws'
 import { queueManager } from '../../packages/core/queue'
 import redis from '../../packages/core/redis'
-import { env } from '../../packages/env'
+import { ContainerModel } from '../../packages/backend/database/models/containers'
+import { InstanceModel } from '../../packages/backend/database/models/instance'
+import { ProjectModel } from '../../packages/backend/database/models/project'
 
 async function connectMongodb() {
-    await mongoose.connect(env.MONGODB_URI)
+    await connect()
     console.log('Mongoose connected')
 }
 
@@ -49,10 +50,7 @@ async function purgeRedis() {
 }
 
 async function purgeEc2() {
-    const instances = await mongoose.connection.db
-        .collection('instances')
-        .find()
-        .toArray()
+    const instances = await InstanceModel.find({}).lean()
 
     await Promise.all(
         instances.map(async (instance) => {
@@ -64,15 +62,11 @@ async function purgeEc2() {
 }
 
 async function purgeEcr() {
-    const repos = await mongoose.connection.db
-        .collection('projects')
-        .find()
-        .toArray()
-
+    const repos = await ProjectModel.find({}).lean()
     await Promise.all(
-        repos.map((repo) => {
+        repos.map(async (repo) => {
             const repoName = repo.ecrRepo.split('/').slice(1).join('/') // remove the account id
-            return ecr.deleteEcrRepo({ name: repoName }).catch((e) => {
+            await ecr.deleteEcrRepo({ name: repoName }).catch((e) => {
                 console.log('ECR repo not found', e.message, repoName)
             })
         })
@@ -82,25 +76,13 @@ async function purgeEcr() {
 }
 
 async function purgeMongo() {
-    Promise.all([
-        mongoose.connection.db
-            .collection('containers')
-            .deleteMany({ _id: { $exists: true } }),
-        mongoose.connection.db
-            .collection('projects')
-            .deleteMany({ _id: { $exists: true } }),
-        mongoose.connection.db
-            .collection('instances')
-            .deleteMany({ _id: { $exists: true } })
-    ])
-        .then(() => {
-            console.log('MongoDB purged')
-            mongoose.connection.close()
-        })
-        .catch((err) => {
-            console.log('MongoDB purged', err.message)
-            mongoose.connection.close()
-        })
+    await Promise.all([
+        ContainerModel.deleteMany({ createdAt: { $exists: true } }),
+        ProjectModel.deleteMany({ createdAt: { $exists: true } }),
+        InstanceModel.deleteMany({ createdAt: { $exists: true } })
+    ]).then(() => {
+        console.log('MongoDB purged')
+    })
 }
 
 async function main() {
