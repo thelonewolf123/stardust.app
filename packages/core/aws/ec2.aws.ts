@@ -43,7 +43,9 @@ async function requestEc2SpotInstance(count: number, pricePerHour: number) {
             InstanceType: EC2_INSTANCE_TYPE,
             KeyName: keyPairName,
             SecurityGroups: [securityGroup]
-        }
+        },
+        ValidUntil: new Date(Date.now() + 1000 * 60 * 10),
+        Type: 'one-time'
     })
 
     const response = await client.send(command)
