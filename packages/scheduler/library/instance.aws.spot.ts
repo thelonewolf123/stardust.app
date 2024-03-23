@@ -24,10 +24,7 @@ class InstanceStrategyAwsSpot extends InstanceStrategyAws {
     }
 
     async #scheduleNewInstance(count: number, type: Ec2InstanceType) {
-        const requestId = await ec2Aws.requestEc2SpotInstance(
-            count,
-            this.pricePerHour
-        )
+        const requestId = await ec2Aws.requestEc2SpotInstance(count)
         invariant(requestId, 'Instance not created')
         const instanceIds = await ec2Aws.waitForSpotInstanceRequest(requestId)
 

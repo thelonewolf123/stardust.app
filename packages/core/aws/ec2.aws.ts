@@ -11,6 +11,7 @@ import {
     RunInstancesCommand,
     TerminateInstancesCommand
 } from '@aws-sdk/client-ec2'
+import { SPOT_INSTANCE_PRICE_PER_HOUR } from '@constants/provider'
 
 import {
     EC2_INSTANCE_TYPE,
@@ -28,7 +29,7 @@ const client = new EC2Client({
     region: env.AWS_REGION
 })
 
-async function requestEc2SpotInstance(count: number, pricePerHour: number) {
+async function requestEc2SpotInstance(count: number) {
     const [ami, securityGroup, keyPairName] = await Promise.all([
         ssmAws.getParameter(SSM_PARAMETER_KEYS.baseAmiId),
         ssmAws.getParameter(SSM_PARAMETER_KEYS.baseSecurityGroup),
@@ -36,7 +37,7 @@ async function requestEc2SpotInstance(count: number, pricePerHour: number) {
     ])
 
     const command = new RequestSpotInstancesCommand({
-        SpotPrice: pricePerHour.toString(),
+        SpotPrice: SPOT_INSTANCE_PRICE_PER_HOUR,
         InstanceCount: count,
         LaunchSpecification: {
             ImageId: ami,
@@ -53,6 +54,8 @@ async function requestEc2SpotInstance(count: number, pricePerHour: number) {
     const requestId = response.SpotInstanceRequests?.map(
         (f) => f.SpotInstanceRequestId
     )?.[0]
+
+    return requestId
 }
 
 async function waitForSpotInstanceRequest(requestId: string) {
