@@ -36,7 +36,7 @@ const dnsRecord = addDnsRecord(instance.publicIp)
 export const amiId = ami.id
 export const instanceId = instance.id
 export const proxySSMId = proxySSM.id
-export const dnsRecordId = dnsRecord.id
+export const dnsRecordId = dnsRecord.map((r) => r.id)
 export const proxyCmdId = proxyCommand.id
 export const sshKeyName = keyPair.keyName
 export const baseAmiSSMId = baseAmiSSM.id
