@@ -33,9 +33,20 @@ sudo docker run -d --restart always --name reverse-proxy-container -p 8080:80 -e
 sudo apt update
 sudo apt install -y certbot python3-certbot-nginx nginx 
 
-sudo certbot certonly --nginx -d ${env.DOMAIN_NAME} -d *.${env.DOMAIN_NAME}
-sudo touch /etc/nginx/sites-enabled/default
+sudo echo '
+DOMAIN="${env.DOMAIN_NAME}"
+CONTACT="admin@${env.DOMAIN_NAME}"
+CLOUD="cf"
+API_KEY="${env.CLOUDFLARE_API_TOKEN}"
+ZONE_ID="${env.CLOUDFLARE_ZONE_ID}"
+' | sudo tee .creds
 
+git clone https://github.com/amirhooshmand/certbot-wildcard .
+chmod +x get-cert.sh
+
+mkdir -p manual_hooks/${env.DOMAIN_NAME}
+cp .creds manual_hooks/${env.DOMAIN_NAME}/cf.creds
+sudo ./get-cert.sh
 
 echo "server {
     listen 80;
