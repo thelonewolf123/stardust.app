@@ -70,6 +70,12 @@ function ArrayFieldsBuilder<T extends ArrayFieldsBuilderType>({
         e.preventDefault()
         const text = e.clipboardData.getData('text')
         const envs = parseEnv(text)
+        if (envs.length === 0) {
+            // set text to the input field
+            e.currentTarget.value = text
+            return
+        }
+
         envs.map((env) =>
             append({
                 name: env.name,
