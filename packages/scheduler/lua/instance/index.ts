@@ -1,32 +1,63 @@
-import { Ec2InstanceType, PhysicalHostType } from '@/types'
+import {
+    Ec2InstanceType,
+    PhysicalHostRedisType,
+    PhysicalHostType
+} from '@/types'
 import redis, { redlock } from '@core/redis'
 
 async function getAllPhysicalHosts(): Promise<PhysicalHostType[]> {
     const hosts = await redis.client.get('physicalHost')
     const result = hosts ? JSON.parse(hosts) : []
-    result.forEach((host: PhysicalHostType) => {
-        host.createdAt = new Date(host.createdAt)
-        host.updatedAt = new Date(host.updatedAt)
-        if (host.scheduledForDeletionAt) {
-            host.scheduledForDeletionAt = new Date(host.scheduledForDeletionAt)
-        }
-        console.log(host.containers)
-        if (!Array.isArray(host.containers)) {
-            host.containers = []
-        }
-        if (host.containers) {
-            host.containers.forEach((container) => {
-                container.updatedAt = new Date(container.updatedAt)
-                container.scheduledAt = new Date(container.scheduledAt)
+    return result.map((host: PhysicalHostRedisType) => {
+        return {
+            ...host,
+            createdAt: new Date(host.createdAt * 1000),
+            updatedAt: new Date(host.updatedAt * 1000),
+            scheduledForDeletionAt: host.scheduledForDeletionAt
+                ? new Date(host.scheduledForDeletionAt * 1000)
+                : null,
+            containers: host.containers.map((container) => {
+                return {
+                    ...container,
+                    updatedAt: new Date(container.updatedAt * 1000),
+                    scheduledAt: new Date(container.scheduledAt * 1000)
+                }
             })
         }
     })
-    return result
 }
 
-// Update the 'physicalHost' key in Redis with the modified data
-async function updateDataInRedis(data: PhysicalHostType[]) {
-    await redis.client.set('physicalHost', JSON.stringify(data))
+function convertToRedisFormat(data: PhysicalHostType[]) {
+    return data.map((instance) => {
+        return {
+            ...instance,
+            createdAt: parseInt(`${instance.createdAt.getTime() / 1000}`),
+            updatedAt: parseInt(`${instance.updatedAt.getTime() / 1000}`),
+            scheduledForDeletionAt: instance.scheduledForDeletionAt
+                ? parseInt(
+                      `${instance.scheduledForDeletionAt.getTime() / 1000}`
+                  )
+                : null,
+            containers: instance.containers.map((container) => {
+                return {
+                    ...container,
+                    updatedAt: parseInt(
+                        `${container.updatedAt.getTime() / 1000}`
+                    ),
+                    scheduledAt: parseInt(
+                        `${container.scheduledAt.getTime() / 1000}`
+                    )
+                }
+            })
+        }
+    })
+}
+
+async function pushToRedis(data: PhysicalHostType[]) {
+    await redis.client.set(
+        'physicalHost',
+        JSON.stringify(convertToRedisFormat(data))
+    )
 }
 
 async function updateInstance(
@@ -51,7 +82,7 @@ async function updateInstance(
         })
 
         // Update the 'physicalHost' key in Redis with the modified data
-        await updateDataInRedis(data)
+        await pushToRedis(data)
 
         // Release the lock
         await lock.release()
@@ -116,7 +147,7 @@ async function cleanupInstance(): Promise<string[]> {
         })
 
         // Update the 'physicalHost' key in Redis with the updated data
-        await updateDataInRedis(physicalHost)
+        await pushToRedis(physicalHost)
 
         // Release the lock
         await lock.release()
@@ -159,7 +190,7 @@ async function scheduleInstance(
         data = [...data, newInstance]
 
         // Update the 'physicalHost' key in Redis with the modified data
-        await updateDataInRedis(data)
+        await pushToRedis(data)
 
         // Release the lock
         await lock.release()
@@ -193,7 +224,7 @@ const scheduleInstanceDelete = async (instanceId: string, failed?: boolean) => {
             return null // If it was not found, return null as we cannot schedule an instance that doesn't exist
         }
 
-        await updateDataInRedis(physicalHost)
+        await pushToRedis(physicalHost)
         await lock.release()
 
         return instanceId

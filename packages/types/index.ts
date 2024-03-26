@@ -46,6 +46,27 @@ export type PhysicalHostType = {
     }[]
 }
 
+export type PhysicalHostRedisType = {
+    instanceId: string
+    publicIp: string
+    scheduledForDeletionAt: number | null
+    instanceType: 'builder' | 'runner'
+    createdAt: number
+    updatedAt: number
+    status: 'running' | 'pending' | 'failed'
+    amiId: string
+    containers: {
+        containerId: string
+        containerSlug: string
+        projectSlug?: string
+        domains?: string[]
+        hostPortMap?: Record<string, number>
+        updatedAt: number
+        scheduledAt: number
+        status: 'running' | 'pending'
+    }[]
+}
+
 export type Context = {
     user:
         | null
