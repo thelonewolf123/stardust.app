@@ -223,7 +223,7 @@ export const setupSpotInstanceTerminateConsumer = async () => {
             })
             .catch((error) => {
                 console.error(error)
-                channel.receiver.nack(message)
+                channel.receiver.ack(message) // Acknowledge the message to prevent reprocessing
             })
     })
 }

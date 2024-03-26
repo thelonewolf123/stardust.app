@@ -1,23 +1,35 @@
 import { getDockerClient } from '../../packages/core/docker'
 
 async function main() {
-    console.log(process.argv[2])
-    const docker = await getDockerClient(process.argv[2])
-    const stream = await docker.pull('docker.io/library/node:latest')
-    await new Promise((resolve, reject) =>
-        docker.modem.followProgress(stream, resolve, (event) =>
-            console.log(event)
-        )
-    )
-    const imageList = await docker.listImages()
-    console.log(imageList)
-    const containers = await docker.createContainer({
-        Image: 'docker.io/library/node:latest',
-        Cmd: ['echo', 'hello world']
+    const docker = await getDockerClient('3.236.115.35')
+
+    docker
+        .createContainer({
+            Image: '655959644936.dkr.ecr.us-east-1.amazonaws.com/thelonewolf123/golang-tools:1',
+            HostConfig: {
+                PortBindings: {
+                    '8080/tcp': [{ HostPort: '10000-11000' }]
+                }
+            },
+            ExposedPorts: {
+                '8080/tcp': {}
+            }
+        })
+        .then((container) => {
+            container.start()
+            console.log('Container started successfully')
+        })
+
+    docker.listContainers({ all: true }).then((containers) => {
+        containers.map((container) => {
+            docker
+                .getContainer(container.Id)
+                .inspect()
+                .then((info) => {
+                    console.log(info.NetworkSettings.Ports)
+                })
+        })
     })
-    await containers.start()
-    const info = await containers.inspect()
-    console.log(info)
 }
 
 main()

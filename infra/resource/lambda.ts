@@ -1,6 +1,7 @@
 import * as aws from '@pulumi/aws'
 import * as pulumi from '@pulumi/pulumi'
 
+import { env } from '../../packages/env'
 import { lambdaRole } from './role'
 
 // Create a Lambda function that will be triggered
@@ -13,7 +14,12 @@ const lambdaFunction = new aws.lambda.Function(
         }),
         timeout: 300,
         handler: 'index.handler',
-        role: lambdaRole.arn
+        role: lambdaRole.arn,
+        environment: {
+            variables: {
+                RABBITMQ_URL: env.RABBITMQ_URL
+            }
+        }
     }
 )
 

@@ -10,9 +10,8 @@ const TARGET_PORT = 80
 const redisClient = new Redis(process.env.REDIS_HOST)
 
 const server = http.createServer(async (req, res) => {
-    // subdomain lookup
-    const subdomain = req.headers.host.split('.')[0]
-    const ipPort = await redisClient.hget('domainMap', subdomain)
+    // domain lookup
+    const ipPort = await redisClient.hget('domainMap', req.headers.host)
     if (!ipPort) {
         res.writeHead(404, { 'Content-Type': 'text/plain' })
         res.end('Not Found')

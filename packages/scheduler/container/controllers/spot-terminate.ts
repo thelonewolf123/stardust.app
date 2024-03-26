@@ -1,3 +1,5 @@
+import invariant from 'invariant'
+
 import models from '@/backend/database'
 import { Container } from '@/backend/database/models/containers'
 import { convertToObject } from '@/core/utils'
@@ -19,8 +21,13 @@ export class SpotTerminateStrategy {
 
     async #getAllContainers() {
         console.log('Getting all containers')
+        const instance = await models.Instance.findOne({
+            instanceId: this.#instanceId
+        }).lean()
+
+        invariant(instance, 'Instance not found')
         const containers = await models.Container.find({
-            instanceId: this.#instanceId,
+            instanceId: instance._id,
             status: ContainerStatus.Running
         }).lean()
         return containers

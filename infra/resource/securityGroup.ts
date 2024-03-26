@@ -42,9 +42,9 @@ export const getUserInstanceSecurityGroup = (
         ingress: [
             ...proxyIpAddresses.map((ip) => {
                 return {
-                    fromPort: 0,
-                    toPort: 0,
-                    protocol: 'tcp',
+                    protocol: '-1', // all protocols
+                    fromPort: 0, // all ports
+                    toPort: 0, // all ports
                     cidrBlocks: [pulumi.interpolate`${ip}/32`]
                 }
             }),

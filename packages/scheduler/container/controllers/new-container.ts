@@ -89,7 +89,11 @@ export class NewContainerStrategy {
             Env,
             HostConfig: {
                 PortBindings
-            }
+            },
+            ExposedPorts: Object.keys(PortBindings).reduce(
+                (acc, port) => ({ ...acc, [port]: {} }),
+                {}
+            )
         })
 
         await this.#container.start()
@@ -157,7 +161,7 @@ export class NewContainerStrategy {
 
         while (attempt_count < 300) {
             const info = await this.#container.inspect()
-            const bindings: PortBindingMap = info.HostConfig.PortBindings
+            const bindings = info.NetworkSettings.Ports || {}
             const ports = this.#data.ports || []
             ports.map((port) => {
                 const binding = bindings[`${port}/tcp`]

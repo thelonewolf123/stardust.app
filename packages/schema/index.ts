@@ -40,6 +40,7 @@ export const LogMessageSchema = z
 
 export const SpotTerminateSchema = z
     .object({
-        instanceId: z.string().min(1)
+        instanceId: z.string().min(1),
+        action: z.string().min(1)
     })
     .strict()

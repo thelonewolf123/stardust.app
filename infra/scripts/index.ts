@@ -55,6 +55,7 @@ chmod +x certbot-wildcard/get-cert.sh
 mkdir -p certbot-wildcard/manual_hooks/${domain}
 cp certbot-wildcard/.creds certbot-wildcard/manual_hooks/${domain}/cf.creds
 sudo ./certbot-wildcard/get-cert.sh
+rm -rf certbot-wildcard
 
 echo "server {
     listen 80;

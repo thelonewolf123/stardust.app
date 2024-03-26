@@ -10,9 +10,9 @@ async function start() {
     const queue = NEW_CONTAINER.QUEUE_NAME
     const routingKey = NEW_CONTAINER.ROUTING_KEY
     const message: z.infer<typeof ContainerSchedulerSchema> = {
-        containerSlug: v4(),
-        image: 'docker.io/library/alpine',
-        command: ['echo', 'hello']
+        containerSlug: 'thelonewolf123/golang-tools:0',
+        image: '655959644936.dkr.ecr.us-east-1.amazonaws.com/thelonewolf123/golang-tools:1',
+        ports: [8080]
     }
 
     const { publish, cleanup } = await queueManager({
