@@ -172,35 +172,30 @@ async function scheduleInstance(
     }
 }
 
-// Main function to schedule an instance for deletion
-const scheduleInstanceDelete = async (instanceId: string) => {
+const scheduleInstanceDelete = async (instanceId: string, failed?: boolean) => {
     try {
-        // Calculate scheduled deletion time
-        const scheduledForDeletionAt = new Date(Date.now() + 120_000)
-
-        // Get the current 'physicalHost' data from Redis
+        const lock = await redlock.acquire(['physicalHostLock'], 10000)
         let physicalHost = await getAllPhysicalHosts()
+        let updated = false
+        physicalHost = physicalHost.map((instance: PhysicalHostType) => {
+            if (instance.instanceId === instanceId) {
+                instance.scheduledForDeletionAt = new Date(Date.now() + 120_000)
+                if (failed) {
+                    instance.status = 'failed'
+                }
+                updated = true
+            }
 
-        // Decode the JSON data into a JavaScript object
+            return instance
+        })
 
-        // Find the index of the instance with the given instanceId
-        const targetInstanceIndex = physicalHost.findIndex(
-            (instance: PhysicalHostType) => instance.instanceId === instanceId
-        )
-
-        // Check if the instance with the given instanceId was found
-        if (targetInstanceIndex === -1) {
+        if (!updated) {
             return null // If it was not found, return null as we cannot schedule an instance that doesn't exist
         }
 
-        // Update the 'scheduledForDeletionAt' field of the target instance with the provided value
-        physicalHost[targetInstanceIndex].scheduledForDeletionAt =
-            scheduledForDeletionAt
-
-        // Update the 'physicalHost' key in Redis with the updated data
         await updateDataInRedis(physicalHost)
+        await lock.release()
 
-        // Return the instanceId to confirm that the instance was scheduled for deletion successfully
         return instanceId
     } catch (error) {
         console.error('Error:', error)
@@ -209,9 +204,9 @@ const scheduleInstanceDelete = async (instanceId: string) => {
 }
 
 export {
-    scheduleInstance,
-    scheduleInstanceDelete,
     updateInstance,
     cleanupInstance,
-    getAllPhysicalHosts
+    scheduleInstance,
+    getAllPhysicalHosts,
+    scheduleInstanceDelete
 }

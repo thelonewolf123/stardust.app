@@ -11,7 +11,8 @@ import { expressMiddleware } from '@apollo/server/express4'
 import {
     BUILD_CONTAINER,
     DESTROY_CONTAINER,
-    NEW_CONTAINER
+    NEW_CONTAINER,
+    SPOT_INSTANCE_TERMINATE
 } from '@constants/queue'
 import redis from '@core/redis'
 import { mergeResolvers, mergeTypeDefs } from '@graphql-tools/merge'
@@ -48,6 +49,7 @@ const server = new ApolloServer({
 let queuePromise: [
     Awaited<ReturnType<typeof createQueue>>,
     Awaited<ReturnType<typeof createQueue>>,
+    Awaited<ReturnType<typeof createQueue>>,
     Awaited<ReturnType<typeof createQueue>>
 ]
 
@@ -73,6 +75,11 @@ server.addPlugin({
                 exchange: BUILD_CONTAINER.EXCHANGE_NAME,
                 queue: BUILD_CONTAINER.QUEUE_NAME,
                 routingKey: BUILD_CONTAINER.ROUTING_KEY
+            }),
+            createQueue(client, {
+                exchange: SPOT_INSTANCE_TERMINATE.EXCHANGE_NAME,
+                queue: SPOT_INSTANCE_TERMINATE.QUEUE_NAME,
+                routingKey: SPOT_INSTANCE_TERMINATE.ROUTING_KEY
             })
         ])
     }
@@ -124,14 +131,19 @@ const main = async () => {
         express.json(),
         expressMiddleware(server, {
             context: async ({ req, res }) => {
-                const [createContainer, destroyContainer, buildContainer] =
-                    await queuePromise
+                const [
+                    createContainer,
+                    destroyContainer,
+                    buildContainer,
+                    spotTermination
+                ] = await queuePromise
 
                 const ctx: Context = {
                     queue: {
                         createContainer,
                         destroyContainer,
-                        buildContainer
+                        buildContainer,
+                        spotTermination
                     },
                     db: models,
                     user: req.user || null

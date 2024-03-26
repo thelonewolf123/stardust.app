@@ -22,35 +22,43 @@ sudo chmod 600 /root/.aws/config
 
 sudo docker login --username AWS --password $(sudo aws ecr get-login-password --region ${env.AWS_REGION}) ${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com
 `
-const TLD = env.DOMAIN_NAME.split('.').pop()
-const DOMAIN = env.DOMAIN_NAME.split('.').shift()
 
-export const ec2ProxyUserData = `#!/bin/bash
+function generateProxyScript(
+    domain: string,
+    redisHost: string,
+    cloudflareApiToken: string,
+    cloudflareZoneId: string
+) {
+    const tld = domain.split('.').pop()
+    const domainName = domain.split('.').shift()
+
+    return `#!/bin/bash
 echo "Starting proxy container"
-sudo docker run -d --restart always --name reverse-proxy-container -p 8080:80 -e REDIS_HOST='${env.REDIS_HOST}' docker.io/thelonewolf123/docker-proxy node /app/reverse-proxy.js 2> /home/ubuntu/reverse-proxy-create.log
+sudo docker run -d --restart always --name reverse-proxy-container -p 8080:80 -e REDIS_HOST='${redisHost}' docker.io/thelonewolf123/docker-proxy node /app/reverse-proxy.js 2> /home/ubuntu/reverse-proxy-create.log
 
 
 sudo apt update
 sudo apt install -y certbot python3-certbot-nginx nginx 
 
+git clone https://github.com/amirhooshmand/certbot-wildcard
+
 sudo echo '
-DOMAIN="${env.DOMAIN_NAME}"
-CONTACT="admin@${env.DOMAIN_NAME}"
+DOMAIN="${domain}"
+CONTACT="admin@${domain}"
 CLOUD="cf"
-API_KEY="${env.CLOUDFLARE_API_TOKEN}"
-ZONE_ID="${env.CLOUDFLARE_ZONE_ID}"
-' | sudo tee .creds
+API_KEY="${cloudflareApiToken}"
+ZONE_ID="${cloudflareZoneId}"
+' | sudo tee certbot-wildcard/.creds
 
-git clone https://github.com/amirhooshmand/certbot-wildcard .
-chmod +x get-cert.sh
+chmod +x certbot-wildcard/get-cert.sh
 
-mkdir -p manual_hooks/${env.DOMAIN_NAME}
-cp .creds manual_hooks/${env.DOMAIN_NAME}/cf.creds
-sudo ./get-cert.sh
+mkdir -p certbot-wildcard/manual_hooks/${domain}
+cp certbot-wildcard/.creds certbot-wildcard/manual_hooks/${domain}/cf.creds
+sudo ./certbot-wildcard/get-cert.sh
 
 echo "server {
     listen 80;
-    server_name ${env.DOMAIN_NAME} ~^(.*)\\.${DOMAIN}\\.${TLD}$;
+    server_name ${domain} ~^(.*)\\.${domainName}\\.${tld}$;
 
     # Redirect HTTP to HTTPS
     location / {
@@ -60,10 +68,10 @@ echo "server {
 
 server {
     listen 443 ssl;
-    server_name ${env.DOMAIN_NAME} ~^(.*)\\.${DOMAIN}\\.${TLD}$;
+    server_name ${domain} ~^(.*)\\.${domainName}\\.${tld}$;
 
-    ssl_certificate /etc/letsencrypt/live/${env.DOMAIN_NAME}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/${env.DOMAIN_NAME}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/${domain}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${domain}/privkey.pem;
 
     location / {
         proxy_pass http://localhost:8080;
@@ -72,11 +80,17 @@ server {
         proxy_set_header X-Forwarded-For \\$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \\$scheme;
     }
-}" | sudo tee /etc/nginx/sites-available/${env.DOMAIN_NAME}
+}" | sudo tee /etc/nginx/sites-available/${domain}
 
-sudo ln -s /etc/nginx/sites-available/${env.DOMAIN_NAME} /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/${domain} /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 
-echo "Nginx has been configured to forward traffic for ${env.DOMAIN_NAME} to port 8080."
+echo "Nginx has been configured to forward traffic for ${domain} to port 8080."
 `
-console.log('ec2ProxyUserData: ', ec2ProxyUserData)
+}
+export const ec2ProxyUserData = generateProxyScript(
+    env.DOMAIN_NAME,
+    env.REDIS_HOST,
+    env.CLOUDFLARE_API_TOKEN,
+    env.CLOUDFLARE_ZONE_ID
+)

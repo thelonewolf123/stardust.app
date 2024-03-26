@@ -4,7 +4,8 @@ import redis from '../core/redis'
 import {
     setupBuildContainerConsumer,
     setupDestroyContainerConsumer,
-    setupNewContainerConsumer
+    setupNewContainerConsumer,
+    setupSpotInstanceTerminateConsumer
 } from './container'
 
 const consumers = async () => {
@@ -14,7 +15,8 @@ const consumers = async () => {
         return Promise.all([
             setupNewContainerConsumer(),
             setupBuildContainerConsumer(),
-            setupDestroyContainerConsumer()
+            setupDestroyContainerConsumer(),
+            setupSpotInstanceTerminateConsumer()
         ])
     } catch (error) {
         console.error(error)

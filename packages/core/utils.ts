@@ -54,3 +54,11 @@ export const getPublisherType = (ch: string): PublisherType => {
     }
     throw new Error('Unknown publisher type')
 }
+
+export function convertToObject(arr: Array<{ name: string; value: string }>) {
+    const obj: Record<string, string> = {}
+    arr.forEach((item) => {
+        obj[item.name] = item.value
+    })
+    return obj
+}

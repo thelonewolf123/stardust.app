@@ -60,11 +60,3 @@ export const projectVerificationMiddlewareWs: WebsocketRequestHandler = async (
 export function generateSubdomain() {
     return generate({ exactly: 2, join: '-' })
 }
-
-export function convertToObject(arr: Array<{ name: string; value: string }>) {
-    const obj: Record<string, string> = {}
-    arr.forEach((item) => {
-        obj[item.name] = item.value
-    })
-    return obj
-}

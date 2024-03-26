@@ -1,25 +1,14 @@
 import ec2Aws from '../../packages/core/aws/ec2.aws'
 
 async function main() {
-    const [close, resultPromise] = await ec2Aws.execCommand({
-        command: 'git',
-        args: [
-            'clone',
-            'https://github.com/thelonewolf123/tools.cyberkrypts.dev',
-            `/home/ubuntu/${Date.now()}`
-        ],
-        ipAddress: '52.91.100.121',
-        cwd: '/home/ubuntu',
-        sudo: true,
-        onProgress: (data) => {
-            console.log(data)
-        }
-    })
-
-    const output = await resultPromise
-    console.log(output)
-
-    close()
+    const request = await ec2Aws.requestEc2SpotInstance(1)
+    const id = request.SpotFleetRequestId
+    console.log(`Spot Fleet Request ID: ${id}`)
+    if (!id) {
+        throw new Error('Spot Fleet Request ID not found')
+    }
+    const instanceIds = await ec2Aws.waitForSpotFleetRequest(id)
+    console.log(`Instance IDs: ${instanceIds.join(', ')}`)
 }
 
 main()

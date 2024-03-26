@@ -15,3 +15,9 @@ export const DESTROY_CONTAINER = {
     EXCHANGE_NAME: 'destroy-container',
     ROUTING_KEY: 'destroy-container'
 }
+
+export const SPOT_INSTANCE_TERMINATE = {
+    QUEUE_NAME: 'spot-instance-terminate',
+    EXCHANGE_NAME: 'spot-instance-terminate',
+    ROUTING_KEY: 'spot-instance-terminate'
+}

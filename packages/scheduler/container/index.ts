@@ -1,18 +1,28 @@
-import models from '@/backend/database';
+import models from '@/backend/database'
 import {
-    MAX_CONTAINER_BUILD_QUEUE_ATTEMPTS, MAX_CONTAINER_DEPLOY_QUEUE_ATTEMPTS,
+    MAX_CONTAINER_BUILD_QUEUE_ATTEMPTS,
+    MAX_CONTAINER_DEPLOY_QUEUE_ATTEMPTS,
     MAX_CONTAINER_TERMINATE_QUEUE_ATTEMPTS
-} from '@constants/aws-infra';
-import { CLOUD_PROVIDER } from '@constants/provider';
-import { BUILD_CONTAINER, DESTROY_CONTAINER, NEW_CONTAINER } from '@constants/queue';
-import { createQueue, getClient, queueManager } from '@core/queue';
+} from '@constants/aws-infra'
+import { CLOUD_PROVIDER } from '@constants/provider'
+import {
+    BUILD_CONTAINER,
+    DESTROY_CONTAINER,
+    NEW_CONTAINER,
+    SPOT_INSTANCE_TERMINATE
+} from '@constants/queue'
+import { createQueue, getClient, queueManager } from '@core/queue'
 
 import {
-    ContainerBuildSchema, ContainerDestroySchema, ContainerSchedulerSchema
-} from '../../schema';
-import { BuildImageStrategy } from './controllers/build-image';
-import { DestroyContainerStrategy } from './controllers/destroy-container';
-import { NewContainerStrategy } from './controllers/new-container';
+    ContainerBuildSchema,
+    ContainerDestroySchema,
+    ContainerSchedulerSchema,
+    SpotTerminateSchema
+} from '../../schema'
+import { BuildImageStrategy } from './controllers/build-image'
+import { DestroyContainerStrategy } from './controllers/destroy-container'
+import { NewContainerStrategy } from './controllers/new-container'
+import { SpotTerminateStrategy } from './controllers/spot-terminate'
 
 export const setupNewContainerConsumer = async () => {
     const { onMessage, channel, cleanup } = await queueManager({
@@ -171,6 +181,43 @@ export const setupBuildContainerConsumer = async () => {
 
         strategy
             .buildImage()
+            .then(() => {
+                channel.receiver.ack(message)
+            })
+            .catch((error) => {
+                console.error(error)
+                channel.receiver.nack(message)
+            })
+    })
+}
+
+export const setupSpotInstanceTerminateConsumer = async () => {
+    const { onMessage, channel, cleanup } = await queueManager({
+        exchange: SPOT_INSTANCE_TERMINATE.EXCHANGE_NAME,
+        queue: SPOT_INSTANCE_TERMINATE.QUEUE_NAME,
+        routingKey: SPOT_INSTANCE_TERMINATE.ROUTING_KEY
+    })
+    process.on('SIGINT', () => cleanup())
+
+    const client = await getClient()
+    const createContainerQueue = await createQueue(client, {
+        exchange: NEW_CONTAINER.EXCHANGE_NAME,
+        queue: NEW_CONTAINER.QUEUE_NAME,
+        routingKey: NEW_CONTAINER.ROUTING_KEY
+    })
+
+    onMessage(async (message) => {
+        if (!message) return
+        const { content } = message
+        const data = SpotTerminateSchema.parse(JSON.parse(content.toString()))
+        console.log(data)
+
+        const strategy = new SpotTerminateStrategy(
+            data.instanceId,
+            createContainerQueue
+        )
+        strategy
+            .rescheduleInstance()
             .then(() => {
                 channel.receiver.ack(message)
             })

@@ -5,13 +5,17 @@ import { InstanceExecArgs } from '@/types'
 import {
     DescribeInstancesCommand,
     DescribeInstanceStatusCommand,
+    DescribeSpotFleetInstancesCommand,
     DescribeSpotInstanceRequestsCommand,
     EC2Client,
-    RequestSpotInstancesCommand,
+    RequestSpotFleetCommand,
     RunInstancesCommand,
     TerminateInstancesCommand
 } from '@aws-sdk/client-ec2'
-import { SPOT_INSTANCE_PRICE_PER_HOUR } from '@constants/provider'
+import {
+    SPOT_INSTANCE_PRICE_PER_HOUR,
+    SPOT_INSTANCE_REQUIREMENTS
+} from '@constants/provider'
 
 import {
     EC2_INSTANCE_TYPE,
@@ -29,33 +33,60 @@ const client = new EC2Client({
     region: env.AWS_REGION
 })
 
-async function requestEc2SpotInstance(count: number) {
-    const [ami, securityGroup, keyPairName] = await Promise.all([
+async function requestEc2SpotInstance(count: number, pricePerHour?: number) {
+    const [ami, securityGroup, keyPairName, spotFleetRole] = await Promise.all([
         ssmAws.getParameter(SSM_PARAMETER_KEYS.baseAmiId),
-        ssmAws.getParameter(SSM_PARAMETER_KEYS.baseSecurityGroup),
-        ssmAws.getParameter(SSM_PARAMETER_KEYS.baseKeyParName)
+        ssmAws.getParameter(SSM_PARAMETER_KEYS.userInstanceSecurityGroup),
+        ssmAws.getParameter(SSM_PARAMETER_KEYS.baseKeyParName),
+        ssmAws.getParameter(SSM_PARAMETER_KEYS.spotFleetRole)
     ])
 
-    const command = new RequestSpotInstancesCommand({
-        SpotPrice: SPOT_INSTANCE_PRICE_PER_HOUR,
-        InstanceCount: count,
-        LaunchSpecification: {
-            ImageId: ami,
-            InstanceType: EC2_INSTANCE_TYPE,
-            KeyName: keyPairName,
-            SecurityGroups: [securityGroup]
-        },
-        ValidUntil: new Date(Date.now() + 1000 * 60 * 10),
-        Type: 'one-time'
+    const command = new RequestSpotFleetCommand({
+        SpotFleetRequestConfig: {
+            SpotPrice: pricePerHour?.toString(),
+            IamFleetRole: spotFleetRole,
+            LaunchSpecifications: [
+                {
+                    ImageId: ami,
+                    SecurityGroups: [{ GroupId: securityGroup }],
+                    KeyName: keyPairName,
+                    InstanceRequirements: SPOT_INSTANCE_REQUIREMENTS
+                }
+            ],
+            TargetCapacity: count,
+            TerminateInstancesWithExpiration: true
+        }
     })
 
-    const response = await client.send(command)
+    return client.send(command)
+}
 
-    const requestId = response.SpotInstanceRequests?.map(
-        (f) => f.SpotInstanceRequestId
-    )?.[0]
+async function waitForSpotFleetRequest(requestId: string, count?: number) {
+    let attempts = 0
+    const maxAttempts = 100
+    const interval = 1000
 
-    return requestId
+    while (attempts < maxAttempts) {
+        const command = new DescribeSpotFleetInstancesCommand({
+            SpotFleetRequestId: requestId
+        })
+        const info = await client.send(command)
+        const totalRequestedInstances = info.ActiveInstances?.length || count
+        const activeInstanceIds = info.ActiveInstances?.map(
+            (instance) => instance.InstanceId
+        )?.filter(Boolean)
+
+        if (
+            activeInstanceIds &&
+            activeInstanceIds.length === totalRequestedInstances
+        ) {
+            return activeInstanceIds
+        }
+
+        await sleep(interval)
+    }
+
+    throw new Error('Spot request timed out')
 }
 
 async function waitForSpotInstanceRequest(requestId: string) {
@@ -89,23 +120,10 @@ async function waitForSpotInstanceRequest(requestId: string) {
     throw new Error('Spot request timed out')
 }
 
-async function getProvisionedSpotInstanceIds(requestId: string) {
-    const command = new DescribeSpotInstanceRequestsCommand({
-        SpotInstanceRequestIds: [requestId]
-    })
-    const info = await client.send(command)
-
-    return info.SpotInstanceRequests?.map((request) => {
-        if (request.State === 'active' && request.InstanceId) {
-            return request.InstanceId
-        }
-    })
-}
-
 async function requestEc2OnDemandInstance(count: number) {
     const [ami, securityGroup, keyPairName] = await Promise.all([
         ssmAws.getParameter(SSM_PARAMETER_KEYS.baseAmiId),
-        ssmAws.getParameter(SSM_PARAMETER_KEYS.baseSecurityGroup),
+        ssmAws.getParameter(SSM_PARAMETER_KEYS.userInstanceSecurityGroup),
         ssmAws.getParameter(SSM_PARAMETER_KEYS.baseKeyParName)
     ])
 
@@ -206,7 +224,7 @@ export default {
     getInstanceInfoById,
     getInstanceStatusById,
     requestEc2SpotInstance,
+    waitForSpotFleetRequest,
     waitForSpotInstanceRequest,
-    requestEc2OnDemandInstance,
-    getProvisionedSpotInstanceIds
+    requestEc2OnDemandInstance
 }

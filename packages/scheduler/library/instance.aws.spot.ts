@@ -16,17 +16,21 @@ import { addLock, releaseLock } from '../lua/lock'
 import InstanceStrategyAws from './instance.aws'
 
 class InstanceStrategyAwsSpot extends InstanceStrategyAws {
-    pricePerHour: number = 1 // default price - $1 per hour
+    pricePerHour?: number
 
-    constructor(pricePerHour: number) {
+    constructor(pricePerHour?: number) {
         super()
         this.pricePerHour = pricePerHour
     }
 
     async #scheduleNewInstance(count: number, type: Ec2InstanceType) {
-        const requestId = await ec2Aws.requestEc2SpotInstance(count)
+        const request = await ec2Aws.requestEc2SpotInstance(
+            count,
+            this.pricePerHour
+        )
+        const requestId = request.SpotFleetRequestId
         invariant(requestId, 'Instance not created')
-        const instanceIds = await ec2Aws.waitForSpotInstanceRequest(requestId)
+        const instanceIds = await ec2Aws.waitForSpotFleetRequest(requestId)
 
         if (instanceIds.length === 0) {
             throw new Error('No instance found')

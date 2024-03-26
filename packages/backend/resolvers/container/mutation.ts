@@ -2,8 +2,7 @@ import gql from 'graphql-tag'
 import invariant from 'invariant'
 import { v4 } from 'uuid'
 
-import { convertToObject } from '@/backend/library'
-import { getRegularUser } from '@/core/utils'
+import { convertToObject, getRegularUser } from '@/core/utils'
 import { Resolvers } from '@/types/graphql-server'
 
 export const mutation: Resolvers['Mutation'] = {

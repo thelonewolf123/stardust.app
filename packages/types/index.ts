@@ -6,7 +6,8 @@ import { createQueue } from '@/core/queue'
 import {
     ContainerBuildSchema,
     ContainerDestroySchema,
-    ContainerSchedulerSchema
+    ContainerSchedulerSchema,
+    SpotTerminateSchema
 } from '@/schema'
 import { User } from '@models/user'
 
@@ -64,6 +65,10 @@ export type Context = {
         >
         buildContainer: Awaited<
             ReturnType<typeof createQueue<z.infer<typeof ContainerBuildSchema>>>
+        >
+
+        spotTermination: Awaited<
+            ReturnType<typeof createQueue<z.infer<typeof SpotTerminateSchema>>>
         >
     }
     db: typeof models

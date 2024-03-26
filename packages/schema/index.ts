@@ -37,3 +37,9 @@ export const LogMessageSchema = z
         timestamp: z.number().min(0)
     })
     .strict()
+
+export const SpotTerminateSchema = z
+    .object({
+        instanceId: z.string().min(1)
+    })
+    .strict()

@@ -15,7 +15,9 @@ export const SSM_PARAMETER_KEYS = {
     ec2PublicKey: 'ec2-public-key.pem',
     ec2PrivateKey: 'ec2-private-key.pem',
     dockerBuildInstanceId: 'docker-build-instance-id',
-    proxyIpAddr: 'proxy-ip-addr'
+    proxyIpAddr: 'proxy-ip-addr',
+    spotFleetRole: 'spot-fleet-role',
+    userInstanceSecurityGroup: 'user-instance-security-group'
 }
 
 export const MAX_CONTAINER_PER_INSTANCE = 2
@@ -26,7 +28,7 @@ export const MAX_CONTAINER_BUILD_ATTEMPTS = 300
 export const LOCK = {
     BUILDER_INSTANCE: 'builder-instance',
     CONTAINER_INSTANCE: 'container-instance'
-}
+} as const
 
 export const ERROR_CODES = {
     INSTANCE_PROVISION_FAILED: 'Instance provision failed',

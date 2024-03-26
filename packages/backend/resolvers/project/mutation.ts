@@ -1,10 +1,10 @@
 import gql from 'graphql-tag'
 import invariant from 'invariant'
 
-import { convertToObject, generateSubdomain } from '@/backend/library'
+import { generateSubdomain } from '@/backend/library'
 import { git } from '@/backend/library/github'
 import { ecr } from '@/core/aws/ecr.aws'
-import { getRegularUser } from '@/core/utils'
+import { convertToObject, getRegularUser } from '@/core/utils'
 import { env } from '@/env'
 import { Resolvers } from '@/types/graphql-server'
 
@@ -258,7 +258,7 @@ export const mutation: Resolvers['Mutation'] = {
                 githubRepoBranch: input.githubBranch || project.githubBranch,
                 dockerPath: input.dockerPath || project.dockerPath,
                 dockerContext: input.dockerContext || project.dockerContext,
-                ecrRepo: repoWithHash,
+                ecrRepo: current.image,
                 buildArgs,
                 version: project.history.length
             })

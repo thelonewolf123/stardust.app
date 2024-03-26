@@ -53,3 +53,21 @@ export function storeProxyIpAddr(proxyIpAddr: Output<string>) {
         value: proxyIpAddr
     })
 }
+
+export function storeSpotFleetRole(role: aws.iam.Role) {
+    return new aws.ssm.Parameter(SSM_PARAMETER_KEYS.spotFleetRole, {
+        name: SSM_PARAMETER_KEYS.spotFleetRole,
+        type: 'String',
+        value: role.arn
+    })
+}
+
+export function storeUserInstanceSecurityGroup(
+    securityGroup: aws.ec2.SecurityGroup
+) {
+    return new aws.ssm.Parameter(SSM_PARAMETER_KEYS.userInstanceSecurityGroup, {
+        name: SSM_PARAMETER_KEYS.userInstanceSecurityGroup,
+        type: 'String',
+        value: securityGroup.id.apply((id) => id)
+    })
+}
