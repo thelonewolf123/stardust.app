@@ -23,7 +23,7 @@ function scheduleContainerBuild(args: {
 }) {
     const script = scheduleContainerBuildScript.replace(
         /MAX_CONTAINER_PER_INSTANCE/g,
-        `${MAX_CONTAINER_PER_INSTANCE}`
+        MAX_CONTAINER_PER_INSTANCE.toString()
     )
     return redis.runLuaScript('scheduleContainerBuild', script, [
         args.containerSlug,
