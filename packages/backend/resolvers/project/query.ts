@@ -24,7 +24,8 @@ export const query: Resolvers['Query'] = {
                 githubUrl: 1,
                 githubBranch: 1,
                 dockerPath: 1,
-                dockerContext: 1
+                dockerContext: 1,
+                domains: 1
             }
         )
             .populate(['current', 'history'])
