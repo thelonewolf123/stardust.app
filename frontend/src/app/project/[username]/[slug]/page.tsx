@@ -42,7 +42,10 @@ export default async function SingleProjectPage({
                         <Button variant={'outline'}>Edit</Button>
                     </Link>
                     {project.domains ? (
-                        <Link href={project.domains[0]} target="_blank">
+                        <Link
+                            href={`https://${project.domains[0]}`}
+                            target="_blank"
+                        >
                             <Button>View</Button>
                         </Link>
                     ) : (
