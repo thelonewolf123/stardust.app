@@ -48,3 +48,23 @@ yarn infra:down
 ### Architecture
 
 ![Architecture](docs/images/architecture.png)
+
+## Preview
+
+Here are some screenshots of the Stardust.app:
+
+|              Step 1               |              Step 2               |
+| :-------------------------------: | :-------------------------------: |
+| ![Step 1](docs/images/step-1.png) | ![Step 2](docs/images/step-2.png) |
+
+|              Step 3               |              Step 4               |
+| :-------------------------------: | :-------------------------------: |
+| ![Step 3](docs/images/step-3.png) | ![Step 4](docs/images/step-4.png) |
+
+|               Project               |               Settings                |
+| :---------------------------------: | :-----------------------------------: |
+| ![Project](docs/images/project.png) | ![Settings](docs/images/settings.png) |
+
+|                Deployment                 |
+| :---------------------------------------: |
+| ![Deployment](docs/images/deployment.png) |
