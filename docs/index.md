@@ -1,51 +1,32 @@
-# Fusion-grid: container provision engine
+# Stardust.app: container provision engine
 
-Fusion-grid is a powerful container provision engine built with Node.js, TypeScript, MongoDB, Redis and Pulumi. It allows you to easily manage and orchestrate containers in your infrastructure, providing a seamless experience for containerized applications.
+Stardust.app is a powerful container provision engine built with Node.js, TypeScript, MongoDB, Redis and Pulumi. It allows you to easily manage and orchestrate containers in your infrastructure, providing a seamless experience for containerized applications.
+
+**Note**: Stardust.app is a proof of concept (PoC) and is not recommended for production use. It's a PoC platform to deploy containers on spot instances in AWS.
 
 ## Features
 
--   **Easy to use**: Fusion-grid is built with simplicity in mind. It's easy to use and easy to deploy.
--   **scalable**: Fusion-grid is built to scale. It can handle thousands of containers with ease.
--   **Secure**: Fusion-grid is built with security in mind. It uses the latest security standards and best practices.
--   **Open source**: Fusion-grid is open source and free to use. You can contribute to the project and make it better.
+-   **Easy to use**: Stardust.app is built with simplicity in mind. It's easy to use and easy to deploy.
+-   **Scalable**: Stardust.app is built to scale. It can handle thousands of containers with ease.
+-   **Secure**: Stardust.app is built with security in mind. It uses the latest security standards and best practices.
+-   **Open source**: Stardust.app is open source and free to use. You can contribute to the project and make it better.
 
-## Getting started
+## Preview
 
-### Prerequisites
+Here are some screenshots of the Stardust.app:
 
--   Node.js
--   MongoDB
--   Redis
--   Pulumi
--   RabbitMQ
+|            Step 1            |            Step 2            |
+| :--------------------------: | :--------------------------: |
+| ![Step 1](images/step-1.png) | ![Step 2](images/step-2.png) |
 
-### Installation
+|            Step 3            |            Step 4            |
+| :--------------------------: | :--------------------------: |
+| ![Step 3](images/step-3.png) | ![Step 4](images/step-4.png) |
 
-1. Clone the repo
+|            Project             |             Settings             |
+| :----------------------------: | :------------------------------: |
+| ![Project](images/project.png) | ![Settings](images/settings.png) |
 
-```sh
-git clone https://github.com/thelonewolf123/fusion-grid.git
-```
-
-2. Install NPM packages for pulumi
-
-```sh
-cd infra && yarn install
-```
-
-4. Deploy on aws
-
-```sh
-yarn infra:up
-```
-
-### Tear down
-
-```sh
-
-yarn infra:down
-```
-
-### Architecture
-
-![Architecture](images/architecture.png)
+|              Deployment              |
+| :----------------------------------: |
+| ![Deployment](images/deployment.png) |
