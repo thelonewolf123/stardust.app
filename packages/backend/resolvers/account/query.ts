@@ -1,14 +1,6 @@
-import crypto from 'crypto'
 import gql from 'graphql-tag'
-import invariant from 'invariant'
-import jwt from 'jsonwebtoken'
 
-import { getRegularUser } from '@/core/utils'
-import { env } from '@/env'
 import { Resolvers } from '@/types/graphql-server'
-
-// Get the JWT_SECRET from environment variables
-const JWT_SECRET = env.JWT_SECRET
 
 export const query: Resolvers['Query'] = {
     logout: async (_, __, ctx) => {
