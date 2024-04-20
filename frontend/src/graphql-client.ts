@@ -172,11 +172,9 @@ export type Query = {
   getAllProjects: Array<Project>;
   getBuildLogs: Array<Scalars['String']>;
   getContainerInfo: Container;
-  getGithubUsername: Scalars['String'];
   getNotRunningProjects: Array<Project>;
   getProjectBySlug: Project;
   getRunningProjects: Array<Project>;
-  login: Scalars['String'];
   logout: Scalars['Boolean'];
 };
 
@@ -198,12 +196,6 @@ export type QueryGetContainerInfoArgs = {
 
 export type QueryGetProjectBySlugArgs = {
   slug: Scalars['String'];
-};
-
-
-export type QueryLoginArgs = {
-  backend_token: Scalars['String'];
-  username: Scalars['String'];
 };
 
 export type RefreshProjectInput = {

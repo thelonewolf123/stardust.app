@@ -1,3 +1,5 @@
+'use client'
+
 import * as React from 'react'
 import { IoEye, IoEyeOff } from 'react-icons/io5'
 

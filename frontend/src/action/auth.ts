@@ -25,7 +25,7 @@ export const logoutAction = async () => {
     })
 
     revalidatePath('/')
-    redirect('/login')
+    return 'success'
 }
 
 export const getAccessToken = async () => {

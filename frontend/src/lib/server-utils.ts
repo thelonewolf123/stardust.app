@@ -2,6 +2,7 @@
 
 import { cookies } from 'next/headers'
 
+import { getAccessToken } from '@/action/auth'
 import { SignUpOrLoginDocument, SignUpOrLoginMutation } from '@/graphql-client'
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
@@ -23,12 +24,6 @@ const authMiddleware = (token: string) =>
             }
         }
     })
-
-export async function getAccessToken() {
-    const cookie = await cookies()
-    const token = cookie.get('token')
-    return token?.value
-}
 
 export async function getApolloClient() {
     const token = await getAccessToken()

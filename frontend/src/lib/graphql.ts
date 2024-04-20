@@ -1,9 +1,8 @@
 // https://www.apollographql.com/docs/react/performance/server-side-rendering/
 
+import { getAccessToken } from '@/action/auth'
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
-
-import { getAccessToken } from '../action/auth'
 
 export function getBackendServerUrl(urlType: 'http' | 'ws' = 'http'): string {
     const scheme = urlType === 'ws' ? 'ws' : 'http'
@@ -14,6 +13,7 @@ export function getBackendServerUrl(urlType: 'http' | 'ws' = 'http'): string {
         throw new Error('Unknown deployment environment')
     }
 }
+
 async function getAuthHeader(): Promise<{
     'x-access-token': string
 }> {
