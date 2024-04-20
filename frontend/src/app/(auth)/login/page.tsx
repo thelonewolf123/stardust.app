@@ -1,7 +1,6 @@
 'use client'
 
 import { signIn, useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { FaGithub } from 'react-icons/fa'
 
@@ -10,14 +9,12 @@ import { Button } from '@/components/ui/button'
 
 export default function LoginPage() {
     const [loading, setLoading] = useState(false)
-    const router = useRouter()
     const session = useSession()
 
     async function handleLogin() {
         setLoading(true)
         await signIn('github')
         setLoading(false)
-        router.push('/projects')
     }
 
     if (session.data?.user) {

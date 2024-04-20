@@ -26,3 +26,9 @@ export const logoutAction = async () => {
     revalidatePath('/')
     return 'success'
 }
+
+export const getAccessToken = async () => {
+    const cookie = await cookies()
+    const token = cookie.get('token')
+    return token?.value
+}

@@ -3,6 +3,8 @@
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 
+import { getAccessToken } from '../action/auth'
+
 export function getBackendServerUrl(urlType: 'http' | 'ws' = 'http'): string {
     const scheme = urlType === 'ws' ? 'ws' : 'http'
 
@@ -21,7 +23,15 @@ async function getAuthHeader(): Promise<{
         }
     }
 
-    const token = localStorage.getItem('token') || ''
+    let token: string | undefined = localStorage.getItem('token') || undefined
+
+    if (!token) {
+        token = await getAccessToken()
+        console.log('Token from cookie', token)
+        if (token) {
+            localStorage.setItem('token', token)
+        }
+    }
 
     return {
         'x-access-token': token || ''

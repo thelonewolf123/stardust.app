@@ -19,6 +19,7 @@ export function LogoutBtn() {
                 setLoading(true)
                 await logoutAction()
                 await signOut()
+                localStorage.removeItem('token')
                 router.push('/login')
                 setLoading(false)
             }}

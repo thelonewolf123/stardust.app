@@ -52,6 +52,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             size,
             asChild = false,
             loading = false,
+            leftIcon,
+            rightIcon,
             ...props
         },
         ref
@@ -67,13 +69,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             >
                 {loading ? <FaSpinner className="animate-spin mr-2" /> : null}
 
-                {props.leftIcon && !loading ? (
-                    <span className="mr-2">{props.leftIcon}</span>
+                {leftIcon && !loading ? (
+                    <span className="mr-2">{leftIcon}</span>
                 ) : null}
+
                 {props.children}
-                {props.rightIcon ? (
-                    <span className="ml-2">{props.rightIcon}</span>
-                ) : null}
+
+                {rightIcon ? <span className="ml-2">{rightIcon}</span> : null}
             </Comp>
         )
     }
