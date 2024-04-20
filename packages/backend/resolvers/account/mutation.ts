@@ -29,8 +29,23 @@ export const mutation: Resolvers['Mutation'] = {
         }).lean()
 
         if (existingUser) {
+            await ctx.db.User.updateOne(
+                {
+                    username,
+                    email
+                },
+                {
+                    $set: {
+                        github_access_token: token
+                    },
+                    $inc: {
+                        count: 1
+                    }
+                }
+            )
+
             const access_token = jwt.sign(
-                { username, count: existingUser.count },
+                { username, count: existingUser.count + 1 },
                 env.JWT_SECRET,
                 {
                     expiresIn: '60h'

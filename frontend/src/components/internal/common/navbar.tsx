@@ -1,7 +1,6 @@
+import { getServerSession } from 'next-auth'
 import Link from 'next/link'
 import { BsStars } from 'react-icons/bs'
-
-import { getAccessToken } from '@/lib/server-utils'
 
 import { Button } from '../../ui/button'
 import { Separator } from '../../ui/separator'
@@ -9,7 +8,7 @@ import { LogoutBtn } from './logout-btn'
 import { ThemeToggle } from './theme-toggle'
 
 export default async function Navbar() {
-    const token = await getAccessToken()
+    const session = await getServerSession()
 
     return (
         <>
@@ -20,7 +19,7 @@ export default async function Navbar() {
                             <span className="text-2xl">✨</span> Stardust
                         </h1>
                     </Link>
-                    {token ? (
+                    {session ? (
                         <div className="flex items-center gap-3">
                             <Link href="/projects" className="hover:underline">
                                 Projects
@@ -36,8 +35,8 @@ export default async function Navbar() {
                 </div>
                 <span className="flex items-center gap-2">
                     <ThemeToggle />
-
-                    {token ? (
+                    <span className="mx-1"></span>
+                    {session ? (
                         <LogoutBtn />
                     ) : (
                         <Link href="/login">

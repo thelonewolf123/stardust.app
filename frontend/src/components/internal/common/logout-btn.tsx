@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { logoutAction } from '@/action/auth'
-
-import { Button } from '../../ui/button'
+import { Button } from '@/components/ui/button'
 
 export function LogoutBtn() {
     const [loading, setLoading] = useState(false)
@@ -17,10 +16,9 @@ export function LogoutBtn() {
             loading={loading}
             onClick={async () => {
                 setLoading(true)
-                await logoutAction()
-                await signOut()
                 localStorage.removeItem('token')
-                router.push('/login')
+                await signOut()
+                await logoutAction()
                 setLoading(false)
             }}
         >
