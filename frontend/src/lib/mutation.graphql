@@ -1,6 +1,3 @@
-# mutation AddGithubToken($token: String!, $username: String!) {
-#     addGithubToken(token: $token, username: $username) 
-# }
 mutation SignUpOrLogin($username: String!, $email: String!, $token: String!, $backend_token: String!) {
     signupOrLogin(username: $username, email: $email, token: $token, backend_token: $backend_token)
 }
