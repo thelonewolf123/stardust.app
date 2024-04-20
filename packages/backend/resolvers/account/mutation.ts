@@ -36,7 +36,8 @@ export const mutation: Resolvers['Mutation'] = {
                 },
                 {
                     $set: {
-                        github_access_token: token
+                        github_access_token: token,
+                        updatedAt: new Date()
                     },
                     $inc: {
                         count: 1

@@ -19,7 +19,8 @@ export const query: Resolvers['Query'] = {
         // Destroy the session
         await ctx.db.User.updateOne(
             {
-                username: user.username
+                username: user.username,
+                updatedAt: new Date()
             },
             {
                 $inc: {
