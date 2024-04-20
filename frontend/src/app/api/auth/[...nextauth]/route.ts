@@ -1,7 +1,9 @@
+import invariant from 'invariant'
 import NextAuth from 'next-auth'
 import GithubProvider from 'next-auth/providers/github'
 
-import { addGithubToken } from '@/lib/server-utils'
+import { authenticateAction } from '@/action/auth'
+import { signupOrLoginBackend } from '@/lib/server-utils'
 
 const handler = NextAuth({
     providers: [
@@ -26,7 +28,13 @@ const handler = NextAuth({
             }
 
             if (accessToken && username) {
-                await addGithubToken(accessToken, username)
+                const backendToken = await signupOrLoginBackend(
+                    username,
+                    profile.email!,
+                    accessToken
+                )
+                invariant(backendToken, 'Backend token is missing')
+                await authenticateAction(backendToken)
                 console.log('Added github token')
             }
             return token

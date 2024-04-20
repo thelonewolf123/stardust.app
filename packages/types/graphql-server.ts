@@ -65,14 +65,13 @@ export type EnvInput = {
 export type Mutation = {
   __typename?: 'Mutation';
   addDomain: Scalars['Boolean'];
-  addGithubToken: Scalars['Boolean'];
   createContainer: Scalars['Boolean'];
   createProject: Scalars['String'];
   deleteProject: Scalars['Boolean'];
   refreshProject: Scalars['Boolean'];
   removeDomain: Scalars['Boolean'];
   roleBackProject: Scalars['Boolean'];
-  signup: Scalars['String'];
+  signupOrLogin: Scalars['String'];
   startContainer: Scalars['Boolean'];
   stopContainer: Scalars['Boolean'];
 };
@@ -81,12 +80,6 @@ export type Mutation = {
 export type MutationAddDomainArgs = {
   domain: Scalars['String'];
   slug: Scalars['String'];
-};
-
-
-export type MutationAddGithubTokenArgs = {
-  token: Scalars['String'];
-  username: Scalars['String'];
 };
 
 
@@ -126,9 +119,10 @@ export type MutationRoleBackProjectArgs = {
 };
 
 
-export type MutationSignupArgs = {
+export type MutationSignupOrLoginArgs = {
+  backend_token: Scalars['String'];
   email: Scalars['String'];
-  password: Scalars['String'];
+  token: Scalars['String'];
   username: Scalars['String'];
 };
 
@@ -208,20 +202,20 @@ export type QueryGetProjectBySlugArgs = {
 
 
 export type QueryLoginArgs = {
-  password: Scalars['String'];
+  backend_token: Scalars['String'];
   username: Scalars['String'];
 };
 
 export type RefreshProjectInput = {
   buildArgs?: InputMaybe<Array<BuildArgsInput>>;
-  description: Scalars['String'];
+  description?: InputMaybe<Scalars['String']>;
   dockerContext?: InputMaybe<Scalars['String']>;
   dockerPath?: InputMaybe<Scalars['String']>;
   env?: InputMaybe<Array<EnvInput>>;
   githubBranch?: InputMaybe<Scalars['String']>;
   githubUrl?: InputMaybe<Scalars['String']>;
   metaData?: InputMaybe<Array<MetaDataInput>>;
-  name: Scalars['String'];
+  name?: InputMaybe<Scalars['String']>;
   port?: InputMaybe<Scalars['Int']>;
 };
 
@@ -386,14 +380,13 @@ export type EnvResolvers<ContextType = Context, ParentType extends ResolversPare
 
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   addDomain?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationAddDomainArgs, 'domain' | 'slug'>>;
-  addGithubToken?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationAddGithubTokenArgs, 'token' | 'username'>>;
   createContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationCreateContainerArgs, 'input'>>;
   createProject?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'input' | 'start'>>;
   deleteProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteProjectArgs, 'slug'>>;
   refreshProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRefreshProjectArgs, 'input' | 'slug' | 'start' | 'type'>>;
   removeDomain?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRemoveDomainArgs, 'domain' | 'slug'>>;
   roleBackProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRoleBackProjectArgs, 'slug' | 'version'>>;
-  signup?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'email' | 'password' | 'username'>>;
+  signupOrLogin?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationSignupOrLoginArgs, 'backend_token' | 'email' | 'token' | 'username'>>;
   startContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationStartContainerArgs, 'projectSlug'>>;
   stopContainer?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationStopContainerArgs, 'projectSlug'>>;
 };
@@ -424,7 +417,7 @@ export type QueryResolvers<ContextType = Context, ParentType extends ResolversPa
   getNotRunningProjects?: Resolver<Array<ResolversTypes['Project']>, ParentType, ContextType>;
   getProjectBySlug?: Resolver<ResolversTypes['Project'], ParentType, ContextType, RequireFields<QueryGetProjectBySlugArgs, 'slug'>>;
   getRunningProjects?: Resolver<Array<ResolversTypes['Project']>, ParentType, ContextType>;
-  login?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<QueryLoginArgs, 'password' | 'username'>>;
+  login?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<QueryLoginArgs, 'backend_token' | 'username'>>;
   logout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
 };
 

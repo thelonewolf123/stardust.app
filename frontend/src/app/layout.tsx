@@ -3,7 +3,6 @@ import './globals.css'
 
 import { Inter } from 'next/font/google'
 
-import Navbar from '@/components/internal/common/navbar'
 import { ApolloWrapper } from '@/components/internal/wrapper/apollo'
 import { NextAuthProvider } from '@/components/internal/wrapper/session'
 import { ThemeProvider } from '@/components/internal/wrapper/theme'
@@ -53,7 +52,6 @@ export default function RootLayout({
                             disableTransitionOnChange
                         >
                             <Toaster />
-                            <Navbar />
                             {children}
                         </ThemeProvider>
                     </ApolloWrapper>

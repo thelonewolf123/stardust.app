@@ -40,11 +40,11 @@ export const mutation: Resolvers['Mutation'] = {
         }
 
         invariant(
-            user.github_username && user.github_access_token,
+            user.username && user.github_access_token,
             'Github account not connected'
         )
 
-        const client = git(user.github_username, user.github_access_token)
+        const client = git(user.username, user.github_access_token)
         await client.addWebhook(
             input.githubUrl,
             `https://${env.DOMAIN_NAME}/api/webhook/${projectSlug}/trigger`

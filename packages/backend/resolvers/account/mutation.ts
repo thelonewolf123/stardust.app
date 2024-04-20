@@ -6,7 +6,11 @@ import { env } from '@/env'
 import { Resolvers } from '@/types/graphql-server'
 
 export const mutation: Resolvers['Mutation'] = {
-    signup: async (_, { username, email, password }, ctx) => {
+    signupOrLogin: async (
+        _,
+        { username, email, token, backend_token },
+        ctx
+    ) => {
         const isValidUsername = /^[a-zA-Z0-9_]+$/.test(username)
         const isValidEmail =
             /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(email)
@@ -15,51 +19,46 @@ export const mutation: Resolvers['Mutation'] = {
             throw new Error('Invalid username/email')
         }
 
-        const isUserTaken = await ctx.db.User.count({
-            $or: [{ username: username }, { email: email }]
-        })
-        if (isUserTaken) {
-            throw new Error('Username/email is already taken')
+        if (backend_token !== env.BACKEND_TOKEN) {
+            throw new Error('Invalid backend token')
         }
 
-        const hashedPassword = crypto
-            .createHash('sha256')
-            .update(password)
-            .digest('hex')
+        const existingUser = await ctx.db.User.findOne({
+            username,
+            email
+        }).lean()
+
+        if (existingUser) {
+            const access_token = jwt.sign(
+                { username, count: existingUser.count },
+                env.JWT_SECRET,
+                {
+                    expiresIn: '60h'
+                }
+            )
+            return access_token
+        }
 
         await ctx.db.User.create({
             username,
-            email,
-            password: hashedPassword
+            github_access_token: token,
+            email
         })
 
-        const token = jwt.sign({ username, count: 0 }, env.JWT_SECRET, {
+        const access_token = jwt.sign({ username, count: 0 }, env.JWT_SECRET, {
             expiresIn: '60h'
         })
-        return token
-    },
-    addGithubToken: async (_, { token, username }, ctx) => {
-        const user = await ctx.db.User.findOne({ username })
-        if (!user) {
-            throw new Error('User not found')
-        }
-
-        await ctx.db.User.updateOne(
-            { username },
-            {
-                github_access_token: token,
-                github_username: username,
-                updatedAt: new Date()
-            }
-        )
-
-        return true
+        return access_token
     }
 }
 
 export const mutationType = gql`
     type Mutation {
-        signup(username: String!, email: String!, password: String!): String!
-        addGithubToken(token: String!, username: String!): Boolean!
+        signupOrLogin(
+            username: String!
+            email: String!
+            token: String!
+            backend_token: String!
+        ): String!
     }
 `

@@ -65,14 +65,13 @@ export type EnvInput = {
 export type Mutation = {
   __typename?: 'Mutation';
   addDomain: Scalars['Boolean'];
-  addGithubToken: Scalars['Boolean'];
   createContainer: Scalars['Boolean'];
   createProject: Scalars['String'];
   deleteProject: Scalars['Boolean'];
   refreshProject: Scalars['Boolean'];
   removeDomain: Scalars['Boolean'];
   roleBackProject: Scalars['Boolean'];
-  signup: Scalars['String'];
+  signupOrLogin: Scalars['String'];
   startContainer: Scalars['Boolean'];
   stopContainer: Scalars['Boolean'];
 };
@@ -81,12 +80,6 @@ export type Mutation = {
 export type MutationAddDomainArgs = {
   domain: Scalars['String'];
   slug: Scalars['String'];
-};
-
-
-export type MutationAddGithubTokenArgs = {
-  token: Scalars['String'];
-  username: Scalars['String'];
 };
 
 
@@ -126,9 +119,10 @@ export type MutationRoleBackProjectArgs = {
 };
 
 
-export type MutationSignupArgs = {
+export type MutationSignupOrLoginArgs = {
+  backend_token: Scalars['String'];
   email: Scalars['String'];
-  password: Scalars['String'];
+  token: Scalars['String'];
   username: Scalars['String'];
 };
 
@@ -208,7 +202,7 @@ export type QueryGetProjectBySlugArgs = {
 
 
 export type QueryLoginArgs = {
-  password: Scalars['String'];
+  backend_token: Scalars['String'];
   username: Scalars['String'];
 };
 
@@ -249,14 +243,6 @@ export type MetaDataInput = {
   value: Scalars['String'];
 };
 
-export type LoginQueryQueryVariables = Exact<{
-  username: Scalars['String'];
-  password: Scalars['String'];
-}>;
-
-
-export type LoginQueryQuery = { __typename?: 'Query', login: string };
-
 export type CreateProjectMutationVariables = Exact<{
   input: ProjectInput;
   start: Scalars['Boolean'];
@@ -291,15 +277,6 @@ export type GetAllProjectsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetAllProjectsQuery = { __typename?: 'Query', getAllProjects: Array<{ __typename?: 'Project', createdAt: number, description: string, dockerContext: string, dockerPath: string, githubBranch: string, githubUrl: string, slug: string, name: string, current?: { __typename?: 'Container', command?: Array<string> | null, containerSlug: string, image: string, port?: number | null, status: ContainerStatus, env?: Array<{ __typename?: 'Env', name: string, value: string }> | null, metaData?: Array<{ __typename?: 'metaData', name: string, value: string }> | null } | null, history?: Array<{ __typename?: 'Container', containerSlug: string }> | null }> };
-
-export type SignupMutaionMutationVariables = Exact<{
-  username: Scalars['String'];
-  email: Scalars['String'];
-  password: Scalars['String'];
-}>;
-
-
-export type SignupMutaionMutation = { __typename?: 'Mutation', signup: string };
 
 export type RefreshProjectMutationVariables = Exact<{
   slug: Scalars['String'];
@@ -337,49 +314,17 @@ export type GetProjectBySlugForEditQueryVariables = Exact<{
 
 export type GetProjectBySlugForEditQuery = { __typename?: 'Query', getProjectBySlug: { __typename?: 'Project', createdAt: number, description: string, dockerContext: string, dockerPath: string, githubBranch: string, githubUrl: string, slug: string, name: string, current?: { __typename?: 'Container', command?: Array<string> | null, containerSlug: string, image: string, port?: number | null, status: ContainerStatus, env?: Array<{ __typename?: 'Env', name: string, value: string }> | null, metaData?: Array<{ __typename?: 'metaData', name: string, value: string }> | null, buildArgs?: Array<{ __typename?: 'buildArgs', name: string, value: string }> | null } | null, history?: Array<{ __typename?: 'Container', containerSlug: string }> | null } };
 
-export type AddGithubTokenMutationVariables = Exact<{
-  token: Scalars['String'];
+export type SignUpOrLoginMutationVariables = Exact<{
   username: Scalars['String'];
+  email: Scalars['String'];
+  token: Scalars['String'];
+  backend_token: Scalars['String'];
 }>;
 
 
-export type AddGithubTokenMutation = { __typename?: 'Mutation', addGithubToken: boolean };
+export type SignUpOrLoginMutation = { __typename?: 'Mutation', signupOrLogin: string };
 
 
-export const LoginQueryDocument = gql`
-    query LoginQuery($username: String!, $password: String!) {
-  login(username: $username, password: $password)
-}
-    `;
-
-/**
- * __useLoginQueryQuery__
- *
- * To run a query within a React component, call `useLoginQueryQuery` and pass it any options that fit your needs.
- * When your component renders, `useLoginQueryQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useLoginQueryQuery({
- *   variables: {
- *      username: // value for 'username'
- *      password: // value for 'password'
- *   },
- * });
- */
-export function useLoginQueryQuery(baseOptions: Apollo.QueryHookOptions<LoginQueryQuery, LoginQueryQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<LoginQueryQuery, LoginQueryQueryVariables>(LoginQueryDocument, options);
-      }
-export function useLoginQueryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LoginQueryQuery, LoginQueryQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<LoginQueryQuery, LoginQueryQueryVariables>(LoginQueryDocument, options);
-        }
-export type LoginQueryQueryHookResult = ReturnType<typeof useLoginQueryQuery>;
-export type LoginQueryLazyQueryHookResult = ReturnType<typeof useLoginQueryLazyQuery>;
-export type LoginQueryQueryResult = Apollo.QueryResult<LoginQueryQuery, LoginQueryQueryVariables>;
 export const CreateProjectDocument = gql`
     mutation CreateProject($input: ProjectInput!, $start: Boolean!) {
   createProject(input: $input, start: $start)
@@ -610,39 +555,6 @@ export function useGetAllProjectsLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type GetAllProjectsQueryHookResult = ReturnType<typeof useGetAllProjectsQuery>;
 export type GetAllProjectsLazyQueryHookResult = ReturnType<typeof useGetAllProjectsLazyQuery>;
 export type GetAllProjectsQueryResult = Apollo.QueryResult<GetAllProjectsQuery, GetAllProjectsQueryVariables>;
-export const SignupMutaionDocument = gql`
-    mutation SignupMutaion($username: String!, $email: String!, $password: String!) {
-  signup(username: $username, email: $email, password: $password)
-}
-    `;
-export type SignupMutaionMutationFn = Apollo.MutationFunction<SignupMutaionMutation, SignupMutaionMutationVariables>;
-
-/**
- * __useSignupMutaionMutation__
- *
- * To run a mutation, you first call `useSignupMutaionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSignupMutaionMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [signupMutaionMutation, { data, loading, error }] = useSignupMutaionMutation({
- *   variables: {
- *      username: // value for 'username'
- *      email: // value for 'email'
- *      password: // value for 'password'
- *   },
- * });
- */
-export function useSignupMutaionMutation(baseOptions?: Apollo.MutationHookOptions<SignupMutaionMutation, SignupMutaionMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<SignupMutaionMutation, SignupMutaionMutationVariables>(SignupMutaionDocument, options);
-      }
-export type SignupMutaionMutationHookResult = ReturnType<typeof useSignupMutaionMutation>;
-export type SignupMutaionMutationResult = Apollo.MutationResult<SignupMutaionMutation>;
-export type SignupMutaionMutationOptions = Apollo.BaseMutationOptions<SignupMutaionMutation, SignupMutaionMutationVariables>;
 export const RefreshProjectDocument = gql`
     mutation RefreshProject($slug: String!, $input: RefreshProjectInput!, $start: Boolean!, $type: String!) {
   refreshProject(slug: $slug, input: $input, start: $start, type: $type)
@@ -839,35 +751,42 @@ export function useGetProjectBySlugForEditLazyQuery(baseOptions?: Apollo.LazyQue
 export type GetProjectBySlugForEditQueryHookResult = ReturnType<typeof useGetProjectBySlugForEditQuery>;
 export type GetProjectBySlugForEditLazyQueryHookResult = ReturnType<typeof useGetProjectBySlugForEditLazyQuery>;
 export type GetProjectBySlugForEditQueryResult = Apollo.QueryResult<GetProjectBySlugForEditQuery, GetProjectBySlugForEditQueryVariables>;
-export const AddGithubTokenDocument = gql`
-    mutation AddGithubToken($token: String!, $username: String!) {
-  addGithubToken(token: $token, username: $username)
+export const SignUpOrLoginDocument = gql`
+    mutation SignUpOrLogin($username: String!, $email: String!, $token: String!, $backend_token: String!) {
+  signupOrLogin(
+    username: $username
+    email: $email
+    token: $token
+    backend_token: $backend_token
+  )
 }
     `;
-export type AddGithubTokenMutationFn = Apollo.MutationFunction<AddGithubTokenMutation, AddGithubTokenMutationVariables>;
+export type SignUpOrLoginMutationFn = Apollo.MutationFunction<SignUpOrLoginMutation, SignUpOrLoginMutationVariables>;
 
 /**
- * __useAddGithubTokenMutation__
+ * __useSignUpOrLoginMutation__
  *
- * To run a mutation, you first call `useAddGithubTokenMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useAddGithubTokenMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useSignUpOrLoginMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSignUpOrLoginMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [addGithubTokenMutation, { data, loading, error }] = useAddGithubTokenMutation({
+ * const [signUpOrLoginMutation, { data, loading, error }] = useSignUpOrLoginMutation({
  *   variables: {
- *      token: // value for 'token'
  *      username: // value for 'username'
+ *      email: // value for 'email'
+ *      token: // value for 'token'
+ *      backend_token: // value for 'backend_token'
  *   },
  * });
  */
-export function useAddGithubTokenMutation(baseOptions?: Apollo.MutationHookOptions<AddGithubTokenMutation, AddGithubTokenMutationVariables>) {
+export function useSignUpOrLoginMutation(baseOptions?: Apollo.MutationHookOptions<SignUpOrLoginMutation, SignUpOrLoginMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AddGithubTokenMutation, AddGithubTokenMutationVariables>(AddGithubTokenDocument, options);
+        return Apollo.useMutation<SignUpOrLoginMutation, SignUpOrLoginMutationVariables>(SignUpOrLoginDocument, options);
       }
-export type AddGithubTokenMutationHookResult = ReturnType<typeof useAddGithubTokenMutation>;
-export type AddGithubTokenMutationResult = Apollo.MutationResult<AddGithubTokenMutation>;
-export type AddGithubTokenMutationOptions = Apollo.BaseMutationOptions<AddGithubTokenMutation, AddGithubTokenMutationVariables>;
+export type SignUpOrLoginMutationHookResult = ReturnType<typeof useSignUpOrLoginMutation>;
+export type SignUpOrLoginMutationResult = Apollo.MutationResult<SignUpOrLoginMutation>;
+export type SignUpOrLoginMutationOptions = Apollo.BaseMutationOptions<SignUpOrLoginMutation, SignUpOrLoginMutationVariables>;

@@ -11,19 +11,17 @@ import { Resolvers } from '@/types/graphql-server'
 const JWT_SECRET = env.JWT_SECRET
 
 export const query: Resolvers['Query'] = {
-    login: async (_, { username, password }, ctx) => {
+    login: async (_, { username, backend_token }, ctx) => {
         // You should have proper authentication and validation here
         // For the sake of this example, let's assume username and password are valid
 
-        // Hash the password using crypto
-        const hashedPassword = crypto
-            .createHash('sha256')
-            .update(password)
-            .digest('hex')
+        // Validate the backend token
+        if (backend_token !== env.BACKEND_TOKEN) {
+            throw new Error('Invalid backend token')
+        }
 
         const user = await ctx.db.User.findOne({
-            username,
-            password: hashedPassword
+            username
         })
 
         if (!user) {
@@ -57,15 +55,15 @@ export const query: Resolvers['Query'] = {
     },
     async getGithubUsername(_, __, ctx) {
         const user = getRegularUser(ctx)
-        invariant(user.github_username, "github wasn't connected!")
+        invariant(user.username, "github wasn't connected!")
 
-        return user.github_username
+        return user.username
     }
 }
 
 export const queryType = gql`
     type Query {
-        login(username: String!, password: String!): String!
+        login(username: String!, backend_token: String!): String!
         logout: Boolean!
         getGithubUsername: String!
     }

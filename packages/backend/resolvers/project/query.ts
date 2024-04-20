@@ -110,10 +110,10 @@ export const query: Resolvers['Query'] = {
     async getAllGithubRepos(_, __, ctx) {
         const user = getRegularUser(ctx)
         invariant(
-            user.github_access_token && user.github_username,
+            user.github_access_token && user.username,
             "github wasn't connected!"
         )
-        const client = git(user.github_username, user.github_access_token)
+        const client = git(user.username, user.github_access_token)
         const list = await client.listRepositories()
 
         return list.map((pathname) =>
@@ -123,10 +123,10 @@ export const query: Resolvers['Query'] = {
     getAllGithubBranches(_, { repo }, ctx) {
         const user = getRegularUser(ctx)
         invariant(
-            user.github_access_token && user.github_username,
+            user.github_access_token && user.username,
             "github wasn't connected!"
         )
-        const client = git(user.github_username, user.github_access_token)
+        const client = git(user.username, user.github_access_token)
         return client.listBranches(repo)
     }
 }

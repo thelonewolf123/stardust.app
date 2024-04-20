@@ -2,10 +2,7 @@
 
 import { cookies } from 'next/headers'
 
-import {
-    AddGithubTokenDocument,
-    AddGithubTokenMutation
-} from '@/graphql-client'
+import { SignUpOrLoginDocument, SignUpOrLoginMutation } from '@/graphql-client'
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 
@@ -45,15 +42,22 @@ export async function getApolloClient() {
     return client
 }
 
-export async function addGithubToken(token: string, username: string) {
+export async function signupOrLoginBackend(
+    username: string,
+    email: string,
+    token: string
+) {
+    const backend_token = process.env.BACKEND_TOKEN
     const client = await getApolloClient()
-    const result = await client.mutate<AddGithubTokenMutation>({
-        mutation: AddGithubTokenDocument,
+    const result = await client.mutate<SignUpOrLoginMutation>({
+        mutation: SignUpOrLoginDocument,
         variables: {
+            username,
+            email,
             token,
-            username
+            backend_token
         }
     })
 
-    return result.data?.addGithubToken
+    return result.data?.signupOrLogin
 }

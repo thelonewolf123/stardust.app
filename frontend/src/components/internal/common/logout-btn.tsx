@@ -1,5 +1,6 @@
 'use client'
 
+import { signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -17,6 +18,7 @@ export function LogoutBtn() {
             onClick={async () => {
                 setLoading(true)
                 await logoutAction()
+                await signOut()
                 router.push('/login')
                 setLoading(false)
             }}

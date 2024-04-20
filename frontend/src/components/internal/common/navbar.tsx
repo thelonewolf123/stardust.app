@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { BsStars } from 'react-icons/bs'
 
 import { getAccessToken } from '@/lib/server-utils'
 
@@ -39,14 +40,9 @@ export default async function Navbar() {
                     {token ? (
                         <LogoutBtn />
                     ) : (
-                        <div className="flex items-center gap-1">
-                            <Link href="/login" className="hover:underline">
-                                Login
-                            </Link>
-                            <Link href="/signup">
-                                <Button>Sign up</Button>
-                            </Link>
-                        </div>
+                        <Link href="/login">
+                            <Button leftIcon={<BsStars />}>Get started</Button>
+                        </Link>
                     )}
                 </span>
             </nav>
