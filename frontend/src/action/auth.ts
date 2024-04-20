@@ -5,7 +5,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 export const authenticateAction = async (token: string) => {
-    cookies().set('token', token, {
+    cookies().set('x-access-token', token, {
         maxAge: 60 * 60 * 60,
         httpOnly: true,
         sameSite: 'strict',
@@ -17,7 +17,7 @@ export const authenticateAction = async (token: string) => {
 }
 
 export const logoutAction = async () => {
-    cookies().set('token', '', {
+    cookies().set('x-access-token', '', {
         maxAge: 0,
         httpOnly: true,
         sameSite: 'strict',
@@ -30,6 +30,6 @@ export const logoutAction = async () => {
 
 export const getAccessToken = async () => {
     const cookie = await cookies()
-    const token = cookie.get('token')
+    const token = cookie.get('x-access-token')
     return token?.value
 }
