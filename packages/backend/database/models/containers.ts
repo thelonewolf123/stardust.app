@@ -1,6 +1,14 @@
+import { preQuery } from '@/backend/library'
 import { ContainerStatus } from '@/types/graphql-server'
-import { getModelForClass, prop, PropType, Ref } from '@typegoose/typegoose'
+import {
+    getModelForClass,
+    pre,
+    prop,
+    PropType,
+    Ref
+} from '@typegoose/typegoose'
 
+import { query } from '../../resolvers/_template/query'
 import { InstanceModel } from './instance'
 import { UserModel } from './user'
 
@@ -28,6 +36,10 @@ class BuildArgs {
     public value!: string
 }
 
+@pre<Container>('find', preQuery)
+@pre<Container>('findOne', preQuery)
+@pre<Container>('updateOne', preQuery)
+@pre<Container>('updateMany', preQuery)
 export class Container {
     @prop({ type: String, required: true })
     public containerSlug!: string
@@ -92,6 +104,15 @@ export class Container {
 
     @prop({ type: String, required: false }, PropType.ARRAY)
     public containerBuildLogs!: string[]
+
+    @prop({ type: String, required: true })
+    public commitHash!: string
+
+    @prop({ type: String, required: true })
+    public commitMessage!: string
+
+    @prop({ type: Boolean, required: true, default: false })
+    public deleted!: boolean
 }
 
 export const ContainerModel = getModelForClass(Container)

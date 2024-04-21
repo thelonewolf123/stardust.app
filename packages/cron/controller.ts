@@ -116,7 +116,15 @@ export const instanceCleanup = async () => {
     console.log('deletedInstance', deletedInstance)
 
     await Promise.all(
-        deletedInstance.map((instanceId) => {
+        deletedInstance.map(async (instanceId) => {
+            await models.Instance.updateOne(
+                {
+                    instanceId
+                },
+                {
+                    isTerminatedByHealthCheck: true
+                }
+            )
             return instance.terminateInstance(instanceId).catch(handleErrors)
         })
     )

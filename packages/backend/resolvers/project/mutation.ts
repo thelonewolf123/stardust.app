@@ -47,7 +47,11 @@ export const mutation: Resolvers['Mutation'] = {
         const client = git(user.username, user.github_access_token)
         await client.addWebhook(
             input.githubUrl,
-            `https://${env.DOMAIN_NAME}/api/webhook/${projectSlug}/trigger`
+            `https://backend.${env.DOMAIN_NAME}/api/webhook/${projectSlug}/trigger`
+        )
+        const { hash, message } = await client.getHeadCommit(
+            input.githubUrl,
+            input.githubBranch
         )
 
         const container = new ctx.db.Container({
@@ -59,7 +63,9 @@ export const mutation: Resolvers['Mutation'] = {
             image: repoWithHash,
             version,
             createdBy: user,
-            buildArgs: input.buildArgs || []
+            buildArgs: input.buildArgs || [],
+            commitHash: hash,
+            commitMessage: message
         })
         await container.save()
 
@@ -92,11 +98,27 @@ export const mutation: Resolvers['Mutation'] = {
             _id: project.current
         }).lean()
 
-        await ctx.db.Container.deleteMany({
-            containerSlug: { $regex: `^${slug}:` }
-        })
+        await ctx.db.Container.updateMany(
+            {
+                containerSlug: { $regex: `^${slug}:` }
+            },
+            {
+                $set: {
+                    deleted: true,
+                    updatedAt: new Date()
+                }
+            }
+        )
 
-        await ctx.db.Project.deleteOne({ slug, user: user._id })
+        await ctx.db.Project.updateOne(
+            { slug, user: user._id },
+            {
+                $set: {
+                    deleted: true,
+                    updatedAt: new Date()
+                }
+            }
+        )
         await ecr.deleteEcrRepo({ name: slug })
 
         if (current && current.containerId) {

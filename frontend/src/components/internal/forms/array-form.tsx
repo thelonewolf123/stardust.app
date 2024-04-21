@@ -239,21 +239,19 @@ export function ProjectArrayForm({
                     <Button
                         type="submit"
                         loading={loading}
-                        className="flex gap-1 items-center"
-                    >
-                        {type === 'new' && start ? (
-                            <>
+                        leftIcon={
+                            type === 'new' && start ? (
                                 <FaCloud />
-                                <span>Deploy</span>
-                            </>
-                        ) : type == 'new' ? (
-                            <>
+                            ) : (
                                 <FaArrowRight />
-                                <span>Next</span>
-                            </>
-                        ) : (
-                            <>Save</>
-                        )}
+                            )
+                        }
+                    >
+                        {type === 'new' && start
+                            ? 'Deploy'
+                            : type == 'new'
+                            ? 'Next'
+                            : 'Save'}
                     </Button>
                     {backTo ? (
                         <Link href={backTo}>

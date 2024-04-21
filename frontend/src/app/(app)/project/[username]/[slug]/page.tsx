@@ -1,6 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { FaPause } from 'react-icons/fa'
 
+import { ProjectStateUpdateBtn } from '@/components/internal/common/project-state-update-btn'
 import { LogsUi } from '@/components/internal/logs-ui'
 import { StatusIcon } from '@/components/internal/project/status'
 import { Button } from '@/components/ui/button'
@@ -36,11 +38,12 @@ export default async function SingleProjectPage({
                     <Link href={project.githubUrl} target="_blank">
                         <Button variant={'outline'}>Github Repo</Button>
                     </Link>
-                    <Link
-                        href={`/project/${params.username}/${params.slug}/edit`}
-                    >
-                        <Button variant={'outline'}>Edit</Button>
-                    </Link>
+
+                    <ProjectStateUpdateBtn
+                        projectSlug={project.slug}
+                        state={project.current?.status}
+                    />
+
                     {project.domains ? (
                         <Link
                             href={`https://${project.domains[0]}`}
@@ -77,6 +80,16 @@ export default async function SingleProjectPage({
                     <span className="flex gap-2 items-baseline">
                         <h4>Current Container:</h4>
                         <p>{project.current?.containerSlug || 'N/A'}</p>
+                    </span>
+                    <span className="flex gap-2 items-baseline">
+                        <h4>Current project commit:</h4>
+                        <p>
+                            {(project.current?.commitHash || 'N/A').slice(-7)}
+                        </p>
+                    </span>
+                    <span className="flex gap-2 items-baseline">
+                        <h4>Current commit message:</h4>
+                        <p>{project.current?.commitMessage || 'N/A'}</p>
                     </span>
                     <h4 className="flex gap-2 items-baseline">
                         Current Container Status:{' '}

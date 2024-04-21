@@ -262,15 +262,12 @@ export const ProjectGeneralInfoForm: React.FC<{
                         )}
                     />
                 </div>
-                <Button type="submit" loading={loading}>
-                    {type === 'new' ? (
-                        <div className="flex gap-1 items-center">
-                            <FaArrowRight />
-                            <span>Next</span>
-                        </div>
-                    ) : (
-                        'Save'
-                    )}
+                <Button
+                    type="submit"
+                    loading={loading}
+                    leftIcon={type === 'new' ? <FaArrowRight /> : null}
+                >
+                    {type === 'new' ? 'Next' : 'Save'}
                 </Button>
             </form>
         </Form>

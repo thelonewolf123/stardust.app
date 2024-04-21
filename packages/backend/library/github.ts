@@ -61,11 +61,33 @@ async function addWebhook(
     }
 }
 
+async function getHeadCommit(
+    username: string,
+    token: string,
+    repo: string,
+    branch: string
+) {
+    const octokit = new Octokit({
+        auth: token
+    })
+
+    const repoName = repo.split('/').at(-1) || repo
+    const response = await octokit.repos.getCommit({
+        owner: username,
+        repo: repoName,
+        ref: branch
+    })
+
+    return { hash: response.data.sha, message: response.data.commit.message }
+}
+
 export function git(username: string, token: string) {
     return {
         listRepositories: () => listRepositories(username, token),
         listBranches: (repo: string) => listBranches(username, token, repo),
         addWebhook: (github_url: string, webhook_url: string) =>
-            addWebhook(username, token, github_url, webhook_url)
+            addWebhook(username, token, github_url, webhook_url),
+        getHeadCommit: (repo: string, branch: string) =>
+            getHeadCommit(username, token, repo, branch)
     }
 }

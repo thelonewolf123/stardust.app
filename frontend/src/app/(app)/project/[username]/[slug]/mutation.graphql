@@ -1,0 +1,7 @@
+mutation StopContainer($projectSlug: String!) {
+    stopContainer(projectSlug: $projectSlug)
+}
+
+mutation StartContainer($projectSlug: String!) {
+    startContainer(projectSlug: $projectSlug)
+}

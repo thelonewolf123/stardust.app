@@ -51,6 +51,8 @@ export const typeDefs = gql`
         metaData: [metaData!]
         status: ContainerStatus!
         buildArgs: [buildArgs!]
+        commitHash: String!
+        commitMessage: String!
         createdAt: Float!
         updatedAt: Float
         terminatedAt: Float

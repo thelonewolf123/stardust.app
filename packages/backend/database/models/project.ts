@@ -1,8 +1,19 @@
-import { getModelForClass, prop, PropType, Ref } from '@typegoose/typegoose'
+import { preQuery } from '@/backend/library'
+import {
+    getModelForClass,
+    pre,
+    prop,
+    PropType,
+    Ref
+} from '@typegoose/typegoose'
 
 import { Container } from './containers'
 import { UserModel } from './user'
 
+@pre<Project>('find', preQuery)
+@pre<Project>('findOne', preQuery)
+@pre<Project>('updateOne', preQuery)
+@pre<Project>('updateMany', preQuery)
 export class Project {
     @prop({ ref: () => UserModel, required: true })
     public user!: Ref<typeof UserModel>
@@ -45,6 +56,9 @@ export class Project {
 
     @prop({ type: Date, default: Date.now(), required: false })
     public updatedAt!: Date
+
+    @prop({ type: Boolean, required: true, default: false })
+    public deleted!: boolean
 }
 
 export const ProjectModel = getModelForClass(Project)

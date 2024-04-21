@@ -1,5 +1,10 @@
-import { getModelForClass, prop } from '@typegoose/typegoose'
+import { preQuery } from '@/backend/library'
+import { getModelForClass, pre, prop } from '@typegoose/typegoose'
 
+@pre<Instance>('find', preQuery)
+@pre<Instance>('findOne', preQuery)
+@pre<Instance>('updateOne', preQuery)
+@pre<Instance>('updateMany', preQuery)
 class Instance {
     @prop({ type: String, required: true })
     public amiId!: string
@@ -31,6 +36,9 @@ class Instance {
 
     @prop({ type: String, required: false, default: 'us-east-1' })
     public region!: string
+
+    @prop({ type: Boolean, required: true, default: false })
+    public deleted!: boolean
 }
 
 export const InstanceModel = getModelForClass(Instance)

@@ -4,10 +4,14 @@ query GetDeploymentHistory($slug: String!) {
             containerSlug
             createdAt
             status
+            commitHash
+            commitMessage
         }
         current {
             containerSlug
             status
+            commitHash
+            commitMessage
         }
         slug
         name

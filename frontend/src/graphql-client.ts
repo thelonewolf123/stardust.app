@@ -24,6 +24,8 @@ export type Container = {
   __typename?: 'Container';
   buildArgs?: Maybe<Array<BuildArgs>>;
   command?: Maybe<Array<Scalars['String']>>;
+  commitHash: Scalars['String'];
+  commitMessage: Scalars['String'];
   containerSlug: Scalars['String'];
   createdAt: Scalars['Float'];
   env?: Maybe<Array<Env>>;
@@ -256,14 +258,28 @@ export type GetDeploymentHistoryQueryVariables = Exact<{
 }>;
 
 
-export type GetDeploymentHistoryQuery = { __typename?: 'Query', getProjectBySlug: { __typename?: 'Project', slug: string, name: string, history?: Array<{ __typename?: 'Container', containerSlug: string, createdAt: number, status: ContainerStatus }> | null, current?: { __typename?: 'Container', containerSlug: string, status: ContainerStatus } | null } };
+export type GetDeploymentHistoryQuery = { __typename?: 'Query', getProjectBySlug: { __typename?: 'Project', slug: string, name: string, history?: Array<{ __typename?: 'Container', containerSlug: string, createdAt: number, status: ContainerStatus, commitHash: string, commitMessage: string }> | null, current?: { __typename?: 'Container', containerSlug: string, status: ContainerStatus, commitHash: string, commitMessage: string } | null } };
+
+export type StopContainerMutationVariables = Exact<{
+  projectSlug: Scalars['String'];
+}>;
+
+
+export type StopContainerMutation = { __typename?: 'Mutation', stopContainer: boolean };
+
+export type StartContainerMutationVariables = Exact<{
+  projectSlug: Scalars['String'];
+}>;
+
+
+export type StartContainerMutation = { __typename?: 'Mutation', startContainer: boolean };
 
 export type GetProjectBySlugQueryVariables = Exact<{
   slug: Scalars['String'];
 }>;
 
 
-export type GetProjectBySlugQuery = { __typename?: 'Query', getProjectBySlug: { __typename?: 'Project', createdAt: number, description: string, dockerContext: string, dockerPath: string, githubBranch: string, githubUrl: string, domains?: Array<string> | null, slug: string, name: string, current?: { __typename?: 'Container', command?: Array<string> | null, containerSlug: string, image: string, port?: number | null, status: ContainerStatus, env?: Array<{ __typename?: 'Env', name: string, value: string }> | null, metaData?: Array<{ __typename?: 'metaData', name: string, value: string }> | null } | null, history?: Array<{ __typename?: 'Container', containerSlug: string, status: ContainerStatus }> | null } };
+export type GetProjectBySlugQuery = { __typename?: 'Query', getProjectBySlug: { __typename?: 'Project', createdAt: number, description: string, dockerContext: string, dockerPath: string, githubBranch: string, githubUrl: string, domains?: Array<string> | null, slug: string, name: string, current?: { __typename?: 'Container', command?: Array<string> | null, containerSlug: string, image: string, port?: number | null, status: ContainerStatus, commitHash: string, commitMessage: string, env?: Array<{ __typename?: 'Env', name: string, value: string }> | null, metaData?: Array<{ __typename?: 'metaData', name: string, value: string }> | null } | null, history?: Array<{ __typename?: 'Container', containerSlug: string, status: ContainerStatus }> | null } };
 
 export type GetAllProjectsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -388,10 +404,14 @@ export const GetDeploymentHistoryDocument = gql`
       containerSlug
       createdAt
       status
+      commitHash
+      commitMessage
     }
     current {
       containerSlug
       status
+      commitHash
+      commitMessage
     }
     slug
     name
@@ -426,6 +446,68 @@ export function useGetDeploymentHistoryLazyQuery(baseOptions?: Apollo.LazyQueryH
 export type GetDeploymentHistoryQueryHookResult = ReturnType<typeof useGetDeploymentHistoryQuery>;
 export type GetDeploymentHistoryLazyQueryHookResult = ReturnType<typeof useGetDeploymentHistoryLazyQuery>;
 export type GetDeploymentHistoryQueryResult = Apollo.QueryResult<GetDeploymentHistoryQuery, GetDeploymentHistoryQueryVariables>;
+export const StopContainerDocument = gql`
+    mutation StopContainer($projectSlug: String!) {
+  stopContainer(projectSlug: $projectSlug)
+}
+    `;
+export type StopContainerMutationFn = Apollo.MutationFunction<StopContainerMutation, StopContainerMutationVariables>;
+
+/**
+ * __useStopContainerMutation__
+ *
+ * To run a mutation, you first call `useStopContainerMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStopContainerMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [stopContainerMutation, { data, loading, error }] = useStopContainerMutation({
+ *   variables: {
+ *      projectSlug: // value for 'projectSlug'
+ *   },
+ * });
+ */
+export function useStopContainerMutation(baseOptions?: Apollo.MutationHookOptions<StopContainerMutation, StopContainerMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<StopContainerMutation, StopContainerMutationVariables>(StopContainerDocument, options);
+      }
+export type StopContainerMutationHookResult = ReturnType<typeof useStopContainerMutation>;
+export type StopContainerMutationResult = Apollo.MutationResult<StopContainerMutation>;
+export type StopContainerMutationOptions = Apollo.BaseMutationOptions<StopContainerMutation, StopContainerMutationVariables>;
+export const StartContainerDocument = gql`
+    mutation StartContainer($projectSlug: String!) {
+  startContainer(projectSlug: $projectSlug)
+}
+    `;
+export type StartContainerMutationFn = Apollo.MutationFunction<StartContainerMutation, StartContainerMutationVariables>;
+
+/**
+ * __useStartContainerMutation__
+ *
+ * To run a mutation, you first call `useStartContainerMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStartContainerMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [startContainerMutation, { data, loading, error }] = useStartContainerMutation({
+ *   variables: {
+ *      projectSlug: // value for 'projectSlug'
+ *   },
+ * });
+ */
+export function useStartContainerMutation(baseOptions?: Apollo.MutationHookOptions<StartContainerMutation, StartContainerMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<StartContainerMutation, StartContainerMutationVariables>(StartContainerDocument, options);
+      }
+export type StartContainerMutationHookResult = ReturnType<typeof useStartContainerMutation>;
+export type StartContainerMutationResult = Apollo.MutationResult<StartContainerMutation>;
+export type StartContainerMutationOptions = Apollo.BaseMutationOptions<StartContainerMutation, StartContainerMutationVariables>;
 export const GetProjectBySlugDocument = gql`
     query GetProjectBySlug($slug: String!) {
   getProjectBySlug(slug: $slug) {
@@ -444,6 +526,8 @@ export const GetProjectBySlugDocument = gql`
       }
       port
       status
+      commitHash
+      commitMessage
     }
     description
     dockerContext

@@ -57,6 +57,8 @@ export default async function ProjectDeploymentPage({
 
                         <StatusIcon status={deploy.status} />
                         <p>{new Date(deploy.createdAt).toLocaleString()}</p>
+                        <p>{deploy.commitMessage}</p>
+                        <p>{deploy.commitHash.slice(-7)}</p>
                         <RollbackForm
                             slug={deploy.containerSlug}
                             currentSlug={currentSlug}
