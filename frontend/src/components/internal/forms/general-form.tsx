@@ -1,29 +1,19 @@
 'use client'
 
-import { useMemo } from 'react'
-import { useForm } from 'react-hook-form'
-import { FaArrowRight } from 'react-icons/fa'
-import { z } from 'zod'
+import { useMemo } from 'react';
+import { useForm } from 'react-hook-form';
+import { FaArrowRight } from 'react-icons/fa';
+import { z } from 'zod';
 
-import { Button } from '@/components/ui/button'
+import { Autocomplete } from '@/components/ui/auto-complete';
+import { Button } from '@/components/ui/button';
 import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import {
-    useGetAllGithubBranchesQuery,
-    useGetAllGithubReposQuery
-} from '@/graphql-client'
-import { zodResolver } from '@hookform/resolvers/zod'
-
-import { Autocomplete } from '../common/auto-complete'
+    Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { useGetAllGithubBranchesQuery, useGetAllGithubReposQuery } from '@/graphql-client';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 export const ProjectSchema = z.object({
     name: z
