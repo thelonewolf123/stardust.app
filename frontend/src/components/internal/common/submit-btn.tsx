@@ -2,14 +2,14 @@
 
 import { useFormStatus } from 'react-dom';
 
-import { Button } from '@/components/ui/button';
+import { Button, ButtonProps } from '@/components/ui/button';
 
-export function SubmitButton({ text }: { text: string }) {
+export function SubmitButton({ children, ...props }: ButtonProps) {
     const { pending } = useFormStatus()
 
     return (
-        <Button variant="outline" type="submit" loading={pending}>
-            {text}
+        <Button type="submit" {...props} loading={pending}>
+            {children}
         </Button>
     )
 }

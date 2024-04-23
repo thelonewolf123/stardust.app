@@ -1,11 +1,11 @@
-import { getModelForClass, pre, prop } from '@typegoose/typegoose'
+import { getModelForClass, pre, prop } from '@typegoose/typegoose';
 
-import { preQuery } from '../utils'
+import { preQuery, preUpdateQuery } from '../utils';
 
 @pre<Instance>('find', preQuery)
 @pre<Instance>('findOne', preQuery)
-@pre<Instance>('updateOne', preQuery)
-@pre<Instance>('updateMany', preQuery)
+@pre<Instance>('updateOne', preUpdateQuery)
+@pre<Instance>('updateMany', preUpdateQuery)
 class Instance {
     @prop({ type: String, required: true })
     public amiId!: string

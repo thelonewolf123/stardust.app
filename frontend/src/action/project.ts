@@ -1,17 +1,15 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+import { revalidatePath } from 'next/cache';
 
 import {
-    StartContainerDocument,
-    StartContainerMutation,
-    StopContainerDocument,
-    StopContainerMutation
-} from '@/graphql-client'
-import { getApolloClient } from '@/lib/server-utils'
+    StartContainerDocument, StartContainerMutation, StopContainerDocument, StopContainerMutation
+} from '@/graphql-client';
+import { getApolloClient } from '@/lib/server-utils';
 
-export async function pauseProject(projectSlug: string) {
+export async function pauseProject(formData: FormData) {
     const client = await getApolloClient()
+    const projectSlug = formData.get('projectSlug') as string
 
     const { data } = await client.mutate<StopContainerMutation>({
         mutation: StopContainerDocument,
@@ -27,8 +25,9 @@ export async function pauseProject(projectSlug: string) {
     }
 }
 
-export async function resumeProject(projectSlug: string) {
+export async function resumeProject(formData: FormData) {
     const client = await getApolloClient()
+    const projectSlug = formData.get('projectSlug') as string
 
     const { data } = await client.mutate<StartContainerMutation>({
         mutation: StartContainerDocument,

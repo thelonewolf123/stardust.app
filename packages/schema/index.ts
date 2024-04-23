@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod';
 
 export const ContainerSchedulerSchema = z
     .object({
@@ -12,7 +12,7 @@ export const ContainerSchedulerSchema = z
 
 export const ContainerDestroySchema = z
     .object({
-        containerId: z.string().min(1),
+        containerId: z.string().optional(),
         containerSlug: z.string().min(1)
     })
     .strict()

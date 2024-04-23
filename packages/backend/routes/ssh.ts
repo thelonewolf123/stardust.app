@@ -1,8 +1,9 @@
-import ExpressWs from 'express-ws'
-import invariant from 'invariant'
+import ExpressWs from 'express-ws';
+import invariant from 'invariant';
 
-import { getDockerClient } from '@/core/docker'
-import models from '@backend/database'
+import { getDockerClient } from '@/core/docker';
+import { ContainerStatus } from '@/types/graphql-server';
+import models from '@backend/database';
 
 export const sshHandler: ExpressWs.WebsocketRequestHandler = async (
     ws,
@@ -14,20 +15,27 @@ export const sshHandler: ExpressWs.WebsocketRequestHandler = async (
         const containerSlug = `${username}/${id}`
 
         const container = await models.Container.findOne({
-            slug: containerSlug
-        })
-            .populate('instanceId')
-            .lean()
+            containerSlug
+        }).lean()
+
+        console.log('container', container)
 
         invariant(container, 'Container not found')
-        invariant(container.status === 'running', 'Container not running')
-        const instance = container.instanceId as any
+        invariant(
+            container.status === ContainerStatus.Running,
+            'Container not running'
+        )
+        const instance = await models.Instance.findOne({
+            _id: container.instanceId
+        }).lean()
 
-        invariant(instance?.publicIp, 'Instance not found')
+        console.log('instance', instance)
 
-        const { publicIp } = instance
+        invariant(instance?.ipAddress, 'Instance not found')
 
-        const docker = await getDockerClient(publicIp)
+        const { ipAddress } = instance
+
+        const docker = await getDockerClient(ipAddress)
 
         docker
             .getContainer(container.containerId)
@@ -58,7 +66,7 @@ export const sshHandler: ExpressWs.WebsocketRequestHandler = async (
                 })
             })
     } catch (err) {
-        console.error(err)
+        console.error('Error in SSH handler', err)
         ws.close()
     }
 }

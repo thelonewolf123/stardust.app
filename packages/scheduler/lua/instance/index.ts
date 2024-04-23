@@ -1,14 +1,12 @@
-import {
-    Ec2InstanceType,
-    PhysicalHostRedisType,
-    PhysicalHostType
-} from '@/types'
-import redis, { redlock } from '@core/redis'
+import { Ec2InstanceType, PhysicalHostRedisType, PhysicalHostType } from '@/types';
+import redis, { redlock } from '@core/redis';
 
 async function getAllPhysicalHosts(): Promise<PhysicalHostType[]> {
     const hosts = await redis.client.get('physicalHost')
     const result = hosts ? JSON.parse(hosts) : []
     return result.map((host: PhysicalHostRedisType) => {
+        const containers = Array.isArray(host.containers) ? host.containers : []
+
         return {
             ...host,
             createdAt: new Date(host.createdAt * 1000),
@@ -16,7 +14,7 @@ async function getAllPhysicalHosts(): Promise<PhysicalHostType[]> {
             scheduledForDeletionAt: host.scheduledForDeletionAt
                 ? new Date(host.scheduledForDeletionAt * 1000)
                 : null,
-            containers: host.containers.map((container) => {
+            containers: containers.map((container) => {
                 return {
                     ...container,
                     updatedAt: new Date(container.updatedAt * 1000),

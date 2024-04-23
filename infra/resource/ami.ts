@@ -1,11 +1,9 @@
-import * as aws from '@pulumi/aws'
-import * as command from '@pulumi/command'
+import * as aws from '@pulumi/aws';
+import * as command from '@pulumi/command';
 
-import * as awsInfra from '../../constants/aws-infra'
-import { getArchLinuxAmiId } from '../utils'
-import { instance } from './instance'
-import { regionName } from './region'
-import { remoteCommand } from './ssh'
+import * as awsInfra from '../../constants/aws-infra';
+import { getArchLinuxAmiId } from '../utils';
+import { regionName } from './region';
 
 export const ubuntuAmi = aws.ec2.getAmi({
     filters: [

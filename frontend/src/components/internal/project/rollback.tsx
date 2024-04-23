@@ -15,9 +15,9 @@ export function RollbackForm({
         <form action={rollbackToVersion}>
             <input type="hidden" name="containerSlug" value={slug} />
 
-            <SubmitButton
-                text={currentSlug === slug ? 'Re-deploy' : 'Roll back'}
-            />
+            <SubmitButton variant={'outline'}>
+                {currentSlug === slug ? 'Re-deploy' : 'Roll back'}
+            </SubmitButton>
         </form>
     )
 }

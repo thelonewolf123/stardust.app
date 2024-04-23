@@ -1,19 +1,13 @@
-import {
-    getModelForClass,
-    pre,
-    prop,
-    PropType,
-    Ref
-} from '@typegoose/typegoose'
+import { getModelForClass, pre, prop, PropType, Ref } from '@typegoose/typegoose';
 
-import { preQuery } from '../utils'
-import { Container } from './containers'
-import { UserModel } from './user'
+import { preQuery, preUpdateQuery } from '../utils';
+import { Container } from './containers';
+import { UserModel } from './user';
 
 @pre<Project>('find', preQuery)
 @pre<Project>('findOne', preQuery)
-@pre<Project>('updateOne', preQuery)
-@pre<Project>('updateMany', preQuery)
+@pre<Project>('updateOne', preUpdateQuery)
+@pre<Project>('updateMany', preUpdateQuery)
 export class Project {
     @prop({ ref: () => UserModel, required: true })
     public user!: Ref<typeof UserModel>

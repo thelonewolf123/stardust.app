@@ -1,9 +1,9 @@
-import gql from 'graphql-tag'
-import invariant from 'invariant'
-import { v4 } from 'uuid'
+import gql from 'graphql-tag';
+import invariant from 'invariant';
+import { v4 } from 'uuid';
 
-import { convertToObject, getRegularUser } from '@/core/utils'
-import { Resolvers } from '@/types/graphql-server'
+import { convertToObject, getRegularUser } from '@/core/utils';
+import { Resolvers } from '@/types/graphql-server';
 
 export const mutation: Resolvers['Mutation'] = {
     async createContainer(_, { input }, ctx) {
@@ -29,10 +29,10 @@ export const mutation: Resolvers['Mutation'] = {
             user: user._id
         }).lean()
 
-        invariant(project, 'Container not found')
+        invariant(project, 'Project not found')
 
         const container = await ctx.db.Container.findOne({
-            _id: project.current
+            _id: project.current._id
         }).lean()
 
         invariant(container, 'Container not found')
@@ -62,10 +62,16 @@ export const mutation: Resolvers['Mutation'] = {
         return true
     },
     async stopContainer(_, { projectSlug }, ctx) {
-        getRegularUser(ctx)
+        const user = getRegularUser(ctx)
+        const project = await ctx.db.Project.findOne({
+            slug: projectSlug,
+            user: user._id
+        }).lean()
+
+        invariant(project, 'Project not found')
+
         const container = await ctx.db.Container.findOne({
-            containerSlug: projectSlug,
-            createdBy: ctx.user?._id
+            _id: project.current
         }).lean()
 
         invariant(container, 'Container not found')

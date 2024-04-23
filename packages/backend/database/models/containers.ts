@@ -1,15 +1,9 @@
-import { ContainerStatus } from '@/types/graphql-server'
-import {
-    getModelForClass,
-    pre,
-    prop,
-    PropType,
-    Ref
-} from '@typegoose/typegoose'
+import { ContainerStatus } from '@/types/graphql-server';
+import { getModelForClass, pre, prop, PropType, Ref } from '@typegoose/typegoose';
 
-import { preQuery } from '../utils'
-import { InstanceModel } from './instance'
-import { UserModel } from './user'
+import { preQuery, preUpdateQuery } from '../utils';
+import { InstanceModel } from './instance';
+import { UserModel } from './user';
 
 class MetaData {
     @prop({ type: String, required: true })
@@ -37,8 +31,8 @@ class BuildArgs {
 
 @pre<Container>('find', preQuery)
 @pre<Container>('findOne', preQuery)
-@pre<Container>('updateOne', preQuery)
-@pre<Container>('updateMany', preQuery)
+@pre<Container>('updateOne', preUpdateQuery)
+@pre<Container>('updateMany', preUpdateQuery)
 export class Container {
     @prop({ type: String, required: true })
     public containerSlug!: string
