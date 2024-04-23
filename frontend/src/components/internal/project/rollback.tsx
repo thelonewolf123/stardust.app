@@ -1,20 +1,8 @@
 'use client'
 
-import { useFormStatus } from 'react-dom'
+import { rollbackToVersion } from '@/action/rollback';
 
-import { rollbackToVersion } from '@/action/rollback'
-
-import { Button } from '../../ui/button'
-
-export function SubmitButton({ text }: { text: string }) {
-    const { pending } = useFormStatus()
-
-    return (
-        <Button variant="outline" type="submit" loading={pending}>
-            {text}
-        </Button>
-    )
-}
+import { SubmitButton } from '../common/submit-btn';
 
 export function RollbackForm({
     slug,
