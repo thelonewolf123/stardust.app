@@ -1,28 +1,19 @@
-import { SSM_PARAMETER_KEYS } from '../constants/aws-infra'
-import { createAmiFromInstance } from './resource/ami'
-import { addDnsRecord } from './resource/cloudflare'
-import { spotTerminationNoticeRule } from './resource/cloudwatch'
-import { instance } from './resource/instance'
-import { dockerHostPassword, keyPair } from './resource/keystore'
-import { lambdaFunction } from './resource/lambda'
-import { proxyCommandFn } from './resource/proxy'
-import { spotFleetRole, spotFleetRolePolicyAttachment } from './resource/role'
-import { containerBucket } from './resource/s3'
+import { SSM_PARAMETER_KEYS } from '../constants/aws-infra';
+import { createAmiFromInstance } from './resource/ami';
+import { addDnsRecord } from './resource/cloudflare';
+import { spotTerminationNoticeRule } from './resource/cloudwatch';
+import { instance } from './resource/instance';
+import { dockerHostPassword, keyPair } from './resource/keystore';
+import { lambdaFunction } from './resource/lambda';
+import { proxyCommandFn } from './resource/proxy';
+import { spotFleetRole, spotFleetRolePolicyAttachment } from './resource/role';
+import { containerBucket } from './resource/s3';
+import { getUserInstanceSecurityGroup, securityGroup } from './resource/securityGroup';
+import { remoteCommand } from './resource/ssh';
 import {
-    getUserInstanceSecurityGroup,
-    securityGroup
-} from './resource/securityGroup'
-import { remoteCommand } from './resource/ssh'
-import {
-    storeBaseAmiId,
-    storeBucketId,
-    storeKeyPairName,
-    storeProxyIpAddr,
-    storeSecret,
-    storeSecurityGroup,
-    storeSpotFleetRole,
-    storeUserInstanceSecurityGroup
-} from './resource/ssm'
+    storeBaseAmiId, storeBucketId, storeKeyPairName, storeProxyIpAddr, storeSecret,
+    storeSecurityGroup, storeSpotFleetRole, storeUserInstanceSecurityGroup
+} from './resource/ssm';
 
 const ami = createAmiFromInstance(instance, remoteCommand)
 
@@ -47,11 +38,13 @@ const userInstanceSecurityGroupSSM = storeUserInstanceSecurityGroup(
 )
 const proxyCommand = proxyCommandFn(ami)
 const dnsRecord = addDnsRecord(instance.publicIp)
+// const backendUrlSSM = storeBackendURL(webListener)
 
 export const amiId = ami.id
 export const instanceId = instance.id
 export const proxySSMId = proxySSM.id
 export const dnsRecordId = dnsRecord.map((r) => r.id)
+// export const backendUrlSSMId = backendUrlSSM.id
 export const proxyCmdId = proxyCommand.id
 export const sshKeyName = keyPair.keyName
 export const baseAmiSSMId = baseAmiSSM.id

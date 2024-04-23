@@ -1,16 +1,12 @@
-import {
-    BUILD_CONTAINER,
-    DESTROY_CONTAINER,
-    NEW_CONTAINER
-} from '../../constants/queue'
-import { connect } from '../../packages/backend/database/mongoose'
-import ec2 from '../../packages/core/aws/ec2.aws'
-import { ecr } from '../../packages/core/aws/ecr.aws'
-import { queueManager } from '../../packages/core/queue'
-import redis from '../../packages/core/redis'
-import { ContainerModel } from '../../packages/backend/database/models/containers'
-import { InstanceModel } from '../../packages/backend/database/models/instance'
-import { ProjectModel } from '../../packages/backend/database/models/project'
+import { BUILD_CONTAINER, DESTROY_CONTAINER, NEW_CONTAINER } from '../../constants/queue';
+import { ContainerModel } from '../../packages/backend/database/models/containers';
+import { InstanceModel } from '../../packages/backend/database/models/instance';
+import { ProjectModel } from '../../packages/backend/database/models/project';
+import { connect } from '../../packages/backend/database/mongoose';
+import ec2 from '../../packages/core/aws/ec2.aws';
+import { ecr } from '../../packages/core/aws/ecr.aws';
+import { queueManager } from '../../packages/core/queue';
+import redis from '../../packages/core/redis';
 
 async function connectMongodb() {
     await connect()
@@ -77,9 +73,18 @@ async function purgeEcr() {
 
 async function purgeMongo() {
     await Promise.all([
-        ContainerModel.deleteMany({ createdAt: { $exists: true } }),
-        ProjectModel.deleteMany({ createdAt: { $exists: true } }),
-        InstanceModel.deleteMany({ createdAt: { $exists: true } })
+        ContainerModel.deleteMany({
+            createdAt: { $exists: true },
+            deleted: { $exists: true }
+        }),
+        ProjectModel.deleteMany({
+            createdAt: { $exists: true },
+            deleted: { $exists: true }
+        }),
+        InstanceModel.deleteMany({
+            createdAt: { $exists: true },
+            deleted: { $exists: true }
+        })
     ]).then(() => {
         console.log('MongoDB purged')
     })

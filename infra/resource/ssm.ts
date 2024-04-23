@@ -1,7 +1,8 @@
-import * as aws from '@pulumi/aws'
-import { Output } from '@pulumi/pulumi'
+import * as aws from '@pulumi/aws';
+import * as awsx from '@pulumi/awsx';
+import { Output } from '@pulumi/pulumi';
 
-import { SSM_PARAMETER_KEYS } from '../../constants/aws-infra'
+import { SSM_PARAMETER_KEYS } from '../../constants/aws-infra';
 
 export function storeBaseAmiId(ami: aws.ec2.Ami) {
     return new aws.ssm.Parameter(SSM_PARAMETER_KEYS.baseAmiId, {
@@ -69,5 +70,15 @@ export function storeUserInstanceSecurityGroup(
         name: SSM_PARAMETER_KEYS.userInstanceSecurityGroup,
         type: 'String',
         value: securityGroup.id.apply((id) => id)
+    })
+}
+
+export function storeBackendURL(
+    webListener: awsx.classic.lb.ApplicationListener
+) {
+    return new aws.ssm.Parameter(SSM_PARAMETER_KEYS.backendURL, {
+        name: SSM_PARAMETER_KEYS.backendURL,
+        type: 'String',
+        value: webListener.endpoint.hostname
     })
 }

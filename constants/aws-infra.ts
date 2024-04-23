@@ -17,8 +17,9 @@ export const SSM_PARAMETER_KEYS = {
     dockerBuildInstanceId: 'docker-build-instance-id',
     proxyIpAddr: 'proxy-ip-addr',
     spotFleetRole: 'spot-fleet-role',
-    userInstanceSecurityGroup: 'user-instance-security-group'
-}
+    userInstanceSecurityGroup: 'user-instance-security-group',
+    backendURL: 'backend-url'
+} as const
 
 export const MAX_CONTAINER_PER_INSTANCE = 2
 export const MAX_INSTANCE_STATUS_ATTEMPTS = 300

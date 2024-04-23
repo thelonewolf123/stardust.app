@@ -1,4 +1,3 @@
-import { preQuery } from '@/backend/library'
 import { ContainerStatus } from '@/types/graphql-server'
 import {
     getModelForClass,
@@ -8,7 +7,7 @@ import {
     Ref
 } from '@typegoose/typegoose'
 
-import { query } from '../../resolvers/_template/query'
+import { preQuery } from '../utils'
 import { InstanceModel } from './instance'
 import { UserModel } from './user'
 

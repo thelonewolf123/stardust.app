@@ -1,5 +1,6 @@
-import { preQuery } from '@/backend/library'
 import { getModelForClass, pre, prop } from '@typegoose/typegoose'
+
+import { preQuery } from '../utils'
 
 @pre<Instance>('find', preQuery)
 @pre<Instance>('findOne', preQuery)

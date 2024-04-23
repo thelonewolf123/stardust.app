@@ -1,4 +1,3 @@
-import { preQuery } from '@/backend/library'
 import {
     getModelForClass,
     pre,
@@ -7,6 +6,7 @@ import {
     Ref
 } from '@typegoose/typegoose'
 
+import { preQuery } from '../utils'
 import { Container } from './containers'
 import { UserModel } from './user'
 
