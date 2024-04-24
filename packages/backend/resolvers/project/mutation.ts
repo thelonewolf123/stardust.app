@@ -1,12 +1,12 @@
-import gql from 'graphql-tag';
-import invariant from 'invariant';
+import gql from 'graphql-tag'
+import invariant from 'invariant'
 
-import { generateSubdomain } from '@/backend/library';
-import { git } from '@/backend/library/github';
-import { ecr } from '@/core/aws/ecr.aws';
-import { convertToObject, getRegularUser } from '@/core/utils';
-import { env } from '@/env';
-import { Resolvers } from '@/types/graphql-server';
+import { generateSubdomain } from '@/backend/library'
+import { git } from '@/backend/library/github'
+import { ecr } from '@/core/aws/ecr.aws'
+import { convertToObject, getRegularUser } from '@/core/utils'
+import { env } from '@/env'
+import { Resolvers } from '@/types/graphql-server'
 
 export const mutation: Resolvers['Mutation'] = {
     async createProject(_, { input, start }, ctx) {
@@ -208,6 +208,11 @@ export const mutation: Resolvers['Mutation'] = {
         const history = project.history
         const containerSlug = `${slug}:${history.length}`
         const repoWithHash = `${project.ecrRepo}:${history.length}`
+        const client = git(user.username, user.github_access_token)
+        const { hash, message } = await client.getHeadCommit(
+            project.githubUrl,
+            project.githubBranch
+        )
 
         if (type === 'edit') {
             ctx.queue.destroyContainer.publish({
@@ -224,7 +229,9 @@ export const mutation: Resolvers['Mutation'] = {
                 status: 'pending',
                 image: repoWithHash,
                 version: history.length,
-                createdBy: user
+                createdBy: user,
+                commitMessage: message,
+                commitHash: hash
             })
 
             await newContainer.save()

@@ -1,4 +1,4 @@
-import { getModelForClass, prop } from '@typegoose/typegoose';
+import { getModelForClass, prop } from '@typegoose/typegoose'
 
 export class User {
     @prop({ type: String, required: true })
@@ -17,8 +17,8 @@ export class User {
     @prop({ type: Date, default: Date.now(), required: false })
     public updatedAt!: Date
 
-    @prop({ type: String, required: false })
-    github_access_token?: string
+    @prop({ type: String, required: true })
+    github_access_token!: string
 }
 
 export const UserModel = getModelForClass(User)

@@ -63,6 +63,10 @@ export const sshHandler: ExpressWs.WebsocketRequestHandler = async (
                     stream.on('end', () => {
                         ws.close()
                     })
+
+                    ws.on('close', () => {
+                        stream.end()
+                    })
                 })
             })
     } catch (err) {

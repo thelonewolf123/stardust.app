@@ -4,17 +4,10 @@ import { EC2_INSTANCE_USERNAME, SSM_PARAMETER_KEYS } from '../../constants/aws-i
 import ssmAws from '../../packages/core/aws/ssm.aws';
 
 export async function getDockerClient(ipAddress: string) {
-    const privateKey = await ssmAws.getParameter(
-        SSM_PARAMETER_KEYS.ec2PrivateKey,
-        true
-    )
     const config = {
         protocol: 'ssh',
         host: ipAddress,
-        username: EC2_INSTANCE_USERNAME,
-        sshOptions: {
-            privateKey
-        }
+        username: EC2_INSTANCE_USERNAME
     } as any
 
     const docker = new Docker()
@@ -58,7 +51,7 @@ async function main() {
                             console.log('end')
                         })
 
-                        stream.end()
+                        // stream.end()
                     })
                 }
             )
