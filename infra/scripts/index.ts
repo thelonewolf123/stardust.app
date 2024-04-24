@@ -10,7 +10,12 @@ sudo snap install docker
 
 sleep 30 # wait for docker to start
 
-sudo docker run -d --restart always --name docker-proxy-container -v /var/run/docker.sock:/var/run/docker.sock -p 2375:2375 -e BEARER_TOKEN='${env.REMOTE_DOCKER_PASSWORD}' -e REDIS_HOST='${env.REDIS_HOST}' docker.io/thelonewolf123/docker-proxy
+sudo groupadd docker
+sudo gpasswd -a $USER docker
+sudo chown root:docker /var/run/docker.sock
+sudo chown -R root:docker /var/run/docker
+
+sudo docker run -d --restart always --name docker-logger-container -v /var/run/docker.sock:/var/run/docker.sock -e REDIS_HOST='${env.REDIS_HOST}' docker.io/thelonewolf123/docker-proxy
 
 # Install aws-cli
 sudo mkdir -p /root/.aws

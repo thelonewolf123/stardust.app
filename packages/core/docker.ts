@@ -1,23 +1,23 @@
 import Docker from 'dockerode'
 
-import { SSM_PARAMETER_KEYS } from '@constants/aws-infra'
+import { EC2_INSTANCE_USERNAME, SSM_PARAMETER_KEYS } from '@constants/aws-infra'
 import ssmAws from '@core/aws/ssm.aws'
 
 export async function getDockerClient(ipAddress: string) {
-    const auth = await ssmAws.getParameter(
-        SSM_PARAMETER_KEYS.dockerRemotePassword,
+    const privateKey = await ssmAws.getParameter(
+        SSM_PARAMETER_KEYS.ec2PrivateKey,
         true
     )
 
-    const docker = new Docker({
-        protocol: 'http',
+    const config = {
+        protocol: 'ssh',
         host: ipAddress,
-        headers: {
-            Authorization: `Bearer ${auth}`
-        },
-        port: 2375,
-        version: 'v1.41',
-        timeout: 30_000
-    })
+        username: EC2_INSTANCE_USERNAME,
+        sshOptions: {
+            privateKey
+        }
+    } as any
+
+    const docker = new Docker(config)
     return docker
 }

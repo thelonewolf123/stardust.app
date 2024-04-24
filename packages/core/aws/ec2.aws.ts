@@ -1,19 +1,26 @@
-import { NodeSSH } from 'node-ssh';
+import { NodeSSH } from 'node-ssh'
 
-import { env } from '@/env';
-import { InstanceExecArgs } from '@/types';
+import { env } from '@/env'
+import { InstanceExecArgs } from '@/types'
 import {
-    DescribeInstancesCommand, DescribeInstanceStatusCommand, DescribeSpotFleetInstancesCommand,
-    DescribeSpotInstanceRequestsCommand, EC2Client, RequestSpotFleetCommand, RunInstancesCommand,
+    DescribeInstancesCommand,
+    DescribeInstanceStatusCommand,
+    DescribeSpotFleetInstancesCommand,
+    DescribeSpotInstanceRequestsCommand,
+    EC2Client,
+    RequestSpotFleetCommand,
+    RunInstancesCommand,
     TerminateInstancesCommand
-} from '@aws-sdk/client-ec2';
-import { SPOT_INSTANCE_REQUIREMENTS } from '@constants/provider';
+} from '@aws-sdk/client-ec2'
+import { SPOT_INSTANCE_REQUIREMENTS } from '@constants/provider'
 
 import {
-    EC2_INSTANCE_TYPE, EC2_INSTANCE_USERNAME, SSM_PARAMETER_KEYS
-} from '../../../constants/aws-infra';
-import { sleep } from '../utils';
-import ssmAws from './ssm.aws';
+    EC2_INSTANCE_TYPE,
+    EC2_INSTANCE_USERNAME,
+    SSM_PARAMETER_KEYS
+} from '../../../constants/aws-infra'
+import { sleep } from '../utils'
+import ssmAws from './ssm.aws'
 
 const client = new EC2Client({
     credentials: {

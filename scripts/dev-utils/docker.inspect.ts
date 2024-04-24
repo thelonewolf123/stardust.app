@@ -1,26 +1,16 @@
-import Docker from 'dockerode';
+import { getDockerClient } from '../../packages/core/docker'
 
-import { EC2_INSTANCE_USERNAME, SSM_PARAMETER_KEYS } from '../../constants/aws-infra';
-import ssmAws from '../../packages/core/aws/ssm.aws';
-
-export async function getDockerClient(ipAddress: string) {
-    const config = {
-        protocol: 'ssh',
-        host: ipAddress,
-        username: EC2_INSTANCE_USERNAME
-    } as any
-
-    const docker = new Docker()
-    return docker
-}
 async function main() {
-    const docker = await getDockerClient('3.91.233.230')
+    const docker = await getDockerClient('44.204.66.30')
+    docker.ping((err, data) => {
+        console.log('ping', err, data)
+    })
     const containers = await docker.listContainers()
     Promise.all(
         containers.map(async (container) => {
             docker.getContainer(container.Id).exec(
                 {
-                    Cmd: ['/bin/echo', 'hello'],
+                    Cmd: ['/bin/sh'],
                     AttachStdin: true,
                     AttachStdout: true,
                     AttachStderr: true,
@@ -50,6 +40,8 @@ async function main() {
                         stream.on('end', () => {
                             console.log('end')
                         })
+
+                        stream.write('echo "hello"\n')
 
                         // stream.end()
                     })
