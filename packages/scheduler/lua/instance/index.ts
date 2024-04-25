@@ -1,5 +1,9 @@
-import { Ec2InstanceType, PhysicalHostRedisType, PhysicalHostType } from '@/types';
-import redis, { redlock } from '@core/redis';
+import {
+    Ec2InstanceType,
+    PhysicalHostRedisType,
+    PhysicalHostType
+} from '@/types'
+import redis, { redlock } from '@core/redis'
 
 async function getAllPhysicalHosts(): Promise<PhysicalHostType[]> {
     const hosts = await redis.client.get('physicalHost')
